@@ -1,4 +1,4 @@
-import { app } from 'electron'
+// import { app } from 'electron/main'
 import path from 'node:path'
 import * as fs from 'node:fs'
 
@@ -7,14 +7,36 @@ export class ConfigStorage<T> {
   private _configPath: string
 
   constructor(configKey: string, defaultConfig: T) {
-    const appDataPath = app.getPath('appData')
-    this._configPath = path.join(appDataPath, `${configKey}.json`)
+    // let appDataPath = '%APPDATA%'
+    // if (process.platform === 'darwin') {
+    //   appDataPath = '~/Library/Application Support'
+    // }
+    const appDataPath =
+      process.env.APPDATA ||
+      (process.platform == 'darwin'
+        ? process.env.HOME + '/Library/Preferences'
+        : process.env.HOME + '/.local/share')
+
+    console.log(appDataPath)
+
+    if (!fs.existsSync(appDataPath)) {
+      fs.mkdirSync(appDataPath)
+    }
+
+    const folderPath = path.join(appDataPath, 'rpg-soundboard')
+    if (!fs.existsSync(folderPath)) {
+      fs.mkdirSync(folderPath)
+    }
+
+    this._configPath = path.join(folderPath, `${configKey}.json`)
 
     const loadedConfig = this._loadConfig()
+
     if (loadedConfig !== null) {
       this._config = loadedConfig
     } else {
       this._config = defaultConfig
+      this.UpdateConfig(defaultConfig)
     }
   }
 
@@ -34,6 +56,9 @@ export class ConfigStorage<T> {
 
   private _loadConfig(): T | null {
     try {
+      if (!fs.existsSync(this._configPath)) {
+        return null
+      }
       const configBuffer = fs.readFileSync(this._configPath)
       const configStr = configBuffer.toString('utf-8')
       const parsedConfig = JSON.parse(configStr)

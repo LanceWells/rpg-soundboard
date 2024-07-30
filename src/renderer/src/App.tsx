@@ -4,6 +4,12 @@ import electronLogo from './assets/electron.svg'
 function App(): JSX.Element {
   const ipcHandle = (): void => window.electron.ipcRenderer.send('ping')
 
+  function audioHandle(): void {
+    window.audio.CreateBoard({
+      name: 'Testing'
+    })
+  }
+
   return (
     <>
       <img alt="logo" className="logo" src={electronLogo} />
@@ -24,6 +30,9 @@ function App(): JSX.Element {
         <div className="action">
           <a target="_blank" rel="noreferrer" onClick={ipcHandle}>
             Send IPC
+          </a>
+          <a target="_blank" rel="noreferrer" onClick={audioHandle}>
+            Create Board
           </a>
         </div>
       </div>

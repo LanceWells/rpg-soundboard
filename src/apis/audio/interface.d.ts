@@ -65,6 +65,16 @@ export type GetAllBoardsResponse = {
   boards: SoundBoard[]
 }
 
+export type AudioApiConfig = {
+  boards: SoundBoard[]
+}
+
+export type BoardID = `brd-${string}-${string}-${string}-${string}-${string}`
+
+export type GroupID = `grp-${string}-${string}-${string}-${string}-${string}`
+
+export type EffectID = `eff-${string}-${string}-${string}-${string}-${string}`
+
 export interface IAudioApi {
   CreateGroup(request: CreateGroupRequest): CreateGroupResponse
   CreateBoard(request: CreateBoardRequest): CreateBoardResponse

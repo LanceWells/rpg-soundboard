@@ -1,16 +1,20 @@
 import {
   AddEffectToGroupRequest,
   AddEffectToGroupResponse,
+  AudioApiConfig,
+  BoardID,
   CreateBoardRequest,
   CreateBoardResponse,
   CreateGroupRequest,
   CreateGroupResponse,
+  EffectID,
   GetAllBoardsRequest,
   GetAllBoardsResponse,
   GetBoardRequest,
   GetBoardResponse,
   GetGroupRequest,
   GetGroupResponse,
+  GroupID,
   IAudioApi,
   SoundBoard,
   SoundEffect,
@@ -20,33 +24,16 @@ import { ConfigStorage } from '../../utils/configStorage'
 import crypto from 'node:crypto'
 import { produce } from 'immer'
 
-type AudioApiConfig = {
-  boards: SoundBoard[]
-}
+const config: ConfigStorage<AudioApiConfig> = new ConfigStorage('audio', {
+  boards: []
+})
 
-type BoardID = `brd-${string}-${string}-${string}-${string}-${string}`
+const allGroups = config.Config.boards.flatMap((b) => b.groups)
+const boardMap = new Map(config.Config.boards.map((b) => [b.id, b]))
+const groupMap = new Map(allGroups.map((g) => [g.id, g]))
 
-type GroupID = `grp-${string}-${string}-${string}-${string}-${string}`
-
-type EffectID = `eff-${string}-${string}-${string}-${string}-${string}`
-
-export class AudioApi implements IAudioApi {
-  private _config: ConfigStorage<AudioApiConfig>
-  private _boardMap: Map<string, SoundBoard>
-  private _groupMap: Map<string, SoundGroup>
-
-  constructor() {
-    this._config = new ConfigStorage('audio-api', {
-      boards: []
-    })
-
-    const allGroups = this._config.Config.boards.flatMap((b) => b.groups)
-
-    this._boardMap = new Map(this._config.Config.boards.map((b) => [b.id, b]))
-    this._groupMap = new Map(allGroups.map((g) => [g.id, g]))
-  }
-
-  CreateGroup(request: CreateGroupRequest): CreateGroupResponse {
+export const audioApi: IAudioApi = {
+  CreateGroup: function (request: CreateGroupRequest): CreateGroupResponse {
     const matchingBoard = this.GetBoard({ boardID: request.boardID })
     if (!matchingBoard) {
       throw new Error(`Could not find matching board with ID ${request.boardID}.`)
@@ -60,21 +47,20 @@ export class AudioApi implements IAudioApi {
       name: request.name
     }
 
-    const newConfig = produce(this._config.Config, (draft) => {
+    const newConfig = produce(config.Config, (draft) => {
       const matchingBoard = draft.boards.find((b) => b.id === request.boardID)
       matchingBoard?.groups.push(newGroup)
     })
 
-    this._config.UpdateConfig(newConfig)
+    config.UpdateConfig(newConfig)
     matchingBoard.board?.groups.push(newGroup)
-    this._groupMap.set(newGroupID, newGroup)
+    groupMap.set(newGroupID, newGroup)
 
     return {
       group: newGroup
     }
-  }
-
-  CreateBoard(request: CreateBoardRequest): CreateBoardResponse {
+  },
+  CreateBoard: function (request: CreateBoardRequest): CreateBoardResponse {
     const uuid = crypto.randomUUID()
     const newBoardID: BoardID = `brd-${uuid}`
     const newBoard: SoundBoard = {
@@ -83,20 +69,18 @@ export class AudioApi implements IAudioApi {
       name: request.name
     }
 
-    const newConfig = produce(this._config.Config, (draft) => {
+    const newConfig = produce(config.Config, (draft) => {
       draft.boards.push(newBoard)
     })
 
-    this._config.UpdateConfig(newConfig)
-    this._boardMap.set(newBoardID, newBoard)
+    config.UpdateConfig(newConfig)
+    boardMap.set(newBoardID, newBoard)
 
     return {
       board: newBoard
     }
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  AddEffectToGroup(request: AddEffectToGroupRequest): AddEffectToGroupResponse {
+  },
+  AddEffectToGroup: function (request: AddEffectToGroupRequest): AddEffectToGroupResponse {
     const matchingGroup = this.GetGroup({ groupID: request.groupID, boardID: request.boardID })
     if (!matchingGroup) {
       throw new Error(`Could not find matching board with ID ${request.boardID}.`)
@@ -109,30 +93,34 @@ export class AudioApi implements IAudioApi {
       path: request.effectPath
     }
 
-    const newConfig = produce(this._config.Config, (draft) => {
-      const matchingBoard = draft.boards.find((b) => b.groups.some((g) => g.id === request.groupID))
-      matchingBoard?.groups.
+    const newConfig = produce(config.Config, (draft) => {
+      const matchingBoard = draft.boards.find((b) => b.id === request.boardID)
+      const matchingGroup = matchingBoard?.groups.find((g) => g.id === request.groupID)
+      matchingGroup?.effects.push(newEffect)
     })
-  }
 
-  GetGroup(request: GetGroupRequest): GetGroupResponse {
-    const matchingGroup = this._groupMap.get(request.groupID)
+    config.UpdateConfig(newConfig)
+
+    return {
+      effect: newEffect
+    }
+  },
+  GetGroup: function (request: GetGroupRequest): GetGroupResponse {
+    const matchingGroup = groupMap.get(request.groupID)
     return {
       group: matchingGroup
     }
-  }
-
-  GetBoard(request: GetBoardRequest): GetBoardResponse {
-    const matchingBoard = this._boardMap.get(request.boardID)
+  },
+  GetBoard: function (request: GetBoardRequest): GetBoardResponse {
+    const matchingBoard = boardMap.get(request.boardID)
     return {
       board: matchingBoard
     }
-  }
-
+  },
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  GetAllBoards(request: GetAllBoardsRequest): GetAllBoardsResponse {
+  GetAllBoards: function (_request: GetAllBoardsRequest): GetAllBoardsResponse {
     return {
-      boards: this._config.Config.boards
+      boards: config.Config.boards
     }
   }
 }
