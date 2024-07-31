@@ -1,44 +1,19 @@
-import Versions from './components/Versions'
-import electronLogo from './assets/electron.svg'
+import { useMemo } from 'react'
+import Board from './components/board/board'
+import { useAudioStore } from './stores/audioStore'
 
-function App(): JSX.Element {
-  const ipcHandle = (): void => window.electron.ipcRenderer.send('ping')
+export default function App() {
+  const { boards } = useAudioStore()
 
-  function audioHandle(): void {
-    window.audio.CreateBoard({
-      name: 'Testing'
-    })
-  }
+  const boardNodes = useMemo(
+    () => boards.map((b) => <Board board={b} key={b.id} />),
+    [boards, boards.length]
+  )
 
   return (
-    <>
-      <img alt="logo" className="logo" src={electronLogo} />
-      <div className="creator">Powered by electron-vite</div>
-      <div className="text">
-        Build an Electron app with <span className="react">React</span>
-        &nbsp;and <span className="ts">TypeScript</span>
-      </div>
-      <p className="tip">
-        Please try pressing <code>F12</code> to open the devTool
-      </p>
-      <div className="actions">
-        <div className="action">
-          <a href="https://electron-vite.org/" target="_blank" rel="noreferrer">
-            Documentation
-          </a>
-        </div>
-        <div className="action">
-          <a target="_blank" rel="noreferrer" onClick={ipcHandle}>
-            Send IPC
-          </a>
-          <a target="_blank" rel="noreferrer" onClick={audioHandle}>
-            Create Board
-          </a>
-        </div>
-      </div>
-      <Versions></Versions>
-    </>
+    <div>
+      <h2>Boards</h2>
+      {boardNodes}
+    </div>
   )
 }
-
-export default App

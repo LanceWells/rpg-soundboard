@@ -53,7 +53,6 @@ export const audioApi: IAudioApi = {
     })
 
     config.UpdateConfig(newConfig)
-    matchingBoard.board?.groups.push(newGroup)
     groupMap.set(newGroupID, newGroup)
 
     return {
