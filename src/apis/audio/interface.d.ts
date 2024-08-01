@@ -1,23 +1,24 @@
 export type SoundEffect = {
-  id: string
+  id: EffectID
   path: string
 }
 
 export type SoundGroup = {
-  id: string
+  id: GroupID
   name: string
   effects: SoundEffect[]
 }
 
 export type SoundBoard = {
-  id: string
+  id: BoardID
   name: string
   groups: SoundGroup[]
 }
 
 export type CreateGroupRequest = {
   name: string
-  boardID: string
+  boardID: BoardID
+  soundFilePath: string
 }
 
 export type CreateGroupResponse = {
@@ -33,8 +34,8 @@ export type CreateBoardResponse = {
 }
 
 export type AddEffectToGroupRequest = {
-  groupID: string
-  boardID: string
+  groupID: GroupID
+  boardID: BoardID
   effectPath: string
 }
 
@@ -43,8 +44,8 @@ export type AddEffectToGroupResponse = {
 }
 
 export type GetGroupRequest = {
-  boardID: string
-  groupID: string
+  boardID: BoardID
+  groupID: GroupID
 }
 
 export type GetGroupResponse = {
@@ -52,7 +53,7 @@ export type GetGroupResponse = {
 }
 
 export type GetBoardRequest = {
-  boardID: string
+  boardID: BoardID
 }
 
 export type GetBoardResponse = {

@@ -1,19 +1,12 @@
-import { useMemo } from 'react'
-import Board from './components/board/board'
-import { useAudioStore } from './stores/audioStore'
+import BoardGrid from './components/board/board-grid'
+import NewEffectModal from './components/modals/newEffectModal'
 
 export default function App() {
-  const { boards } = useAudioStore()
-
-  const boardNodes = useMemo(
-    () => boards.map((b) => <Board board={b} key={b.id} />),
-    [boards, boards.length]
-  )
-
   return (
-    <div>
-      <h2>Boards</h2>
-      {boardNodes}
+    <div className="flex flex-col h-full flex-grow">
+      <NewEffectModal />
+      <h2 className="p-2 text-center text-2xl">Soundboards</h2>
+      <BoardGrid />
     </div>
   )
 }
