@@ -18,7 +18,7 @@ export default function IconLookup() {
   const rowVirtualizer = useVirtualizer({
     count: icons.length,
     getScrollElement: () => parentRef.current,
-    estimateSize: () => 80
+    estimateSize: () => 112
   })
 
   return (

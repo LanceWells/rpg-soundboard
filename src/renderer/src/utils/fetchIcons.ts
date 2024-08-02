@@ -22,8 +22,8 @@ class SoundboardIcons {
       }
 
       const renderData = iconToSVG(iconData, {
-        height: '64',
-        width: '64'
+        height: '96',
+        width: '96'
       })
 
       const svgAttributes: Record<string, string> = {

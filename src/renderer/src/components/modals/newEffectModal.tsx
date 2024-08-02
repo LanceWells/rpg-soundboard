@@ -66,7 +66,7 @@ export default function NewEffectModal() {
     <dialog id={NewEffectModalId} className="modal">
       <div className="modal-box overflow-visible relative">
         <h3 className="font-bold text-lg">New Effect</h3>
-        <div className="absolute left-4 top-28">
+        <div className="absolute left-1 bottom-1">
           <IconEffect icon={selectedIcon} />
         </div>
         <div className="flex flex-col items-center w-full">

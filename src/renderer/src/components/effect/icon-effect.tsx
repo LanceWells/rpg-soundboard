@@ -18,7 +18,7 @@ export function IconEffect(props: IconEffectProps) {
         backgroundColor: icon.backgroundColor,
         color: icon.foregroundColor
       }}
-      className="rounded-lg w-16 h-16"
+      className="rounded-lg w-24 h-24"
     >
       {reactNode}
     </div>
