@@ -1,9 +1,14 @@
 import { useAudioStore } from '@renderer/stores/audioStore'
-import { useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 import Board from './board'
+import { NewBoardModalId } from '../modals/newBoardModal'
 
 export default function BoardGrid() {
   const { boards } = useAudioStore()
+
+  const onNewBoard = useCallback(() => {
+    ;(document.getElementById(NewBoardModalId) as HTMLDialogElement).showModal()
+  }, [])
 
   const { boardNodes, boardPickerNodes } = useMemo(() => {
     const boardNodes = boards.map((b) => {
@@ -34,7 +39,12 @@ export default function BoardGrid() {
   return (
     <div className="grid h-full gap-2 [grid-template-rows:_1fr_min-content]">
       <div className="carousel w-full flex-grow">{boardNodes}</div>
-      <div className="flex w-full justify-center gap-2 py-2">{boardPickerNodes}</div>
+      <div className="flex w-full justify-center gap-2 py-2">
+        {boardPickerNodes}
+        <button onClick={onNewBoard} className="btn rounded-btn btn-outline">
+          New Board
+        </button>
+      </div>
     </div>
   )
 }

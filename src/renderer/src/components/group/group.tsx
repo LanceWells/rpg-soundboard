@@ -8,7 +8,7 @@ export default function Group(props: GroupProps) {
   const { group } = props
 
   return (
-    <button className="bg-slate-200 rounded-md p-4 text-center btn shadow-sm">
+    <button className="bg-base-100 rounded-md p-4 text-center btn shadow-sm">
       <h3>{group.name}</h3>
     </button>
   )

@@ -6,6 +6,7 @@ export type AudioStore = {
   boardBeingAddedToId: BoardID | undefined
   setBoardBeingAddedTo: (id: BoardID) => void
   addGroup: IAudioApi['CreateGroup']
+  addBoard: IAudioApi['CreateBoard']
 }
 
 export const useAudioStore = create<AudioStore>((set) => ({
@@ -24,5 +25,14 @@ export const useAudioStore = create<AudioStore>((set) => ({
     })
 
     return newGroup
+  },
+  addBoard(req) {
+    const newBoard = window.audio.CreateBoard(req)
+    const newBoards = window.audio.GetAllBoards({}).boards
+    set({
+      boards: newBoards
+    })
+
+    return newBoard
   }
 }))

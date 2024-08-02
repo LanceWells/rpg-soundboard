@@ -1,6 +1,7 @@
 import { useAudioStore } from '@renderer/stores/audioStore'
 import { useCallback } from 'react'
 import { useForm } from 'react-hook-form'
+import IconLookup from '../effect/iconLookup'
 
 export const NewEffectModalId = 'new-effect-modal'
 
@@ -16,8 +17,6 @@ export default function NewEffectModal() {
 
   const onSubmit = useCallback(
     (data: NewEffectForm) => {
-      console.log(data)
-
       if (data.soundFile.length !== 1) {
         return
       }
@@ -31,6 +30,8 @@ export default function NewEffectModal() {
           soundFilePath: file.path
         })
       }
+
+      ;(document.getElementById(NewEffectModalId) as HTMLDialogElement).close()
     },
     [addGroup, boardBeingAddedToId]
   )
@@ -54,11 +55,12 @@ export default function NewEffectModal() {
               className="file-input file-input-bordered w-full max-w-xs"
               {...register('soundFile', { required: true })}
             />
+            <IconLookup />
           </form>
         </div>
         <div className="modal-action">
           <form method="dialog">
-            <button className="btn btn-primary" onClick={handleSubmit(onSubmit)}>
+            <button type="submit" className="btn btn-primary" onClick={handleSubmit(onSubmit)}>
               Create
             </button>
             <button className="btn btn-circle absolute text-white font-bold -top-3 -right-3 bg-error">
