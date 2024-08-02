@@ -1,7 +1,7 @@
 import { icons } from '../../../../node_modules/@iconify-json/game-icons/'
 import { iconToSVG, parseIconSet, validateIconSet } from '@iconify/utils'
 
-type IconBody = {
+export type IconBody = {
   name: string
   body: string
 }
@@ -71,7 +71,15 @@ class SoundboardIcons {
   }
 
   SearchIcons(search: string): IconBody[] {
-    const searchPhrases = search.split(/\s+/)
+    if (search === '') {
+      return []
+    }
+
+    const searchPhrases = search
+      .split(/\s+/)
+      .map((s) => s.toLowerCase())
+      .filter((s) => s !== '')
+
     const lookupKeys = [...this._iconLookup.keys()]
     const matchingKeys = lookupKeys.filter((lookupKey) =>
       searchPhrases.some((searchPhrase) => lookupKey.startsWith(searchPhrase))

@@ -40,7 +40,7 @@ export default function NewEffectModal() {
     <dialog id={NewEffectModalId} className="modal">
       <div className="modal-box overflow-visible">
         <h3 className="font-bold text-lg">New Effect</h3>
-        <div className="flex justify-center w-full">
+        <div className="flex flex-col items-center w-full">
           <form className="w-fit flex flex-col">
             <div className="label-text w-fit mt-4">Name</div>
             <input
@@ -55,8 +55,8 @@ export default function NewEffectModal() {
               className="file-input file-input-bordered w-full max-w-xs"
               {...register('soundFile', { required: true })}
             />
-            <IconLookup />
           </form>
+          <IconLookup />
         </div>
         <div className="modal-action">
           <form method="dialog">

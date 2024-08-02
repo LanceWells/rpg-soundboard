@@ -26,11 +26,13 @@
     "@electron-toolkit/preload": "^3.0.1",
     "@electron-toolkit/utils": "^3.0.0",
     "@iconify/tools": "^4.0.4",
+    "@tanstack/react-virtual": "^3.8.4",
     "electron-updater": "^6.1.7",
     "howler": "^2.2.4",
     "html-to-react": "^1.7.0",
     "immer": "^10.1.1",
     "react-hook-form": "^7.52.1",
+    "use-debounce": "^10.0.2",
     "zustand": "^4.5.4"
   },
   "devDependencies": {
