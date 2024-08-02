@@ -24,7 +24,7 @@ export default function Board(props: BoardProps) {
   }, [])
 
   return (
-    <div className="bg-base-200 w-full flex flex-col p-2 shadow-sm justify-between">
+    <div className="bg-base-200 w-full flex flex-col p-2 mx-4 rounded-lg shadow-sm justify-between">
       <h3 className="text-center text-xl">{board.name}</h3>
       <div className="rounded-md p-3 flex flex-row items-start flex-wrap gap-4">{groups}</div>
       <button

@@ -52,7 +52,6 @@ export type AddEffectToGroupResponse = {
 }
 
 export type GetGroupRequest = {
-  boardID: BoardID
   groupID: GroupID
 }
 
@@ -74,6 +73,14 @@ export type GetAllBoardsResponse = {
   boards: SoundBoard[]
 }
 
+export type PlayGroupRequest = {
+  groupID: GroupID
+}
+
+export type PlayGroupResponse = {
+  soundB64: string
+}
+
 export type AudioApiConfig = {
   boards: SoundBoard[]
 }
@@ -91,4 +98,5 @@ export interface IAudioApi {
   GetGroup(request: GetGroupRequest): GetGroupResponse
   GetBoard(request: GetBoardRequest): GetBoardResponse
   GetAllBoards(request: GetAllBoardsRequest): GetAllBoardsResponse
+  PlayGroup(request: PlayGroupRequest): Promise<PlayGroupResponse>
 }

@@ -1,29 +1,19 @@
 import path from 'node:path'
 import * as fs from 'node:fs'
+import { GetAppDataPath } from './paths'
 
 export class ConfigStorage<T> {
   private _config: T
   private _configPath: string
 
   constructor(configKey: string, defaultConfig: T) {
-    const appDataPath =
-      process.env.APPDATA ||
-      (process.platform == 'darwin'
-        ? process.env.HOME + '/Library/Preferences'
-        : process.env.HOME + '/.local/share')
-
-    console.log(appDataPath)
+    const appDataPath = GetAppDataPath()
 
     if (!fs.existsSync(appDataPath)) {
       fs.mkdirSync(appDataPath)
     }
 
-    const folderPath = path.join(appDataPath, 'rpg-soundboard')
-    if (!fs.existsSync(folderPath)) {
-      fs.mkdirSync(folderPath)
-    }
-
-    this._configPath = path.join(folderPath, `${configKey}.json`)
+    this._configPath = path.join(appDataPath, `${configKey}.json`)
 
     const loadedConfig = this._loadConfig()
 

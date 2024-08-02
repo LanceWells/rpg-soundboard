@@ -14,7 +14,6 @@ export default function IconLookup() {
 
   const parentRef = useRef(null)
 
-  // The virtualizer
   const rowVirtualizer = useVirtualizer({
     count: icons.length,
     getScrollElement: () => parentRef.current,
@@ -26,7 +25,7 @@ export default function IconLookup() {
       <input
         onChange={(e) => setSearch(e.target.value)}
         placeholder="Search"
-        className="input bg-black rounded-b-none z-10"
+        className="input bg-slate-300 dark:bg-black rounded-b-none z-10"
         value={search}
       />
       <div className="min-h-72 max-h-72 overflow-y-scroll bg-base-300 max-w-96 p-6 rounded-md rounded-t-none">

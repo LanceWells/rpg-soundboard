@@ -59,7 +59,7 @@ export default function NewEffectModal() {
 
       ;(document.getElementById(NewEffectModalId) as HTMLDialogElement).close()
     },
-    [addGroup, boardBeingAddedToId]
+    [addGroup, boardBeingAddedToId, selectedIcon]
   )
 
   return (
