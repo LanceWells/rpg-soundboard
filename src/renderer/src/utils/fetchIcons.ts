@@ -95,6 +95,18 @@ class SoundboardIcons {
 
     return iconBodies
   }
+
+  GetIcon(iconName: string): IconBody | undefined {
+    const icon = this._iconRef.get(iconName)
+    if (!icon) {
+      return undefined
+    }
+
+    return {
+      body: icon,
+      name: iconName
+    }
+  }
 }
 
 export const soundboardIcons = new SoundboardIcons()

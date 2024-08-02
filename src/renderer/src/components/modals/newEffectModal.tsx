@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form'
 import IconLookup from '../effect/iconLookup'
 import { ColorResult } from 'react-color'
 import ColorPicker from './colorPicker'
+import { IconEffect } from '../effect/icon-effect'
 
 export const NewEffectModalId = 'new-effect-modal'
 
@@ -63,8 +64,11 @@ export default function NewEffectModal() {
 
   return (
     <dialog id={NewEffectModalId} className="modal">
-      <div className="modal-box overflow-visible">
+      <div className="modal-box overflow-visible relative">
         <h3 className="font-bold text-lg">New Effect</h3>
+        <div className="absolute left-4 top-28">
+          <IconEffect icon={selectedIcon} />
+        </div>
         <div className="flex flex-col items-center w-full">
           <form className="w-fit flex flex-col">
             <div className="label-text w-fit mt-4">Name</div>

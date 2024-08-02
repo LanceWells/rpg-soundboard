@@ -1,7 +1,8 @@
 import { useAudioStore } from '@renderer/stores/audioStore'
 import { IconBody } from '@renderer/utils/fetchIcons'
-import { Parser } from 'html-to-react'
+// import { Parser } from 'html-to-react'
 import { useCallback } from 'react'
+import { IconEffect } from './icon-effect'
 
 export type IconPreviewProps = {
   icon: IconBody
@@ -23,7 +24,7 @@ export function IconPreview(props: IconPreviewProps) {
     })
   }, [icon.name, selectedIcon, setSelectedIcon])
 
-  const reactNode = Parser().parse(icon.body)
+  // const reactNode = Parser().parse(icon.body)
 
   const readableName = icon.name
     .split('-')
@@ -45,7 +46,7 @@ export function IconPreview(props: IconPreviewProps) {
         ${selectedIcon?.name === icon.name ? 'bg-base-100' : ''}
       `}
     >
-      <div
+      {/* <div
         style={{
           backgroundColor: selectedIcon.backgroundColor,
           color: selectedIcon.foregroundColor
@@ -53,7 +54,14 @@ export function IconPreview(props: IconPreviewProps) {
         className="rounded-lg"
       >
         {reactNode}
-      </div>
+      </div> */}
+      <IconEffect
+        icon={{
+          name: icon.name,
+          backgroundColor: selectedIcon.backgroundColor,
+          foregroundColor: selectedIcon.foregroundColor
+        }}
+      />
       <span>{readableName}</span>
       <button onClick={handlePickIcon} className="btn btn-circle">
         O
