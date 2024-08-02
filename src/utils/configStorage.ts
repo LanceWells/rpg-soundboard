@@ -1,4 +1,3 @@
-// import { app } from 'electron/main'
 import path from 'node:path'
 import * as fs from 'node:fs'
 
@@ -7,10 +6,6 @@ export class ConfigStorage<T> {
   private _configPath: string
 
   constructor(configKey: string, defaultConfig: T) {
-    // let appDataPath = '%APPDATA%'
-    // if (process.platform === 'darwin') {
-    //   appDataPath = '~/Library/Application Support'
-    // }
     const appDataPath =
       process.env.APPDATA ||
       (process.platform == 'darwin'
