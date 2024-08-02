@@ -2,22 +2,22 @@ import { BoardID, IAudioApi, SoundBoard } from 'src/apis/audio/interface'
 import { create } from 'zustand'
 
 export type AudioStore = {
-  iconSearch: string
+  selectedIcon: string | undefined
   boards: SoundBoard[]
   boardBeingAddedToId: BoardID | undefined
-  setIconSearch: (search: string) => void
+  setSelectedIcon: (icon: string | undefined) => void
   setBoardBeingAddedTo: (id: BoardID) => void
   addGroup: IAudioApi['CreateGroup']
   addBoard: IAudioApi['CreateBoard']
 }
 
 export const useAudioStore = create<AudioStore>((set) => ({
-  iconSearch: '',
+  selectedIcon: undefined,
   boards: window.audio.GetAllBoards({}).boards,
   boardBeingAddedToId: undefined,
-  setIconSearch(search) {
+  setSelectedIcon(icon) {
     set({
-      iconSearch: search
+      selectedIcon: icon
     })
   },
   setBoardBeingAddedTo: (id) => {
