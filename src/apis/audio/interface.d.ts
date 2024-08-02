@@ -1,3 +1,9 @@
+export type SoundIcon = {
+  name: string
+  backgroundColor: string
+  foregroundColor: string
+}
+
 export type SoundEffect = {
   id: EffectID
   path: string
@@ -7,6 +13,7 @@ export type SoundGroup = {
   id: GroupID
   name: string
   effects: SoundEffect[]
+  icon: SoundIcon
 }
 
 export type SoundBoard = {
@@ -19,6 +26,7 @@ export type CreateGroupRequest = {
   name: string
   boardID: BoardID
   soundFilePath: string
+  icon: SoundIcon
 }
 
 export type CreateGroupResponse = {

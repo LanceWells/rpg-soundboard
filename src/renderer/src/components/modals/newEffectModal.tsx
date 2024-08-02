@@ -2,6 +2,8 @@ import { useAudioStore } from '@renderer/stores/audioStore'
 import { useCallback } from 'react'
 import { useForm } from 'react-hook-form'
 import IconLookup from '../effect/iconLookup'
+import { ColorResult } from 'react-color'
+import ColorPicker from './colorPicker'
 
 export const NewEffectModalId = 'new-effect-modal'
 
@@ -11,9 +13,31 @@ type NewEffectForm = {
 }
 
 export default function NewEffectModal() {
-  const { addGroup, boardBeingAddedToId } = useAudioStore()
+  const { addGroup, boardBeingAddedToId, selectedIcon, setSelectedIcon } = useAudioStore()
 
   const { register, handleSubmit } = useForm<NewEffectForm>({})
+
+  const handleForegroundSelect = useCallback(
+    (c: ColorResult) => {
+      setSelectedIcon({
+        backgroundColor: selectedIcon.backgroundColor,
+        foregroundColor: c.hex,
+        name: selectedIcon.name
+      })
+    },
+    [selectedIcon.backgroundColor, selectedIcon.foregroundColor, selectedIcon.name, setSelectedIcon]
+  )
+
+  const handleBackgroundSelect = useCallback(
+    (c: ColorResult) => {
+      setSelectedIcon({
+        backgroundColor: c.hex,
+        foregroundColor: selectedIcon.foregroundColor,
+        name: selectedIcon.name
+      })
+    },
+    [selectedIcon.backgroundColor, selectedIcon.foregroundColor, selectedIcon.name, setSelectedIcon]
+  )
 
   const onSubmit = useCallback(
     (data: NewEffectForm) => {
@@ -23,11 +47,12 @@ export default function NewEffectModal() {
 
       const file = data.soundFile.item(0)!
 
-      if (boardBeingAddedToId) {
+      if (selectedIcon && boardBeingAddedToId) {
         addGroup({
           boardID: boardBeingAddedToId,
           name: data.name,
-          soundFilePath: file.path
+          soundFilePath: file.path,
+          icon: selectedIcon
         })
       }
 
@@ -57,6 +82,18 @@ export default function NewEffectModal() {
             />
           </form>
           <IconLookup />
+          <div className="flex gap-6 w-fit">
+            <ColorPicker
+              title="Foreground"
+              color={selectedIcon.foregroundColor}
+              onColorChange={handleForegroundSelect}
+            />
+            <ColorPicker
+              title="Background"
+              color={selectedIcon.backgroundColor}
+              onColorChange={handleBackgroundSelect}
+            />
+          </div>
         </div>
         <div className="modal-action">
           <form method="dialog">

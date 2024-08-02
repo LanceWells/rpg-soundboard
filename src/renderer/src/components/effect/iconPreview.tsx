@@ -16,8 +16,12 @@ export function IconPreview(props: IconPreviewProps) {
   }))
 
   const handlePickIcon = useCallback(() => {
-    setSelectedIcon(icon.name)
-  }, [icon.name, setSelectedIcon])
+    setSelectedIcon({
+      name: icon.name,
+      backgroundColor: selectedIcon?.backgroundColor ?? 'transparent',
+      foregroundColor: selectedIcon?.foregroundColor ?? 'transparent'
+    })
+  }, [icon.name, selectedIcon, setSelectedIcon])
 
   const reactNode = Parser().parse(icon.body)
 
@@ -38,10 +42,18 @@ export function IconPreview(props: IconPreviewProps) {
         rounded-md
         p-2
         [grid-template-columns:_min-content_1fr_min-content]
-        ${selectedIcon === icon.name ? 'bg-base-100' : ''}
+        ${selectedIcon?.name === icon.name ? 'bg-base-100' : ''}
       `}
     >
-      {reactNode}
+      <div
+        style={{
+          backgroundColor: selectedIcon.backgroundColor,
+          color: selectedIcon.foregroundColor
+        }}
+        className="rounded-lg"
+      >
+        {reactNode}
+      </div>
       <span>{readableName}</span>
       <button onClick={handlePickIcon} className="btn btn-circle">
         O

@@ -1,5 +1,5 @@
 import { icons } from '../../../../node_modules/@iconify-json/game-icons/'
-import { iconToSVG, parseIconSet, validateIconSet } from '@iconify/utils'
+import { colorKeywords, iconToSVG, parseIconSet, validateIconSet } from '@iconify/utils'
 
 export type IconBody = {
   name: string

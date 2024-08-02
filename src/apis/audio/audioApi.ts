@@ -44,7 +44,8 @@ export const audioApi: IAudioApi = {
     const newGroup: SoundGroup = {
       effects: [],
       id: newGroupID,
-      name: request.name
+      name: request.name,
+      icon: request.icon
     }
 
     const newConfig = produce(config.Config, (draft) => {
