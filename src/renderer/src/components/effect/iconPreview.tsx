@@ -1,8 +1,8 @@
 import { useAudioStore } from '@renderer/stores/audioStore'
 import { IconBody } from '@renderer/utils/fetchIcons'
-// import { Parser } from 'html-to-react'
 import { useCallback } from 'react'
 import { IconEffect } from './icon-effect'
+import { ColorOptions } from '../colors/colorPicker'
 
 export type IconPreviewProps = {
   icon: IconBody
@@ -19,12 +19,10 @@ export function IconPreview(props: IconPreviewProps) {
   const handlePickIcon = useCallback(() => {
     setSelectedIcon({
       name: icon.name,
-      backgroundColor: selectedIcon?.backgroundColor ?? 'transparent',
-      foregroundColor: selectedIcon?.foregroundColor ?? 'transparent'
+      backgroundColor: selectedIcon?.backgroundColor ?? ColorOptions.black,
+      foregroundColor: selectedIcon?.foregroundColor ?? ColorOptions.white
     })
   }, [icon.name, selectedIcon, setSelectedIcon])
-
-  // const reactNode = Parser().parse(icon.body)
 
   const readableName = icon.name
     .split('-')
@@ -32,29 +30,23 @@ export function IconPreview(props: IconPreviewProps) {
     .join(' ')
 
   return (
-    <div
+    <button
       className={`
         h-18
-        mt-2
         mb-2
         grid
         items-center
         gap-4
         rounded-md
         p-2
-        [grid-template-columns:_min-content_1fr_min-content]
+        [grid-template-columns:_min-content_1fr]
+        w-full
+        btn
+        h-fit
         ${selectedIcon?.name === icon.name ? 'bg-base-100' : ''}
       `}
+      onClick={handlePickIcon}
     >
-      {/* <div
-        style={{
-          backgroundColor: selectedIcon.backgroundColor,
-          color: selectedIcon.foregroundColor
-        }}
-        className="rounded-lg"
-      >
-        {reactNode}
-      </div> */}
       <IconEffect
         icon={{
           name: icon.name,
@@ -63,9 +55,9 @@ export function IconPreview(props: IconPreviewProps) {
         }}
       />
       <span>{readableName}</span>
-      <button onClick={handlePickIcon} className="btn btn-circle">
+      {/* <button onClick={handlePickIcon} className="btn btn-circle">
         O
-      </button>
-    </div>
+      </button> */}
+    </button>
   )
 }

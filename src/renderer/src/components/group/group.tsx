@@ -30,6 +30,7 @@ export default function Group(props: GroupProps) {
       `}
     >
       <IconEffect icon={group.icon} />
+      <span className="text-sm flex justify-center">{group.name}</span>
     </div>
   )
 }

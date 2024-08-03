@@ -1,6 +1,7 @@
 import { BoardID, GroupID, IAudioApi, SoundBoard, SoundIcon } from 'src/apis/audio/interface'
 import { create } from 'zustand'
 import { Howl } from 'howler'
+import { ColorOptions } from '@renderer/components/colors/colorPicker'
 
 export type AudioStore = {
   selectedIcon: SoundIcon
@@ -15,8 +16,8 @@ export type AudioStore = {
 
 export const useAudioStore = create<AudioStore>((set) => ({
   selectedIcon: {
-    backgroundColor: 'black',
-    foregroundColor: 'white',
+    backgroundColor: ColorOptions.black,
+    foregroundColor: ColorOptions.white,
     name: 'moon'
   },
   boards: window.audio.GetAllBoards({}).boards,

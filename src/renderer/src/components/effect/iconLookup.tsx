@@ -4,7 +4,13 @@ import { IconPreview } from './iconPreview'
 import { useDebounce } from 'use-debounce'
 import { useVirtualizer } from '@tanstack/react-virtual'
 
-export default function IconLookup() {
+export type IconLookupProps = {
+  className?: string
+}
+
+export default function IconLookup(props: IconLookupProps) {
+  const { className } = props
+
   const [search, setSearch] = useState('')
   const [debouncedSearch] = useDebounce(search, 500)
 
@@ -17,18 +23,18 @@ export default function IconLookup() {
   const rowVirtualizer = useVirtualizer({
     count: icons.length,
     getScrollElement: () => parentRef.current,
-    estimateSize: () => 112
+    estimateSize: () => 113
   })
 
   return (
-    <div className="min-w-96 max-w-96 flex flex-col pt-6">
+    <div className={`min-w-96 flex flex-col pt-6 ${className}`}>
       <input
         onChange={(e) => setSearch(e.target.value)}
         placeholder="Search"
         className="input bg-slate-300 dark:bg-black rounded-b-none z-10"
         value={search}
       />
-      <div className="min-h-72 max-h-72 overflow-y-scroll bg-base-300 max-w-96 p-6 rounded-md rounded-t-none">
+      <div className="min-h-72 max-h-72 overflow-y-scroll bg-base-300 p-6 rounded-md rounded-t-none">
         <div
           style={{
             height: `${rowVirtualizer.getTotalSize()}px`

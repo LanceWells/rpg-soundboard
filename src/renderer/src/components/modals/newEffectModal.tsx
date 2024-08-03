@@ -3,8 +3,8 @@ import { useCallback } from 'react'
 import { useForm } from 'react-hook-form'
 import IconLookup from '../effect/iconLookup'
 import { ColorResult } from 'react-color'
-import ColorPicker from './colorPicker'
 import { IconEffect } from '../effect/icon-effect'
+import ColorPicker from '../colors/colorPicker'
 
 export const NewEffectModalId = 'new-effect-modal'
 
@@ -64,13 +64,11 @@ export default function NewEffectModal() {
 
   return (
     <dialog id={NewEffectModalId} className="modal">
-      <div className="modal-box overflow-visible relative">
+      <div className="modal-box min-w-fit overflow-visible relative">
         <h3 className="font-bold text-lg">New Effect</h3>
-        <div className="absolute left-1 bottom-1">
-          <IconEffect icon={selectedIcon} />
-        </div>
-        <div className="flex flex-col items-center w-full">
-          <form className="w-fit flex flex-col">
+        <div className='grid [grid-template-areas:_"icon_form_form"_"lookup_lookup_lookup"_"foreground_._background"] items-center w-full'>
+          <IconEffect className="[grid-area:_icon]" icon={selectedIcon} />
+          <form className="w-fit flex flex-col [grid-area:_form]">
             <div className="label-text w-fit mt-4">Name</div>
             <input
               type="text"
@@ -85,19 +83,19 @@ export default function NewEffectModal() {
               {...register('soundFile', { required: true })}
             />
           </form>
-          <IconLookup />
-          <div className="flex gap-6 w-fit">
-            <ColorPicker
-              title="Foreground"
-              color={selectedIcon.foregroundColor}
-              onColorChange={handleForegroundSelect}
-            />
-            <ColorPicker
-              title="Background"
-              color={selectedIcon.backgroundColor}
-              onColorChange={handleBackgroundSelect}
-            />
-          </div>
+          <IconLookup className="[grid-area:_lookup] w-full" />
+          <ColorPicker
+            title="Foreground"
+            color={selectedIcon.foregroundColor}
+            onColorChange={handleForegroundSelect}
+            className="[grid-area:_foreground]"
+          />
+          <ColorPicker
+            title="Background"
+            color={selectedIcon.backgroundColor}
+            onColorChange={handleBackgroundSelect}
+            className="[grid-area:_background]"
+          />
         </div>
         <div className="modal-action">
           <form method="dialog">
