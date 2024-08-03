@@ -2,7 +2,7 @@ import { useCallback, useMemo } from 'react'
 import { SoundBoard } from 'src/apis/audio/interface'
 import Group from '../group/group'
 import { useAudioStore } from '@renderer/stores/audioStore'
-import { NewEffectModalId } from '../modals/newEffectModal'
+import { NewEffectModalId } from '../modals/newEffectModal/newEffectModal'
 
 export type BoardProps = {
   board: SoundBoard

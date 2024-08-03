@@ -1,6 +1,6 @@
 import { soundboardIcons } from '@renderer/utils/fetchIcons'
 import { useMemo, useRef, useState } from 'react'
-import { IconPreview } from './iconPreview'
+import { IconPreview } from '../modals/newEffectModal/iconPreview'
 import { useDebounce } from 'use-debounce'
 import { useVirtualizer } from '@tanstack/react-virtual'
 

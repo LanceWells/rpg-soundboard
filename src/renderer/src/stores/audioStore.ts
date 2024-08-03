@@ -1,7 +1,7 @@
 import { BoardID, GroupID, IAudioApi, SoundBoard, SoundIcon } from 'src/apis/audio/interface'
 import { create } from 'zustand'
 import { Howl } from 'howler'
-import { ColorOptions } from '@renderer/components/colors/colorPicker'
+import { ColorOptions } from '@renderer/components/modals/newEffectModal/colorPicker'
 
 export type AudioStore = {
   selectedIcon: SoundIcon

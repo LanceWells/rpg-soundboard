@@ -1,7 +1,7 @@
 import { useAudioStore } from '@renderer/stores/audioStore'
 import { useCallback, useMemo } from 'react'
 import Board from './board'
-import { NewBoardModalId } from '../modals/newBoardModal'
+import { NewBoardModalId } from '../modals/newBoardModal/newBoardModal'
 
 export default function BoardGrid() {
   const { boards } = useAudioStore()

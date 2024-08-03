@@ -1,6 +1,6 @@
 import BoardGrid from './components/board/board-grid'
-import NewBoardModal from './components/modals/newBoardModal'
-import NewEffectModal from './components/modals/newEffectModal'
+import NewBoardModal from './components/modals/newBoardModal/newBoardModal'
+import NewEffectModal from './components/modals/newEffectModal/newEffectModal'
 
 export default function App() {
   return (

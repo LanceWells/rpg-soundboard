@@ -1,14 +1,15 @@
 import { useAudioStore } from '@renderer/stores/audioStore'
-import { useCallback } from 'react'
-import { useForm } from 'react-hook-form'
-import IconLookup from '../effect/iconLookup'
+import { MouseEventHandler, useCallback, useState } from 'react'
+import IconLookup from '../../effect/iconLookup'
 import { ColorResult } from 'react-color'
-import { IconEffect } from '../effect/icon-effect'
-import ColorPicker from '../colors/colorPicker'
+import { IconEffect } from '../../effect/icon-effect'
+import ColorPicker from './colorPicker'
+import FileSelector from './fileSelector'
+import TextField from './textField'
 
 export const NewEffectModalId = 'new-effect-modal'
 
-type NewEffectForm = {
+export type NewEffectForm = {
   name: string
   soundFile: FileList
 }
@@ -16,7 +17,10 @@ type NewEffectForm = {
 export default function NewEffectModal() {
   const { addGroup, boardBeingAddedToId, selectedIcon, setSelectedIcon } = useAudioStore()
 
-  const { register, handleSubmit } = useForm<NewEffectForm>({})
+  const [effectName, setEffectName] = useState('')
+  const [fileList, setFileList] = useState(null as FileList | null)
+  const [effectNameErr, setEffectNameErr] = useState('')
+  const [fileListErr, setFileListErr] = useState('')
 
   const handleForegroundSelect = useCallback(
     (c: ColorResult) => {
@@ -40,18 +44,36 @@ export default function NewEffectModal() {
     [selectedIcon.backgroundColor, selectedIcon.foregroundColor, selectedIcon.name, setSelectedIcon]
   )
 
-  const onSubmit = useCallback(
-    (data: NewEffectForm) => {
-      if (data.soundFile.length !== 1) {
+  const onSubmit = useCallback<MouseEventHandler>(
+    (e) => {
+      let failToSubmit = false
+
+      if (fileList === null) {
+        failToSubmit = true
+        setFileListErr('This field is required')
+      }
+
+      if (fileList?.length !== 1) {
+        failToSubmit = true
+        setFileListErr('This field is required')
+      }
+
+      if (!effectName) {
+        failToSubmit = true
+        setEffectNameErr('This field is required')
+      }
+
+      if (failToSubmit) {
+        e.preventDefault()
         return
       }
 
-      const file = data.soundFile.item(0)!
+      const file = fileList!.item(0)!
 
       if (selectedIcon && boardBeingAddedToId) {
         addGroup({
           boardID: boardBeingAddedToId,
-          name: data.name,
+          name: effectName,
           soundFilePath: file.path,
           icon: selectedIcon
         })
@@ -59,28 +81,28 @@ export default function NewEffectModal() {
 
       ;(document.getElementById(NewEffectModalId) as HTMLDialogElement).close()
     },
-    [addGroup, boardBeingAddedToId, selectedIcon]
+    [addGroup, boardBeingAddedToId, selectedIcon, effectName, fileList]
   )
 
   return (
     <dialog id={NewEffectModalId} className="modal">
       <div className="modal-box min-w-fit overflow-visible relative">
         <h3 className="font-bold text-lg">New Effect</h3>
-        <div className='grid [grid-template-areas:_"icon_form_form"_"lookup_lookup_lookup"_"foreground_._background"] items-center w-full'>
+        <div className='grid [grid-template-areas:_"icon_form_form"_"lookup_lookup_lookup"_"foreground_._background"_"error_error_error"] items-center w-full'>
           <IconEffect className="[grid-area:_icon]" icon={selectedIcon} />
           <form className="w-fit flex flex-col [grid-area:_form]">
-            <div className="label-text w-fit mt-4">Name</div>
-            <input
-              type="text"
-              className="input input-bordered w-full max-w-xs"
-              placeholder="My New Sound"
-              {...register('name', { required: true })}
+            <TextField
+              required
+              formName="Name"
+              value={effectName}
+              error={effectNameErr}
+              onChange={(e) => setEffectName(e.target.value)}
             />
-            <div className="label-text w-fit mt-4">Sound File</div>
-            <input
-              type="file"
-              className="file-input file-input-bordered w-full max-w-xs"
-              {...register('soundFile', { required: true })}
+            <FileSelector
+              required
+              formName="Sound File"
+              error={fileListErr}
+              onChange={(e) => setFileList(e.target.files)}
             />
           </form>
           <IconLookup className="[grid-area:_lookup] w-full" />
@@ -99,7 +121,7 @@ export default function NewEffectModal() {
         </div>
         <div className="modal-action">
           <form method="dialog">
-            <button type="submit" className="btn btn-primary" onClick={handleSubmit(onSubmit)}>
+            <button type="submit" className="btn btn-primary" onClick={onSubmit}>
               Create
             </button>
             <button className="btn btn-circle absolute text-white font-bold -top-3 -right-3 bg-error">

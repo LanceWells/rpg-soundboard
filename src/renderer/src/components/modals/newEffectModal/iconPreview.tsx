@@ -1,8 +1,8 @@
 import { useAudioStore } from '@renderer/stores/audioStore'
 import { IconBody } from '@renderer/utils/fetchIcons'
 import { useCallback } from 'react'
-import { IconEffect } from './icon-effect'
-import { ColorOptions } from '../colors/colorPicker'
+import { IconEffect } from '../../effect/icon-effect'
+import { ColorOptions } from './colorPicker'
 
 export type IconPreviewProps = {
   icon: IconBody
@@ -55,9 +55,6 @@ export function IconPreview(props: IconPreviewProps) {
         }}
       />
       <span>{readableName}</span>
-      {/* <button onClick={handlePickIcon} className="btn btn-circle">
-        O
-      </button> */}
     </button>
   )
 }
