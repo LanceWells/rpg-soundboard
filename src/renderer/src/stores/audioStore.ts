@@ -1,6 +1,7 @@
 import { BoardID, GroupID, IAudioApi, SoundBoard, SoundIcon } from 'src/apis/audio/interface'
 import { create } from 'zustand'
 import { Howl } from 'howler'
+// import testaudio from '../testaudio.ogg'
 
 export type AudioStore = {
   selectedIcon: SoundIcon
@@ -8,7 +9,7 @@ export type AudioStore = {
   boardBeingAddedToId: BoardID | undefined
   setSelectedIcon: (icon: SoundIcon) => void
   setBoardBeingAddedTo: (id: BoardID) => void
-  playGroup: IAudioApi['PlayGroup']
+  playGroup: (groupID: GroupID) => void
   addGroup: IAudioApi['CreateGroup']
   addBoard: IAudioApi['CreateBoard']
 }
@@ -31,8 +32,8 @@ export const useAudioStore = create<AudioStore>((set) => ({
       boardBeingAddedToId: id
     })
   },
-  async playGroup(req) {
-    const audio = await window.audio.PlayGroup({ groupID: req.groupID })
+  async playGroup(groupID) {
+    const audio = await window.audio.PlayGroup({ groupID: groupID, relFile: import.meta.dirname })
     // const sound = new Audio(audio.soundB64)
     // sound.crossOrigin = 'anonymous'
     // sound.addEventListener('canplaythrough', async () => {
@@ -54,12 +55,22 @@ export const useAudioStore = create<AudioStore>((set) => ({
     // const audio = new Audio(effect.path)
     // audio.play()
 
+    // const relPath = path.relative(__filename, audio.soundB64)
+
+    // const a = require(audio.soundB64)
+
+    // // This works \/
+    // const a = await import('../testaudio.ogg')
+
+    // const a = await import(audio.soundB64)
+
     new Howl({
+      // src: ['/src/../testaudio.ogg'],
       src: [audio.soundB64],
       volume: 1.0,
       html5: true,
       autoplay: true,
-      format: ['ogg'],
+      format: ['mp3'],
       onload: function (id) {
         console.log(`Loaded ${id}`)
       },

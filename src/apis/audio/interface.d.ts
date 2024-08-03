@@ -75,6 +75,7 @@ export type GetAllBoardsResponse = {
 
 export type PlayGroupRequest = {
   groupID: GroupID
+  relFile: string
 }
 
 export type PlayGroupResponse = {

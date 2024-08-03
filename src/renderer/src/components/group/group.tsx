@@ -13,7 +13,7 @@ export default function Group(props: GroupProps) {
   const { group } = props
 
   const onClickPlay = useCallback(() => {
-    playGroup({ groupID: group.id })
+    playGroup(group.id)
   }, [group])
 
   return (

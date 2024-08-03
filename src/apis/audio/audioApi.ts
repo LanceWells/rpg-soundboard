@@ -192,11 +192,45 @@ export const audioApi: IAudioApi = {
 
     const effectIndex = group.effects.length > 1 ? crypto.randomInt(0, group.effects.length - 1) : 0
     const effect = group.effects[effectIndex]
+    // const relPath = path.relative(request.relFile, effect.path)
+    // const encodedPath = encodeFilePath(effect.path)
 
-    const fileData = await fs.promises.readFile(effect.path, { encoding: 'base64' })
+    // const p = path.resolve('.')
+    // console.log(p)
+
+    // const reader = new FileReader()
+
+    const reader = new FileReader()
+    const file = fs.readFileSync(effect.path)
+    const blob = new Blob([file.buffer])
+    reader.readAsDataURL(blob)
+    await new Promise<void>((resolve) => {
+      reader.addEventListener('load', () => {
+        resolve()
+      })
+    })
+    const r = reader.result
+    console.log(r)
+
     return {
-      soundB64: fileData
+      soundB64: r?.toString() ?? ''
     }
+
+    // const audioCtx = new AudioContext()
+    // const arrayBuffer = audioCtx.createBuffer(2, audioCtx.sampleRate * 3, audioCtx.sampleRate)
+
+    // const dest = fs.createWriteStream(effect.path)
+    // const file = await fs.promises.readFile(effect.path)
+    // reader.readAsDataURL(dest.)
+
+    // return {
+    //   soundB64: effect.path
+    // }
+
+    // const fileData = await fs.promises.readFile(effect.path, { encoding: 'base64' })
+    // return {
+    //   soundB64: fileData
+    // }
 
     // const sound = new Howl({
     //   src: effect.path
@@ -207,3 +241,9 @@ export const audioApi: IAudioApi = {
     // return {}
   }
 }
+
+// export function encodeFilePath(path: string) {
+//   return `file://${encodeURIComponent(path)
+//     .replace(/(%2F)|(%5C)/g, '/')
+//     .replace(/%3A/g, ':')}`
+// }
