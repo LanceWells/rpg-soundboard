@@ -94,36 +94,11 @@ export const useAudioStore = create<AudioStore>((set) => ({
       volume: audio.volume
     })
 
-    // const howl = new Howl({
-    //   src: audio.soundB64,
-    //   volume: 1.0,
-    //   format: audio.format.replace('.', ''),
-    //   autoplay: true
-    // })
-
-    // howl
-    //   .once('end', () => {
-    //     // howl.off()
-    //     handleHowlStop(groupID, howl)
-    //   })
-    //   .once('loaderror', (id, err) => {
-    //     console.error(`Failed to load sound ${id}: ${err}`)
-    //     handleHowlStop(groupID, howl)
-    //     // howl.off()
-    //   })
-    //   .once('playerror', (id, err) => {
-    //     console.error(`Failed to play sound ${id}: ${err}`)
-    //     handleHowlStop(groupID, howl)
-    //     // howl.off()
-    //   })
-
     set((state) => ({
       playingGroups: [...state.playingGroups, groupID]
     }))
 
     sound.Play()
-
-    // howl.play()
 
     return audio
   },
@@ -131,7 +106,8 @@ export const useAudioStore = create<AudioStore>((set) => ({
     const newGroup = window.audio.CreateGroup(req)
     const newBoards = window.audio.GetAllBoards({}).boards
     set({
-      boards: newBoards
+      boards: newBoards,
+      workingFileList: []
     })
 
     return newGroup
