@@ -1,3 +1,5 @@
+import { SupportedFileTypes } from './audioApi'
+
 export type SoundIcon = {
   name: string
   backgroundColor: string
@@ -7,6 +9,7 @@ export type SoundIcon = {
 export type SoundEffect = {
   id: EffectID
   path: string
+  format: SupportedFileTypes
 }
 
 export type SoundGroup = {
@@ -80,6 +83,7 @@ export type PlayGroupRequest = {
 
 export type PlayGroupResponse = {
   soundB64: string
+  format: SupportedFileTypes
 }
 
 export type AudioApiConfig = {

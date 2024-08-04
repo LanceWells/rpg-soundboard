@@ -10,6 +10,7 @@ export type FileSelectListItem = {
 export type AudioStore = {
   selectedIcon: SoundIcon
   workingFileList: FileSelectListItem[]
+  playingGroups: GroupID[]
   boards: SoundBoard[]
   boardBeingAddedToId: BoardID | undefined
   addWorkingFile: (list: FileSelectListItem) => void
@@ -28,6 +29,7 @@ export const useAudioStore = create<AudioStore>((set) => ({
     name: 'moon'
   },
   boards: window.audio.GetAllBoards({}).boards,
+  playingGroups: [],
   boardBeingAddedToId: undefined,
   workingFileList: [],
   addWorkingFile(newItem) {
@@ -56,24 +58,45 @@ export const useAudioStore = create<AudioStore>((set) => ({
   },
   async playGroup(groupID) {
     const audio = await window.audio.PlayGroup({ groupID: groupID, relFile: import.meta.dirname })
-    new Howl({
-      src: [audio.soundB64],
+
+    const handleHowlStop = (groupID: GroupID, howl: Howl) => {
+      set((state) => {
+        const filteredGroups = state.playingGroups.filter((g) => g !== groupID)
+        howl.off()
+        return {
+          playingGroups: filteredGroups
+        }
+      })
+    }
+
+    const howl = new Howl({
+      src: audio.soundB64,
       volume: 1.0,
-      autoplay: true,
-      format: ['ogg'],
-      onload: function (id) {
-        console.log(`Loaded ${id}`)
-      },
-      onplay: function (id) {
-        console.log(`Played ${id}`)
-      },
-      onplayerror: function (id) {
-        console.log(`Play err ${id}`)
-      },
-      onloaderror: function (id, err) {
-        console.log(`Load err ${id}; ${err}`)
-      }
+      format: audio.format.replace('.', ''),
+      autoplay: true
     })
+
+    howl
+      .once('end', () => {
+        // howl.off()
+        handleHowlStop(groupID, howl)
+      })
+      .once('loaderror', (id, err) => {
+        console.error(`Failed to load sound ${id}: ${err}`)
+        handleHowlStop(groupID, howl)
+        // howl.off()
+      })
+      .once('playerror', (id, err) => {
+        console.error(`Failed to play sound ${id}: ${err}`)
+        handleHowlStop(groupID, howl)
+        // howl.off()
+      })
+
+    set((state) => ({
+      playingGroups: [...state.playingGroups, groupID]
+    }))
+
+    howl.play()
 
     return audio
   },

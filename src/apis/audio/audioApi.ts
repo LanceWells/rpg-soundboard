@@ -35,24 +35,30 @@ const allGroups = config.Config.boards.flatMap((b) => b.groups)
 const boardMap = new Map(config.Config.boards.map((b) => [b.id, b]))
 const groupMap = new Map(allGroups.map((g) => [g.id, g]))
 
-export const SupportedFileTypes = [
-  '.mp3',
-  '.mpeg',
-  '.opus',
-  '.ogg',
-  '.oga',
-  '.wav',
-  '.aac',
-  '.caf',
-  '.m4a',
-  '.mp4',
-  '.weba',
-  '.webm',
-  '.dolby',
-  '.flac'
-]
+export const SupportedFileTypes = {
+  '.mp3': 0,
+  '.mpeg': 1,
+  '.opus': 2,
+  '.ogg': 3,
+  '.oga': 4,
+  '.wav': 5,
+  '.aac': 6,
+  '.caf': 7,
+  '.m4a': 8,
+  '.mp4': 9,
+  '.weba': 10,
+  '.webm': 11,
+  '.dolby': 12,
+  '.flac': 13
+}
 
-const saveSoundEffect = (boardID: BoardID, groupID: GroupID, srcFilePath: string): string => {
+export type SupportedFileTypes = keyof typeof SupportedFileTypes
+
+const saveSoundEffect = (
+  boardID: BoardID,
+  groupID: GroupID,
+  srcFilePath: string
+): { path: string; format: SupportedFileTypes } => {
   const appDataPath = GetAppDataPath()
 
   if (!fs.existsSync(srcFilePath)) {
@@ -61,7 +67,7 @@ const saveSoundEffect = (boardID: BoardID, groupID: GroupID, srcFilePath: string
 
   const srcFileData = path.parse(srcFilePath)
 
-  if (!SupportedFileTypes.includes(srcFileData.ext)) {
+  if (!Object.keys(SupportedFileTypes).includes(srcFileData.ext)) {
     throw new Error(`Unsupported file type ${srcFileData.ext}`)
   }
 
@@ -77,7 +83,7 @@ const saveSoundEffect = (boardID: BoardID, groupID: GroupID, srcFilePath: string
 
   fs.copyFileSync(srcFilePath, dstFilePath)
 
-  return dstFilePath
+  return { path: dstFilePath, format: srcFileData.ext as SupportedFileTypes }
 }
 
 export const audioApi: IAudioApi = {
@@ -91,10 +97,11 @@ export const audioApi: IAudioApi = {
 
     const newEffects = request.soundFilePaths.map((eff) => {
       const newEffectID: EffectID = `eff-${crypto.randomUUID()}`
-      const savedFilePath = saveSoundEffect(request.boardID, newGroupID, eff)
+      const savedFile = saveSoundEffect(request.boardID, newGroupID, eff)
       const newEffect: SoundEffect = {
         id: newEffectID,
-        path: savedFilePath
+        path: savedFile.path,
+        format: savedFile.format
       }
 
       return newEffect
@@ -145,11 +152,14 @@ export const audioApi: IAudioApi = {
       throw new Error(`Could not find matching board with ID ${request.boardID}.`)
     }
 
+    const pathExt = path.parse(request.effectPath).ext
+
     const uuid = crypto.randomUUID()
     const newEffectID: EffectID = `eff-${uuid}`
     const newEffect: SoundEffect = {
       id: newEffectID,
-      path: request.effectPath
+      path: request.effectPath,
+      format: pathExt as SupportedFileTypes
     }
 
     const newConfig = produce(config.Config, (draft) => {
@@ -186,7 +196,8 @@ export const audioApi: IAudioApi = {
     const group = groupMap.get(request.groupID)
     if (!group || group.effects.length === 0) {
       return {
-        soundB64: ''
+        soundB64: '',
+        format: '.mp3'
       }
     }
 
@@ -207,7 +218,8 @@ export const audioApi: IAudioApi = {
     const r = reader.result
 
     return {
-      soundB64: r?.toString() ?? ''
+      soundB64: r?.toString() ?? '',
+      format: effect.format as SupportedFileTypes
     }
   }
 }

@@ -28,9 +28,9 @@ export function FileSelectInput(props: FileSelectInputProps) {
         filepath: newFile.path
       })
 
-      if (fileInputRef.current) {
-        fileInputRef.current.files = new FileList()
-      }
+      // if (fileInputRef.current) {
+      //   fileInputRef.current.files = new FileList()
+      // }
     },
     [fileInputRef, addWorkingFile]
   )
@@ -92,7 +92,7 @@ function FileEntry(props: FileEntryProps) {
   const { file, index, onClick } = props
 
   const fileName = useMemo(() => {
-    const pathSegments = new Array(...file.filepath.split(/[\/\\]/))
+    const pathSegments = new Array(...file.filepath.split(/[/\\]/))
     return pathSegments.at(-1) ?? ''
   }, [file])
 
