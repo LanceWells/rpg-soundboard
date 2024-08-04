@@ -16,6 +16,7 @@ import {
   GetGroupResponse,
   GroupID,
   IAudioApi,
+  PreviewSoundResponse,
   SoundBoard,
   SoundEffect,
   SoundGroup
@@ -97,11 +98,12 @@ export const audioApi: IAudioApi = {
 
     const newEffects = request.soundFilePaths.map((eff) => {
       const newEffectID: EffectID = `eff-${crypto.randomUUID()}`
-      const savedFile = saveSoundEffect(request.boardID, newGroupID, eff)
+      const savedFile = saveSoundEffect(request.boardID, newGroupID, eff.path)
       const newEffect: SoundEffect = {
         id: newEffectID,
         path: savedFile.path,
-        format: savedFile.format
+        format: savedFile.format,
+        volume: eff.volume
       }
 
       return newEffect
@@ -159,7 +161,8 @@ export const audioApi: IAudioApi = {
     const newEffect: SoundEffect = {
       id: newEffectID,
       path: request.effectPath,
-      format: pathExt as SupportedFileTypes
+      format: pathExt as SupportedFileTypes,
+      volume: request.effectVolume
     }
 
     const newConfig = produce(config.Config, (draft) => {
@@ -197,7 +200,8 @@ export const audioApi: IAudioApi = {
     if (!group || group.effects.length === 0) {
       return {
         soundB64: '',
-        format: '.mp3'
+        format: '.mp3',
+        volume: 100
       }
     }
 
@@ -219,7 +223,30 @@ export const audioApi: IAudioApi = {
 
     return {
       soundB64: r?.toString() ?? '',
-      format: effect.format as SupportedFileTypes
+      format: effect.format as SupportedFileTypes,
+      volume: effect.volume
+    }
+  },
+  async PreviewSound(request): Promise<PreviewSoundResponse> {
+    const reader = new FileReader()
+    const file = fs.readFileSync(request.effect.path)
+    const blob = new Blob([file.buffer])
+
+    reader.readAsDataURL(blob)
+    await new Promise<void>((resolve) => {
+      reader.addEventListener('load', () => {
+        resolve()
+      })
+    })
+
+    const r = reader.result
+
+    const srcFileData = path.parse(request.effect.path)
+
+    return {
+      format: srcFileData.ext as SupportedFileTypes,
+      soundB64: r?.toString() ?? '',
+      volume: request.effect.volume
     }
   }
 }

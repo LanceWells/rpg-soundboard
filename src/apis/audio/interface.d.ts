@@ -10,6 +10,7 @@ export type SoundEffect = {
   id: EffectID
   path: string
   format: SupportedFileTypes
+  volume: number
 }
 
 export type SoundGroup = {
@@ -25,10 +26,15 @@ export type SoundBoard = {
   groups: SoundGroup[]
 }
 
+export type NewEffectData = {
+  path: string
+  volume: number
+}
+
 export type CreateGroupRequest = {
   name: string
   boardID: BoardID
-  soundFilePaths: string[]
+  soundFilePaths: NewEffectData[]
   icon: SoundIcon
 }
 
@@ -48,6 +54,7 @@ export type AddEffectToGroupRequest = {
   groupID: GroupID
   boardID: BoardID
   effectPath: string
+  effectVolume: number
 }
 
 export type AddEffectToGroupResponse = {
@@ -84,6 +91,17 @@ export type PlayGroupRequest = {
 export type PlayGroupResponse = {
   soundB64: string
   format: SupportedFileTypes
+  volume: number
+}
+
+export type PreviewSoundRequest = {
+  effect: NewEffectData
+}
+
+export type PreviewSoundResponse = {
+  soundB64: string
+  format: SupportedFileTypes
+  volume: number
 }
 
 export type AudioApiConfig = {
@@ -104,4 +122,5 @@ export interface IAudioApi {
   GetBoard(request: GetBoardRequest): GetBoardResponse
   GetAllBoards(request: GetAllBoardsRequest): GetAllBoardsResponse
   PlayGroup(request: PlayGroupRequest): Promise<PlayGroupResponse>
+  PreviewSound(request: PreviewSoundRequest): Promise<PreviewSoundResponse>
 }

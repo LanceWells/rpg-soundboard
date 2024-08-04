@@ -71,7 +71,7 @@ export default function NewEffectModal() {
         addGroup({
           boardID: boardBeingAddedToId,
           name: effectName,
-          soundFilePaths: workingFileList.map((l) => l.filepath),
+          soundFilePaths: workingFileList,
           icon: selectedIcon
         })
       }

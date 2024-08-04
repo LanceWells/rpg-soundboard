@@ -1,20 +1,24 @@
-import { BoardID, GroupID, IAudioApi, SoundBoard, SoundIcon } from 'src/apis/audio/interface'
+import {
+  BoardID,
+  GroupID,
+  IAudioApi,
+  NewEffectData,
+  SoundBoard,
+  SoundIcon
+} from 'src/apis/audio/interface'
 import { create } from 'zustand'
-import { Howl } from 'howler'
 import { ColorOptions } from '@renderer/components/modals/newEffectModal/colorPicker'
-
-export type FileSelectListItem = {
-  filepath: string
-}
+import { SoundContainer } from '@renderer/utils/soundContainer'
 
 export type AudioStore = {
   selectedIcon: SoundIcon
-  workingFileList: FileSelectListItem[]
+  workingFileList: NewEffectData[]
   playingGroups: GroupID[]
   boards: SoundBoard[]
   boardBeingAddedToId: BoardID | undefined
-  addWorkingFile: (list: FileSelectListItem) => void
+  addWorkingFile: (list: NewEffectData) => void
   removeWorkingFile: (index: number) => void
+  updateWorkingFile: (index: number, volume: number) => void
   setSelectedIcon: (icon: SoundIcon) => void
   setBoardBeingAddedTo: (id: BoardID) => void
   playGroup: (groupID: GroupID) => void
@@ -46,6 +50,18 @@ export const useAudioStore = create<AudioStore>((set) => ({
       }
     })
   },
+  updateWorkingFile(index, volume) {
+    set((state) => {
+      const newList = new Array(...state.workingFileList)
+      if (newList.at(index)) {
+        newList.at(index)!.volume = volume
+      }
+
+      return {
+        workingFileList: newList
+      }
+    })
+  },
   setSelectedIcon(icon) {
     set({
       selectedIcon: icon
@@ -59,44 +75,55 @@ export const useAudioStore = create<AudioStore>((set) => ({
   async playGroup(groupID) {
     const audio = await window.audio.PlayGroup({ groupID: groupID, relFile: import.meta.dirname })
 
-    const handleHowlStop = (groupID: GroupID, howl: Howl) => {
+    const handleHowlStop = (groupID: GroupID) => {
       set((state) => {
         const filteredGroups = state.playingGroups.filter((g) => g !== groupID)
-        howl.off()
         return {
           playingGroups: filteredGroups
         }
       })
     }
 
-    const howl = new Howl({
+    const sound = new SoundContainer({
+      format: audio.format,
+      stopHandler: {
+        id: groupID,
+        handler: handleHowlStop
+      },
       src: audio.soundB64,
-      volume: 1.0,
-      format: audio.format.replace('.', ''),
-      autoplay: true
+      volume: audio.volume
     })
 
-    howl
-      .once('end', () => {
-        // howl.off()
-        handleHowlStop(groupID, howl)
-      })
-      .once('loaderror', (id, err) => {
-        console.error(`Failed to load sound ${id}: ${err}`)
-        handleHowlStop(groupID, howl)
-        // howl.off()
-      })
-      .once('playerror', (id, err) => {
-        console.error(`Failed to play sound ${id}: ${err}`)
-        handleHowlStop(groupID, howl)
-        // howl.off()
-      })
+    // const howl = new Howl({
+    //   src: audio.soundB64,
+    //   volume: 1.0,
+    //   format: audio.format.replace('.', ''),
+    //   autoplay: true
+    // })
+
+    // howl
+    //   .once('end', () => {
+    //     // howl.off()
+    //     handleHowlStop(groupID, howl)
+    //   })
+    //   .once('loaderror', (id, err) => {
+    //     console.error(`Failed to load sound ${id}: ${err}`)
+    //     handleHowlStop(groupID, howl)
+    //     // howl.off()
+    //   })
+    //   .once('playerror', (id, err) => {
+    //     console.error(`Failed to play sound ${id}: ${err}`)
+    //     handleHowlStop(groupID, howl)
+    //     // howl.off()
+    //   })
 
     set((state) => ({
       playingGroups: [...state.playingGroups, groupID]
     }))
 
-    howl.play()
+    sound.Play()
+
+    // howl.play()
 
     return audio
   },

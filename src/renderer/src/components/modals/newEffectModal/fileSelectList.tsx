@@ -1,5 +1,9 @@
 import { ChangeEventHandler, useCallback, useMemo, useRef } from 'react'
-import { FileSelectListItem, useAudioStore } from '@renderer/stores/audioStore'
+import { useAudioStore } from '@renderer/stores/audioStore'
+import SoundIcon from '@renderer/assets/icons/sound'
+import CloseIcon from '@renderer/assets/icons/close'
+import { SoundContainer } from '@renderer/utils/soundContainer'
+import { NewEffectData } from 'src/apis/audio/interface'
 
 export type FileSelectListProps = {
   className?: string
@@ -25,12 +29,9 @@ export function FileSelectInput(props: FileSelectInputProps) {
       const newFile = e.target.files.item(0)!
 
       addWorkingFile({
-        filepath: newFile.path
+        path: newFile.path,
+        volume: 100
       })
-
-      // if (fileInputRef.current) {
-      //   fileInputRef.current.files = new FileList()
-      // }
     },
     [fileInputRef, addWorkingFile]
   )
@@ -44,6 +45,7 @@ export function FileSelectInput(props: FileSelectInputProps) {
         ref={fileInputRef}
         type="file"
         onChange={onAddFile}
+        accept="audio/*"
         className={`
           file-input
           file-input-bordered
@@ -68,14 +70,27 @@ export default function FileSelectList(props: FileSelectListProps) {
   const fileEntries = useMemo(
     () =>
       workingFileList.map((f, i) => (
-        <FileEntry onClick={onRemoveFile} index={i} file={f} key={`file-${f.filepath}`} />
+        <FileEntry onClick={onRemoveFile} index={i} file={f} key={`file-${f.path}`} />
       )),
     [workingFileList]
   )
 
   return (
     <div
-      className={`bg-base-200 max-w-80 overflow-x-hidden overflow-y-scroll h-full rounded-lg ${className}`}
+      className={`
+        bg-base-200
+        max-w-80
+        w-80
+        max-h-[420px]
+        h-[420px]
+        overflow-x-hidden
+        overflow-y-scroll
+        rounded-lg
+        flex
+        flex-col
+        gap-y-4
+        ${className}
+      `}
     >
       {fileEntries}
     </div>
@@ -83,7 +98,7 @@ export default function FileSelectList(props: FileSelectListProps) {
 }
 
 type FileEntryProps = {
-  file: FileSelectListItem
+  file: NewEffectData
   index: number
   onClick: (i: number) => void
 }
@@ -91,20 +106,100 @@ type FileEntryProps = {
 function FileEntry(props: FileEntryProps) {
   const { file, index, onClick } = props
 
+  const { updateWorkingFile } = useAudioStore()
+
   const fileName = useMemo(() => {
-    const pathSegments = new Array(...file.filepath.split(/[/\\]/))
+    const pathSegments = new Array(...file.path.split(/[/\\]/))
     return pathSegments.at(-1) ?? ''
   }, [file])
+
+  // const [volume, setVolume] = useState(100)
 
   const onClickRemove = useCallback(() => {
     onClick(index)
   }, [index, onclick])
 
+  const onClickTest = useCallback(async () => {
+    const soundData = await window.audio.PreviewSound({
+      effect: {
+        path: file.path,
+        volume: file.volume
+      }
+    })
+
+    const sound = new SoundContainer({
+      format: soundData.format,
+      src: soundData.soundB64,
+      volume: file.volume
+    })
+
+    sound.Play()
+  }, [file, file.volume])
+
+  const onChangeVolume = useCallback<ChangeEventHandler<HTMLInputElement>>(
+    (e) => {
+      const parsedVol = parseInt(e.target.value)
+      const volToSet = isNaN(parsedVol) ? 100 : parsedVol
+      // setVolume(volToSet)
+      updateWorkingFile(index, volToSet)
+    },
+    [file.volume, index, updateWorkingFile]
+  )
+
   return (
-    <div className="grid items-center max-w-80 p-4 gap-2 grid-cols-[minmax(0,_1fr)_min-content]">
-      <span className="text-ellipsis overflow-hidden text-nowrap">{fileName}</span>
-      <button onClick={onClickRemove} className="btn btn-square btn-error">
-        X
+    <div
+      className={`
+        grid
+        items-center
+        grid-cols-[minmax(0,_1fr)_min-content]
+        w-full
+        max-w-80
+        p-4
+        gap-x-2
+        gap-y-4
+        [grid-template-areas:"title_delete"_"slider_preview"]
+        `}
+    >
+      <span
+        className={`
+        text-ellipsis
+        overflow-hidden
+        text-nowrap
+        [grid-area:_title]
+        `}
+      >
+        {fileName}
+      </span>
+      <button
+        onClick={onClickRemove}
+        className={`
+        btn
+        btn-square
+        btn-error
+        [grid-area:_delete]
+        `}
+      >
+        <CloseIcon />
+      </button>
+      <input
+        type="range"
+        min="0"
+        max="100"
+        className="range [grid-area:slider]"
+        step="10"
+        value={file.volume}
+        onChange={onChangeVolume}
+      />
+      <button
+        onClick={onClickTest}
+        className={`
+        btn
+        btn-square
+        btn-secondary
+        [grid-area:_preview]
+      `}
+      >
+        <SoundIcon />
       </button>
     </div>
   )
