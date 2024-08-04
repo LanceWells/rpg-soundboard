@@ -8,9 +8,9 @@ export default function TextField(props: TextFieldProps) {
   const { className, formName, error, ...others } = props
 
   return (
-    <div className="form-control">
+    <div className={`form-control ${className}`}>
       <div className="label">
-        <span className="label-text mt-4">{formName}</span>
+        <span className="label-text">{formName}</span>
       </div>
       <input
         type="text"
@@ -20,7 +20,6 @@ export default function TextField(props: TextFieldProps) {
           w-full
           max-w-xs
           ${error ? 'input-error' : ''}
-          ${className}
         `}
         placeholder="My New Sound"
         {...others}

@@ -27,7 +27,7 @@ export default function IconLookup(props: IconLookupProps) {
   })
 
   return (
-    <div className={`min-w-96 flex flex-col pt-6 ${className}`}>
+    <div className={`min-w-96 flex flex-col ${className}`}>
       <input
         onChange={(e) => setSearch(e.target.value)}
         placeholder="Search"

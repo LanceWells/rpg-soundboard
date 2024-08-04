@@ -25,7 +25,7 @@ export type SoundBoard = {
 export type CreateGroupRequest = {
   name: string
   boardID: BoardID
-  soundFilePath: string
+  soundFilePaths: string[]
   icon: SoundIcon
 }
 

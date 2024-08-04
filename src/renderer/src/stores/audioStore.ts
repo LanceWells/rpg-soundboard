@@ -3,10 +3,17 @@ import { create } from 'zustand'
 import { Howl } from 'howler'
 import { ColorOptions } from '@renderer/components/modals/newEffectModal/colorPicker'
 
+export type FileSelectListItem = {
+  filepath: string
+}
+
 export type AudioStore = {
   selectedIcon: SoundIcon
+  workingFileList: FileSelectListItem[]
   boards: SoundBoard[]
   boardBeingAddedToId: BoardID | undefined
+  addWorkingFile: (list: FileSelectListItem) => void
+  removeWorkingFile: (index: number) => void
   setSelectedIcon: (icon: SoundIcon) => void
   setBoardBeingAddedTo: (id: BoardID) => void
   playGroup: (groupID: GroupID) => void
@@ -22,6 +29,21 @@ export const useAudioStore = create<AudioStore>((set) => ({
   },
   boards: window.audio.GetAllBoards({}).boards,
   boardBeingAddedToId: undefined,
+  workingFileList: [],
+  addWorkingFile(newItem) {
+    set((state) => ({
+      workingFileList: [...state.workingFileList, newItem]
+    }))
+  },
+  removeWorkingFile(index) {
+    set((state) => {
+      const newList = new Array(...state.workingFileList)
+      newList.splice(index, 1)
+      return {
+        workingFileList: newList
+      }
+    })
+  },
   setSelectedIcon(icon) {
     set({
       selectedIcon: icon

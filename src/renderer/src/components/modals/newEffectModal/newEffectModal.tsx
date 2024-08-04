@@ -4,8 +4,8 @@ import IconLookup from '../../effect/iconLookup'
 import { ColorResult } from 'react-color'
 import { IconEffect } from '../../effect/icon-effect'
 import ColorPicker from './colorPicker'
-import FileSelector from './fileSelector'
 import TextField from './textField'
+import FileSelectList, { FileSelectInput } from './fileSelectList'
 
 export const NewEffectModalId = 'new-effect-modal'
 
@@ -15,10 +15,10 @@ export type NewEffectForm = {
 }
 
 export default function NewEffectModal() {
-  const { addGroup, boardBeingAddedToId, selectedIcon, setSelectedIcon } = useAudioStore()
+  const { addGroup, boardBeingAddedToId, selectedIcon, setSelectedIcon, workingFileList } =
+    useAudioStore()
 
   const [effectName, setEffectName] = useState('')
-  const [fileList, setFileList] = useState(null as FileList | null)
   const [effectNameErr, setEffectNameErr] = useState('')
   const [fileListErr, setFileListErr] = useState('')
 
@@ -48,19 +48,18 @@ export default function NewEffectModal() {
     (e) => {
       let failToSubmit = false
 
-      if (fileList === null) {
+      if (workingFileList.length === 0) {
         failToSubmit = true
         setFileListErr('This field is required')
-      }
-
-      if (fileList?.length !== 1) {
-        failToSubmit = true
-        setFileListErr('This field is required')
+      } else {
+        setFileListErr('')
       }
 
       if (!effectName) {
         failToSubmit = true
         setEffectNameErr('This field is required')
+      } else {
+        setEffectNameErr('')
       }
 
       if (failToSubmit) {
@@ -68,43 +67,36 @@ export default function NewEffectModal() {
         return
       }
 
-      const file = fileList!.item(0)!
-
       if (selectedIcon && boardBeingAddedToId) {
         addGroup({
           boardID: boardBeingAddedToId,
           name: effectName,
-          soundFilePath: file.path,
+          soundFilePaths: workingFileList.map((l) => l.filepath),
           icon: selectedIcon
         })
       }
 
       ;(document.getElementById(NewEffectModalId) as HTMLDialogElement).close()
     },
-    [addGroup, boardBeingAddedToId, selectedIcon, effectName, fileList]
+    [addGroup, boardBeingAddedToId, selectedIcon, effectName, workingFileList]
   )
 
   return (
     <dialog id={NewEffectModalId} className="modal">
       <div className="modal-box min-w-fit overflow-visible relative">
         <h3 className="font-bold text-lg">New Effect</h3>
-        <div className='grid [grid-template-areas:_"icon_form_form"_"lookup_lookup_lookup"_"foreground_._background"_"error_error_error"] items-center w-full'>
+        <div className='grid gap-4 [grid-template-areas:_"icon_form_fileselect"_"lookup_lookup_files"_"foreground_background_files"] items-center w-full'>
           <IconEffect className="[grid-area:_icon]" icon={selectedIcon} />
-          <form className="w-fit flex flex-col [grid-area:_form]">
-            <TextField
-              required
-              formName="Name"
-              value={effectName}
-              error={effectNameErr}
-              onChange={(e) => setEffectName(e.target.value)}
-            />
-            <FileSelector
-              required
-              formName="Sound File"
-              error={fileListErr}
-              onChange={(e) => setFileList(e.target.files)}
-            />
-          </form>
+          <TextField
+            required
+            className="w-fit [grid-area:_form]"
+            formName="Name"
+            value={effectName}
+            error={effectNameErr}
+            onChange={(e) => setEffectName(e.target.value)}
+          />
+          <FileSelectInput error={fileListErr} className="[grid-area:_fileselect]" />
+          <FileSelectList className="[grid-area:_files]" />
           <IconLookup className="[grid-area:_lookup] w-full" />
           <ColorPicker
             title="Foreground"

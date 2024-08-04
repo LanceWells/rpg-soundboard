@@ -21,12 +21,11 @@ import {
   SoundGroup
 } from './interface'
 import { ConfigStorage } from '../../utils/configStorage'
-import crypto, { randomInt } from 'node:crypto'
+import crypto from 'node:crypto'
 import { produce } from 'immer'
 import fs from 'node:fs'
 import path from 'node:path'
-import { GetAppDataPath, GetCwd } from '../../utils/paths'
-import { Howl } from 'howler'
+import { GetAppDataPath } from '../../utils/paths'
 
 const config: ConfigStorage<AudioApiConfig> = new ConfigStorage('audio', {
   boards: []
@@ -76,8 +75,6 @@ const saveSoundEffect = (boardID: BoardID, groupID: GroupID, srcFilePath: string
     base: srcFileData.base
   })
 
-  // const cwd = GetCwd()
-
   fs.copyFileSync(srcFilePath, dstFilePath)
 
   return dstFilePath
@@ -91,17 +88,20 @@ export const audioApi: IAudioApi = {
     }
 
     const newGroupID: GroupID = `grp-${crypto.randomUUID()}`
-    const newEffectID: EffectID = `eff-${crypto.randomUUID()}`
 
-    const savedFilePath = saveSoundEffect(request.boardID, newGroupID, request.soundFilePath)
+    const newEffects = request.soundFilePaths.map((eff) => {
+      const newEffectID: EffectID = `eff-${crypto.randomUUID()}`
+      const savedFilePath = saveSoundEffect(request.boardID, newGroupID, eff)
+      const newEffect: SoundEffect = {
+        id: newEffectID,
+        path: savedFilePath
+      }
 
-    const newEffect: SoundEffect = {
-      id: newEffectID,
-      path: savedFilePath
-    }
+      return newEffect
+    })
 
     const newGroup: SoundGroup = {
-      effects: [newEffect],
+      effects: newEffects,
       id: newGroupID,
       name: request.name,
       icon: request.icon
@@ -190,7 +190,7 @@ export const audioApi: IAudioApi = {
       }
     }
 
-    const effectIndex = group.effects.length > 1 ? crypto.randomInt(0, group.effects.length - 1) : 0
+    const effectIndex = crypto.randomInt(0, group.effects.length)
     const effect = group.effects[effectIndex]
 
     const reader = new FileReader()
