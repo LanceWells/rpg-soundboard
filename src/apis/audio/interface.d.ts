@@ -1,15 +1,52 @@
-import { SupportedFileTypes } from './audioApi'
+import { SupportedFileTypes as SupportedFileType } from './audioApi'
 
+/**
+ * Represents the icon associated with an {@link SoundGroup}.
+ */
 export type SoundIcon = {
+  /**
+   * The name of the icon to use. This name refers to the name of the icon from the game-icons
+   * repository.
+   */
   name: string
+
+  /**
+   * The hex code for the background color to use with the group's icon.
+   */
   backgroundColor: string
+
+  /**
+   * The hex code for the foreground color to use with the group's icon.
+   */
   foregroundColor: string
 }
 
+/**
+ * Represents an independent sound effect, for use with picking a random sound from a
+ * {@link SoundGroup}.
+ */
 export type SoundEffect = {
+  /**
+   * The ID for the effect.
+   */
   id: EffectID
+
+  /**
+   * The filepath associated with the given sound effect. Should generally be located in the app
+   * directory.
+   */
   path: string
-  format: SupportedFileTypes
+
+  /**
+   * The file type associated with this given sound effect. Used with howler to determine how to
+   * play the given audio, considering that the audio will be translated into a base64 data URL.
+   */
+  format: SupportedFileType
+
+  /**
+   * The volume associated with the sound effect. Represented by a number from 0 to 100, where 100
+   * is the original volume of the audio.
+   */
   volume: number
 }
 
@@ -102,7 +139,7 @@ export type PlayGroupRequest = {
 
 export type PlayGroupResponse = {
   soundB64: string
-  format: SupportedFileTypes
+  format: SupportedFileType
   volume: number
 }
 
@@ -112,7 +149,7 @@ export type PreviewSoundRequest = {
 
 export type PreviewSoundResponse = {
   soundB64: string
-  format: SupportedFileTypes
+  format: SupportedFileType
   volume: number
 }
 

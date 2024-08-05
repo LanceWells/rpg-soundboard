@@ -10,7 +10,7 @@ import { create } from 'zustand'
 import { ColorOptions } from '@renderer/components/modals/newEffectModal/colorPicker'
 import { SoundContainer } from '@renderer/utils/soundContainer'
 
-export type AudioStore = {
+export type AudioState = {
   selectedIcon: SoundIcon
   editingGroupID: GroupID | undefined
   editingMode: boolean
@@ -19,6 +19,12 @@ export type AudioStore = {
   playingGroups: GroupID[]
   boards: SoundBoard[]
   boardBeingAddedToId: BoardID | undefined
+}
+
+export type AudioStoreMethods = {
+  addGroup: IAudioApi['CreateGroup']
+  updateGroup: IAudioApi['UpdateGroup']
+  addBoard: IAudioApi['CreateBoard']
   setEditingMode: (isEditing: boolean) => void
   addWorkingFile: (list: NewEffectData) => void
   resetWorkingFiles: (list?: NewEffectData[]) => void
@@ -29,10 +35,9 @@ export type AudioStore = {
   setSelectedIcon: (icon: SoundIcon) => void
   setBoardBeingAddedTo: (id: BoardID) => void
   playGroup: (groupID: GroupID) => void
-  updateGroup: IAudioApi['UpdateGroup']
-  addGroup: IAudioApi['CreateGroup']
-  addBoard: IAudioApi['CreateBoard']
 }
+
+export type AudioStore = AudioState & AudioStoreMethods
 
 export const useAudioStore = create<AudioStore>((set) => ({
   selectedIcon: {
