@@ -11,7 +11,7 @@ export type BoardProps = {
 }
 
 export default function Board(props: BoardProps) {
-  const { setEffectBoardID: setBoardBeingAddedTo, setEditingMode, editingMode } = useAudioStore()
+  const { setEditingBoardID, setEditingMode, editingMode } = useAudioStore()
 
   const { board } = props
 
@@ -21,7 +21,7 @@ export default function Board(props: BoardProps) {
   )
 
   const onNewGroup = useCallback(() => {
-    setBoardBeingAddedTo(board.id)
+    setEditingBoardID(board.id)
     ;(document.getElementById(NewEffectModalId) as HTMLDialogElement).showModal()
   }, [])
 

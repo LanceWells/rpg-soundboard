@@ -21,7 +21,7 @@ export default function Group(props: GroupProps) {
     setSelectedIcon,
     setGroupName,
     resetWorkingFiles,
-    setEffectBoardID: setBoardBeingAddedTo
+    setEditingBoardID
   } = useAudioStore()
 
   const isPlaying = useMemo(() => {
@@ -41,7 +41,7 @@ export default function Group(props: GroupProps) {
     setSelectedIcon(group.icon)
     setGroupName(group.name)
     resetWorkingFiles(group.effects)
-    setBoardBeingAddedTo(boardID)
+    setEditingBoardID(boardID)
     ;(document.getElementById(EditEffectModalId) as HTMLDialogElement).showModal()
   }, [group, boardID])
 

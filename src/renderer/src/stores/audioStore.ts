@@ -12,13 +12,43 @@ import { ColorOptions } from '@renderer/components/modals/newEffectModal/colorPi
 import { SoundContainer } from '@renderer/utils/soundContainer'
 import { produce } from 'immer'
 
+/**
+ * The state for the soundboard application. Does not contain methods.
+ */
 export type AudioState = {
+  /**
+   * A handle for the group that is being actively edited. Should generally only be defined if
+   * {@link AudioState.editingMode} is true.
+   */
   editingGroupID: GroupID | undefined
-  editingMode: boolean
-  playingGroups: GroupID[]
-  boards: SoundBoard[]
-  effectBoardID: BoardID | undefined
 
+  /**
+   * A handle for the board that is being actively edited. Should be set either if the board is
+   * being edited and {@link AudioState.editingMode} is enabled, or if a new effect is being added
+   * to said board.
+   */
+  editingBoardID: BoardID | undefined
+
+  /**
+   * If true, the view is currently in "editing mode", which implies that button presses should not
+   * perform actions, but should rather open an editable node for that element.
+   */
+  editingMode: boolean
+
+  /**
+   * The set of IDs for groups that are actively playing a sound effect.
+   */
+  playingGroups: GroupID[]
+
+  /**
+   * The set of boards that should be represented by the view.
+   */
+  boards: SoundBoard[]
+
+  /**
+   * The draft state for the currently-editing group. Should be set to the value of a group that is
+   * either being edited, or a new group that is being created.
+   */
   editingGroup: SoundGroupEditableFields
 }
 
@@ -36,8 +66,9 @@ export type AudioStoreMethods = {
   updateWorkingFile: (index: number, volume: number) => void
   setGroupName: (name: string | undefined) => void
   setSelectedIcon: (icon: SoundIcon) => void
+  resetEditingGroup: () => void
 
-  setEffectBoardID: (id: BoardID) => void
+  setEditingBoardID: (id: BoardID) => void
 
   playGroup: (groupID: GroupID) => void
   stopGroup: (groupID: GroupID) => void
@@ -62,7 +93,7 @@ export const useAudioStore = create<AudioStore>((set) => ({
   editingMode: false,
   boards: window.audio.GetAllBoards({}).boards,
   playingGroups: [],
-  effectBoardID: undefined,
+  editingBoardID: undefined,
   editingGroupID: undefined,
   setEditingMode(isEditing) {
     set({
@@ -106,9 +137,9 @@ export const useAudioStore = create<AudioStore>((set) => ({
       })
     )
   },
-  setEffectBoardID: (id) => {
+  setEditingBoardID: (id) => {
     set({
-      effectBoardID: id
+      editingBoardID: id
     })
   },
   async playGroup(groupID) {
@@ -162,6 +193,11 @@ export const useAudioStore = create<AudioStore>((set) => ({
         state.editingGroup.name = name ?? ''
       })
     )
+  },
+  resetEditingGroup() {
+    set({
+      editingGroup: getDefaultGroup()
+    })
   },
   updateGroup(req) {
     const updatedGroup = window.audio.UpdateGroup(req)

@@ -8,6 +8,7 @@ import TextField from './textField'
 import FileSelectList, { FileSelectInput } from './fileSelectList'
 import { CreateGroupRequest } from 'src/apis/audio/interface'
 import CheckboxField from './checkboxField'
+import CloseIcon from '@renderer/assets/icons/close'
 
 export type EffectModalProps = {
   id: string
@@ -22,9 +23,10 @@ export default function EffectModal(props: EffectModalProps) {
   const {
     setGroupName,
     addGroup,
-    effectBoardID: boardBeingAddedToId,
+    editingBoardID,
     setSelectedIcon,
-    editingGroup
+    editingGroup,
+    resetEditingGroup
   } = useAudioStore()
 
   const [effectNameErr, setEffectNameErr] = useState('')
@@ -52,6 +54,10 @@ export default function EffectModal(props: EffectModalProps) {
     [editingGroup.icon, setSelectedIcon]
   )
 
+  const onClose = useCallback(() => {
+    resetEditingGroup()
+  }, [resetEditingGroup, editingGroup])
+
   const onSubmit = useCallback<MouseEventHandler>(
     (e) => {
       let failToSubmit = false
@@ -75,18 +81,18 @@ export default function EffectModal(props: EffectModalProps) {
         return
       }
 
-      if (editingGroup.icon && boardBeingAddedToId) {
+      if (editingGroup.icon && editingBoardID) {
         handleSubmit({
-          boardID: boardBeingAddedToId,
+          boardID: editingBoardID,
           icon: editingGroup.icon,
           name: editingGroup.name,
-          soundFilePaths: editingGroup.effects
+          soundEffects: editingGroup.effects
         })
       }
 
       ;(document.getElementById(id) as HTMLDialogElement).close()
     },
-    [addGroup, boardBeingAddedToId, editingGroup]
+    [addGroup, editingBoardID, editingGroup]
   )
 
   return (
@@ -133,8 +139,11 @@ export default function EffectModal(props: EffectModalProps) {
             <button type="submit" className="btn btn-primary" onClick={onSubmit}>
               {actionName}
             </button>
-            <button className="btn btn-circle absolute text-white font-bold -top-3 -right-3 bg-error">
-              X
+            <button
+              onClick={onClose}
+              className="btn btn-circle absolute text-white font-bold -top-3 -right-3 bg-error"
+            >
+              <CloseIcon />
             </button>
           </form>
         </div>

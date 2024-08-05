@@ -96,7 +96,7 @@ export const audioApi: IAudioApi = {
 
     const newGroupID: GroupID = `grp-${crypto.randomUUID()}`
 
-    const newEffects = request.soundFilePaths.map((eff) => {
+    const newEffects = request.soundEffects.map((eff) => {
       const newEffectID: EffectID = `eff-${crypto.randomUUID()}`
       const savedFile = saveSoundEffect(request.boardID, newGroupID, eff.path)
       const newEffect: SoundEffect = {

@@ -15,7 +15,7 @@ export default function EditEffectModal() {
           boardID: req.boardID,
           icon: req.icon,
           name: req.name,
-          soundFilePaths: req.soundFilePaths,
+          soundFilePaths: req.soundEffects,
           groupID: editingGroupID
         })
       }
