@@ -46,10 +46,19 @@ export class SoundContainer {
     this._howl.play()
   }
 
+  GetStopHandle() {
+    return () => this.StopSound()
+  }
+
   private HandleHowlStop() {
     this._howl.off()
     if (this._stopHandler) {
       this._stopHandler.handler(this._stopHandler.id)
     }
+  }
+
+  private StopSound() {
+    this._howl.stop()
+    this.HandleHowlStop()
   }
 }

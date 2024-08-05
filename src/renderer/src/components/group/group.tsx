@@ -14,6 +14,7 @@ export default function Group(props: GroupProps) {
 
   const {
     playGroup,
+    stopGroup,
     playingGroups,
     editingMode,
     setEditingGroupID,
@@ -23,9 +24,17 @@ export default function Group(props: GroupProps) {
     setBoardBeingAddedTo
   } = useAudioStore()
 
+  const isPlaying = useMemo(() => {
+    return playingGroups.includes(group.id)
+  }, [playingGroups, group.id])
+
   const onClickPlay = useCallback(() => {
-    playGroup(group.id)
-  }, [group])
+    if (isPlaying) {
+      stopGroup(group.id)
+    } else {
+      playGroup(group.id)
+    }
+  }, [group, isPlaying])
 
   const onClickEdit = useCallback(() => {
     setEditingGroupID(group.id)
@@ -35,10 +44,6 @@ export default function Group(props: GroupProps) {
     setBoardBeingAddedTo(boardID)
     ;(document.getElementById(EditEffectModalId) as HTMLDialogElement).showModal()
   }, [group, boardID])
-
-  const isPlaying = useMemo(() => {
-    return playingGroups.includes(group.id)
-  }, [playingGroups, group.id])
 
   return (
     <div

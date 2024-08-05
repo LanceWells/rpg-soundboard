@@ -35,9 +35,12 @@ export type AudioStoreMethods = {
   setSelectedIcon: (icon: SoundIcon) => void
   setBoardBeingAddedTo: (id: BoardID) => void
   playGroup: (groupID: GroupID) => void
+  stopGroup: (groupID: GroupID) => void
 }
 
 export type AudioStore = AudioState & AudioStoreMethods
+
+export const GroupStopHandles: Map<GroupID, () => void> = new Map()
 
 export const useAudioStore = create<AudioStore>((set) => ({
   selectedIcon: {
@@ -108,6 +111,7 @@ export const useAudioStore = create<AudioStore>((set) => ({
           playingGroups: filteredGroups
         }
       })
+      GroupStopHandles.delete(groupID)
     }
 
     const sound = new SoundContainer({
@@ -120,6 +124,8 @@ export const useAudioStore = create<AudioStore>((set) => ({
       volume: audio.volume
     })
 
+    GroupStopHandles.set(groupID, sound.GetStopHandle())
+
     set((state) => ({
       playingGroups: [...state.playingGroups, groupID]
     }))
@@ -127,6 +133,11 @@ export const useAudioStore = create<AudioStore>((set) => ({
     sound.Play()
 
     return audio
+  },
+  async stopGroup(groupID) {
+    if (GroupStopHandles.has(groupID)) {
+      GroupStopHandles.get(groupID)!()
+    }
   },
   resetWorkingFiles(list) {
     set({
