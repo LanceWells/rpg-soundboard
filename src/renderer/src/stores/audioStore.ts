@@ -12,16 +12,24 @@ import { SoundContainer } from '@renderer/utils/soundContainer'
 
 export type AudioStore = {
   selectedIcon: SoundIcon
+  editingGroupID: GroupID | undefined
+  editingMode: boolean
+  groupName: string
   workingFileList: NewEffectData[]
   playingGroups: GroupID[]
   boards: SoundBoard[]
   boardBeingAddedToId: BoardID | undefined
+  setEditingMode: (isEditing: boolean) => void
   addWorkingFile: (list: NewEffectData) => void
+  resetWorkingFiles: (list?: NewEffectData[]) => void
   removeWorkingFile: (index: number) => void
   updateWorkingFile: (index: number, volume: number) => void
+  setEditingGroupID: (id: GroupID) => void
+  setGroupName: (name: string | undefined) => void
   setSelectedIcon: (icon: SoundIcon) => void
   setBoardBeingAddedTo: (id: BoardID) => void
   playGroup: (groupID: GroupID) => void
+  updateGroup: IAudioApi['UpdateGroup']
   addGroup: IAudioApi['CreateGroup']
   addBoard: IAudioApi['CreateBoard']
 }
@@ -32,10 +40,18 @@ export const useAudioStore = create<AudioStore>((set) => ({
     foregroundColor: ColorOptions.white,
     name: 'moon'
   },
+  editingMode: false,
   boards: window.audio.GetAllBoards({}).boards,
   playingGroups: [],
   boardBeingAddedToId: undefined,
   workingFileList: [],
+  groupName: '',
+  editingGroupID: undefined,
+  setEditingMode(isEditing) {
+    set({
+      editingMode: isEditing
+    })
+  },
   addWorkingFile(newItem) {
     set((state) => ({
       workingFileList: [...state.workingFileList, newItem]
@@ -60,6 +76,11 @@ export const useAudioStore = create<AudioStore>((set) => ({
       return {
         workingFileList: newList
       }
+    })
+  },
+  setEditingGroupID(id) {
+    set({
+      editingGroupID: id
     })
   },
   setSelectedIcon(icon) {
@@ -101,6 +122,26 @@ export const useAudioStore = create<AudioStore>((set) => ({
     sound.Play()
 
     return audio
+  },
+  resetWorkingFiles(list) {
+    set({
+      workingFileList: list ?? []
+    })
+  },
+  setGroupName(name) {
+    set({
+      groupName: name
+    })
+  },
+  updateGroup(req) {
+    const updatedGroup = window.audio.UpdateGroup(req)
+    const newBoards = window.audio.GetAllBoards({}).boards
+    set({
+      boards: newBoards,
+      workingFileList: []
+    })
+
+    return updatedGroup
   },
   addGroup: (req) => {
     const newGroup = window.audio.CreateGroup(req)

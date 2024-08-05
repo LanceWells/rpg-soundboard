@@ -128,6 +128,68 @@ export const audioApi: IAudioApi = {
       group: newGroup
     }
   },
+  UpdateGroup(request) {
+    const matchingGroup = this.GetGroup({ groupID: request.groupID })
+    if (!matchingGroup) {
+      throw new Error(`Could not find matching grup with ID ${request.groupID}.`)
+    }
+
+    const appDataPath = GetAppDataPath()
+    const updatedEffects = request.soundFilePaths.map((eff) => {
+      const newEffectID: EffectID = `eff-${crypto.randomUUID()}`
+
+      if (eff.path.startsWith(appDataPath)) {
+        const parsedPath = path.parse(eff.path)
+        const updatedEffect: SoundEffect = {
+          id: newEffectID,
+          path: eff.path,
+          format: parsedPath.ext as SupportedFileTypes,
+          volume: eff.volume
+        }
+
+        return updatedEffect
+      }
+
+      const savedFile = saveSoundEffect(request.boardID, request.groupID, eff.path)
+      const newEffect: SoundEffect = {
+        id: newEffectID,
+        path: savedFile.path,
+        format: savedFile.format,
+        volume: eff.volume
+      }
+
+      return newEffect
+    })
+
+    const updatedGroup: SoundGroup = {
+      effects: updatedEffects,
+      id: request.groupID,
+      name: request.name,
+      icon: request.icon
+    }
+
+    const newConfig = produce(config.Config, (draft) => {
+      const matchingBoard = draft.boards.find((b) => b.id === request.boardID)
+      const newGroups =
+        matchingBoard?.groups.map<SoundGroup>((g) => {
+          if (g.id === request.groupID) {
+            return updatedGroup
+          }
+          return g
+        }) ?? []
+
+      if (matchingBoard) {
+        matchingBoard.groups = newGroups
+      }
+    })
+
+    config.UpdateConfig(newConfig)
+    groupMap.set(request.groupID, updatedGroup)
+
+    return {
+      group: updatedGroup
+    }
+  },
   CreateBoard: function (request: CreateBoardRequest): CreateBoardResponse {
     const uuid = crypto.randomUUID()
     const newBoardID: BoardID = `brd-${uuid}`

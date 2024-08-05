@@ -61,6 +61,18 @@ export type AddEffectToGroupResponse = {
   effect: SoundEffect
 }
 
+export type UpdateGroupRequest = {
+  boardID: BoardID
+  groupID: GroupID
+  name: string
+  soundFilePaths: NewEffectData[]
+  icon: SoundIcon
+}
+
+export type UpdateGroupResponse = {
+  group: SoundGroup
+}
+
 export type GetGroupRequest = {
   groupID: GroupID
 }
@@ -116,6 +128,7 @@ export type EffectID = `eff-${string}-${string}-${string}-${string}-${string}`
 
 export interface IAudioApi {
   CreateGroup(request: CreateGroupRequest): CreateGroupResponse
+  UpdateGroup(request: UpdateGroupRequest): UpdateGroupResponse
   CreateBoard(request: CreateBoardRequest): CreateBoardResponse
   AddEffectToGroup(request: AddEffectToGroupRequest): AddEffectToGroupResponse
   GetGroup(request: GetGroupRequest): GetGroupResponse

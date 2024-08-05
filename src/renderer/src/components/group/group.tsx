@@ -1,20 +1,40 @@
-import { SoundGroup } from 'src/apis/audio/interface'
+import { BoardID, SoundGroup } from 'src/apis/audio/interface'
 import { IconEffect } from '../effect/icon-effect'
 import { useCallback, useMemo } from 'react'
 import { useAudioStore } from '@renderer/stores/audioStore'
+import { EditEffectModalId } from '../modals/newEffectModal/editEffectModal'
 
 export type GroupProps = {
   group: SoundGroup
+  boardID: BoardID
 }
 
 export default function Group(props: GroupProps) {
-  const { group } = props
+  const { group, boardID } = props
 
-  const { playGroup, playingGroups } = useAudioStore()
+  const {
+    playGroup,
+    playingGroups,
+    editingMode,
+    setEditingGroupID,
+    setSelectedIcon,
+    setGroupName,
+    resetWorkingFiles,
+    setBoardBeingAddedTo
+  } = useAudioStore()
 
   const onClickPlay = useCallback(() => {
     playGroup(group.id)
   }, [group])
+
+  const onClickEdit = useCallback(() => {
+    setEditingGroupID(group.id)
+    setSelectedIcon(group.icon)
+    setGroupName(group.name)
+    resetWorkingFiles(group.effects)
+    setBoardBeingAddedTo(boardID)
+    ;(document.getElementById(EditEffectModalId) as HTMLDialogElement).showModal()
+  }, [group, boardID])
 
   const isPlaying = useMemo(() => {
     return playingGroups.includes(group.id)
@@ -22,7 +42,7 @@ export default function Group(props: GroupProps) {
 
   return (
     <div
-      onClick={onClickPlay}
+      onClick={editingMode ? onClickEdit : onClickPlay}
       role="button"
       className={`
         cursor-pointer
