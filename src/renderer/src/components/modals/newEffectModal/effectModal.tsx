@@ -7,6 +7,7 @@ import ColorPicker from './colorPicker'
 import TextField from './textField'
 import FileSelectList, { FileSelectInput } from './fileSelectList'
 import { BoardID, NewEffectData, SoundIcon } from 'src/apis/audio/interface'
+import CheckboxField from './checkboxField'
 
 export type EffectModalProps = {
   id: string
@@ -103,7 +104,7 @@ export default function EffectModal(props: EffectModalProps) {
           className={`
             grid
             gap-4
-            [grid-template-areas:_"icon_form_fileselect"_"lookup_lookup_files"_"foreground_background_files"]
+            [grid-template-areas:_"icon_form_fileselect"_"lookup_lookup_files"_"foreground_background_repeat"]
             items-center
             w-full
           `}
@@ -132,6 +133,7 @@ export default function EffectModal(props: EffectModalProps) {
             onColorChange={handleBackgroundSelect}
             className="[grid-area:_background]"
           />
+          <CheckboxField formName="Repeat?" className="[grid-area:repeat]" />
         </div>
         <div className="modal-action">
           <form method="dialog">

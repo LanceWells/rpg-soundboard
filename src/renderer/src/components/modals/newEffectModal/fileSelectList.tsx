@@ -81,8 +81,8 @@ export default function FileSelectList(props: FileSelectListProps) {
         bg-base-200
         max-w-80
         w-80
-        max-h-[420px]
-        h-[420px]
+        max-h-[340px]
+        h-[340px]
         overflow-x-hidden
         overflow-y-scroll
         rounded-lg
