@@ -6,17 +6,12 @@ import { IconEffect } from '../../effect/icon-effect'
 import ColorPicker from './colorPicker'
 import TextField from './textField'
 import FileSelectList, { FileSelectInput } from './fileSelectList'
-import { BoardID, NewEffectData, SoundIcon } from 'src/apis/audio/interface'
+import { CreateGroupRequest } from 'src/apis/audio/interface'
 import CheckboxField from './checkboxField'
 
 export type EffectModalProps = {
   id: string
-  handleSubmit: (req: {
-    name: string
-    boardID: BoardID
-    soundFilePaths: NewEffectData[]
-    icon: SoundIcon
-  }) => void
+  handleSubmit: (req: CreateGroupRequest) => void
   actionName: string
   modalTitle: string
 }
@@ -25,13 +20,11 @@ export default function EffectModal(props: EffectModalProps) {
   const { id, handleSubmit, actionName, modalTitle } = props
 
   const {
-    groupName,
     setGroupName,
     addGroup,
-    boardBeingAddedToId,
-    selectedIcon,
+    effectBoardID: boardBeingAddedToId,
     setSelectedIcon,
-    workingFileList
+    editingGroup
   } = useAudioStore()
 
   const [effectNameErr, setEffectNameErr] = useState('')
@@ -40,37 +33,37 @@ export default function EffectModal(props: EffectModalProps) {
   const handleForegroundSelect = useCallback(
     (c: ColorResult) => {
       setSelectedIcon({
-        backgroundColor: selectedIcon.backgroundColor,
+        backgroundColor: editingGroup.icon.backgroundColor,
         foregroundColor: c.hex,
-        name: selectedIcon.name
+        name: editingGroup.icon.name
       })
     },
-    [selectedIcon.backgroundColor, selectedIcon.foregroundColor, selectedIcon.name, setSelectedIcon]
+    [editingGroup, setSelectedIcon]
   )
 
   const handleBackgroundSelect = useCallback(
     (c: ColorResult) => {
       setSelectedIcon({
         backgroundColor: c.hex,
-        foregroundColor: selectedIcon.foregroundColor,
-        name: selectedIcon.name
+        foregroundColor: editingGroup.icon.foregroundColor,
+        name: editingGroup.icon.name
       })
     },
-    [selectedIcon.backgroundColor, selectedIcon.foregroundColor, selectedIcon.name, setSelectedIcon]
+    [editingGroup.icon, setSelectedIcon]
   )
 
   const onSubmit = useCallback<MouseEventHandler>(
     (e) => {
       let failToSubmit = false
 
-      if (workingFileList.length === 0) {
+      if (editingGroup.effects.length === 0) {
         failToSubmit = true
         setFileListErr('This field is required')
       } else {
         setFileListErr('')
       }
 
-      if (!groupName) {
+      if (!editingGroup.name) {
         failToSubmit = true
         setEffectNameErr('This field is required')
       } else {
@@ -82,18 +75,18 @@ export default function EffectModal(props: EffectModalProps) {
         return
       }
 
-      if (selectedIcon && boardBeingAddedToId) {
+      if (editingGroup.icon && boardBeingAddedToId) {
         handleSubmit({
           boardID: boardBeingAddedToId,
-          name: groupName,
-          soundFilePaths: workingFileList,
-          icon: selectedIcon
+          icon: editingGroup.icon,
+          name: editingGroup.name,
+          soundFilePaths: editingGroup.effects
         })
       }
 
       ;(document.getElementById(id) as HTMLDialogElement).close()
     },
-    [addGroup, boardBeingAddedToId, selectedIcon, groupName, workingFileList]
+    [addGroup, boardBeingAddedToId, editingGroup]
   )
 
   return (
@@ -109,12 +102,12 @@ export default function EffectModal(props: EffectModalProps) {
             w-full
           `}
         >
-          <IconEffect className="[grid-area:_icon]" icon={selectedIcon} />
+          <IconEffect className="[grid-area:_icon]" icon={editingGroup.icon} />
           <TextField
             required
             className="w-fit [grid-area:_form]"
             formName="Name"
-            value={groupName}
+            value={editingGroup.name}
             error={effectNameErr}
             onChange={(e) => setGroupName(e.target.value)}
           />
@@ -123,13 +116,13 @@ export default function EffectModal(props: EffectModalProps) {
           <IconLookup className="[grid-area:_lookup] w-full" />
           <ColorPicker
             title="Foreground"
-            color={selectedIcon.foregroundColor}
+            color={editingGroup.icon.foregroundColor}
             onColorChange={handleForegroundSelect}
             className="[grid-area:_foreground]"
           />
           <ColorPicker
             title="Background"
-            color={selectedIcon.backgroundColor}
+            color={editingGroup.icon.backgroundColor}
             onColorChange={handleBackgroundSelect}
             className="[grid-area:_background]"
           />

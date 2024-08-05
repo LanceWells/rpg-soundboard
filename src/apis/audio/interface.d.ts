@@ -50,11 +50,17 @@ export type SoundEffect = {
   volume: number
 }
 
+export type SoundEffectEditableFields = Omit<SoundEffect, 'id' | 'format'>
+
 export type SoundGroup = {
   id: GroupID
   name: string
   effects: SoundEffect[]
   icon: SoundIcon
+}
+
+export type SoundGroupEditableFields = Omit<SoundGroup, 'id' | 'effects'> & {
+  effects: SoundEffectEditableFields[]
 }
 
 export type SoundBoard = {
@@ -63,15 +69,10 @@ export type SoundBoard = {
   groups: SoundGroup[]
 }
 
-export type NewEffectData = {
-  path: string
-  volume: number
-}
-
 export type CreateGroupRequest = {
   name: string
   boardID: BoardID
-  soundFilePaths: NewEffectData[]
+  soundFilePaths: SoundEffectEditableFields[]
   icon: SoundIcon
 }
 
@@ -102,7 +103,7 @@ export type UpdateGroupRequest = {
   boardID: BoardID
   groupID: GroupID
   name: string
-  soundFilePaths: NewEffectData[]
+  soundFilePaths: SoundEffectEditableFields[]
   icon: SoundIcon
 }
 
@@ -144,7 +145,7 @@ export type PlayGroupResponse = {
 }
 
 export type PreviewSoundRequest = {
-  effect: NewEffectData
+  effect: SoundEffectEditableFields
 }
 
 export type PreviewSoundResponse = {

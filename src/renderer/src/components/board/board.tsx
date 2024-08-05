@@ -11,7 +11,7 @@ export type BoardProps = {
 }
 
 export default function Board(props: BoardProps) {
-  const { setBoardBeingAddedTo, setEditingMode, editingMode } = useAudioStore()
+  const { setEffectBoardID: setBoardBeingAddedTo, setEditingMode, editingMode } = useAudioStore()
 
   const { board } = props
 

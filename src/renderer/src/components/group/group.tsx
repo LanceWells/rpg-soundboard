@@ -21,7 +21,7 @@ export default function Group(props: GroupProps) {
     setSelectedIcon,
     setGroupName,
     resetWorkingFiles,
-    setBoardBeingAddedTo
+    setEffectBoardID: setBoardBeingAddedTo
   } = useAudioStore()
 
   const isPlaying = useMemo(() => {

@@ -3,7 +3,7 @@ import { useAudioStore } from '@renderer/stores/audioStore'
 import SoundIcon from '@renderer/assets/icons/sound'
 import CloseIcon from '@renderer/assets/icons/close'
 import { SoundContainer } from '@renderer/utils/soundContainer'
-import { NewEffectData } from 'src/apis/audio/interface'
+import { SoundEffectEditableFields } from 'src/apis/audio/interface'
 
 export type FileSelectListProps = {
   className?: string
@@ -61,7 +61,7 @@ export function FileSelectInput(props: FileSelectInputProps) {
 
 export default function FileSelectList(props: FileSelectListProps) {
   const { className } = props
-  const { workingFileList, removeWorkingFile } = useAudioStore()
+  const { editingGroup, removeWorkingFile } = useAudioStore()
 
   const onRemoveFile = useCallback((i: number) => {
     removeWorkingFile(i)
@@ -69,10 +69,10 @@ export default function FileSelectList(props: FileSelectListProps) {
 
   const fileEntries = useMemo(
     () =>
-      workingFileList.map((f, i) => (
+      editingGroup.effects.map((f, i) => (
         <FileEntry onClick={onRemoveFile} index={i} file={f} key={`file-${f.path}`} />
       )),
-    [workingFileList]
+    [editingGroup]
   )
 
   return (
@@ -98,7 +98,7 @@ export default function FileSelectList(props: FileSelectListProps) {
 }
 
 type FileEntryProps = {
-  file: NewEffectData
+  file: SoundEffectEditableFields
   index: number
   onClick: (i: number) => void
 }
@@ -112,8 +112,6 @@ function FileEntry(props: FileEntryProps) {
     const pathSegments = new Array(...file.path.split(/[/\\]/))
     return pathSegments.at(-1) ?? ''
   }, [file])
-
-  // const [volume, setVolume] = useState(100)
 
   const onClickRemove = useCallback(() => {
     onClick(index)
@@ -140,7 +138,6 @@ function FileEntry(props: FileEntryProps) {
     (e) => {
       const parsedVol = parseInt(e.target.value)
       const volToSet = isNaN(parsedVol) ? 100 : parsedVol
-      // setVolume(volToSet)
       updateWorkingFile(index, volToSet)
     },
     [file.volume, index, updateWorkingFile]

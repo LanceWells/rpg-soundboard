@@ -2,23 +2,24 @@ import {
   BoardID,
   GroupID,
   IAudioApi,
-  NewEffectData,
+  SoundEffectEditableFields,
   SoundBoard,
+  SoundGroupEditableFields,
   SoundIcon
 } from 'src/apis/audio/interface'
 import { create } from 'zustand'
 import { ColorOptions } from '@renderer/components/modals/newEffectModal/colorPicker'
 import { SoundContainer } from '@renderer/utils/soundContainer'
+import { produce } from 'immer'
 
 export type AudioState = {
-  selectedIcon: SoundIcon
   editingGroupID: GroupID | undefined
   editingMode: boolean
-  groupName: string
-  workingFileList: NewEffectData[]
   playingGroups: GroupID[]
   boards: SoundBoard[]
-  boardBeingAddedToId: BoardID | undefined
+  effectBoardID: BoardID | undefined
+
+  editingGroup: SoundGroupEditableFields
 }
 
 export type AudioStoreMethods = {
@@ -26,14 +27,18 @@ export type AudioStoreMethods = {
   updateGroup: IAudioApi['UpdateGroup']
   addBoard: IAudioApi['CreateBoard']
   setEditingMode: (isEditing: boolean) => void
-  addWorkingFile: (list: NewEffectData) => void
-  resetWorkingFiles: (list?: NewEffectData[]) => void
+
+  setEditingGroupID: (id: GroupID) => void
+
+  addWorkingFile: (list: SoundEffectEditableFields) => void
+  resetWorkingFiles: (list?: SoundEffectEditableFields[]) => void
   removeWorkingFile: (index: number) => void
   updateWorkingFile: (index: number, volume: number) => void
-  setEditingGroupID: (id: GroupID) => void
   setGroupName: (name: string | undefined) => void
   setSelectedIcon: (icon: SoundIcon) => void
-  setBoardBeingAddedTo: (id: BoardID) => void
+
+  setEffectBoardID: (id: BoardID) => void
+
   playGroup: (groupID: GroupID) => void
   stopGroup: (groupID: GroupID) => void
 }
@@ -42,18 +47,22 @@ export type AudioStore = AudioState & AudioStoreMethods
 
 export const GroupStopHandles: Map<GroupID, () => void> = new Map()
 
-export const useAudioStore = create<AudioStore>((set) => ({
-  selectedIcon: {
+const getDefaultGroup = () => ({
+  effects: [],
+  icon: {
     backgroundColor: ColorOptions.black,
     foregroundColor: ColorOptions.white,
     name: 'moon'
   },
+  name: ''
+})
+
+export const useAudioStore = create<AudioStore>((set) => ({
+  editingGroup: getDefaultGroup(),
   editingMode: false,
   boards: window.audio.GetAllBoards({}).boards,
   playingGroups: [],
-  boardBeingAddedToId: undefined,
-  workingFileList: [],
-  groupName: '',
+  effectBoardID: undefined,
   editingGroupID: undefined,
   setEditingMode(isEditing) {
     set({
@@ -61,30 +70,29 @@ export const useAudioStore = create<AudioStore>((set) => ({
     })
   },
   addWorkingFile(newItem) {
-    set((state) => ({
-      workingFileList: [...state.workingFileList, newItem]
-    }))
+    set(
+      produce((state: AudioStore) => {
+        state.editingGroup.effects.push(newItem)
+      })
+    )
   },
   removeWorkingFile(index) {
-    set((state) => {
-      const newList = new Array(...state.workingFileList)
-      newList.splice(index, 1)
-      return {
-        workingFileList: newList
-      }
-    })
+    set(
+      produce((state: AudioStore) => {
+        const newList = new Array(...state.editingGroup.effects)
+        newList.splice(index, 1)
+        state.editingGroup.effects = newList
+      })
+    )
   },
   updateWorkingFile(index, volume) {
-    set((state) => {
-      const newList = new Array(...state.workingFileList)
-      if (newList.at(index)) {
-        newList.at(index)!.volume = volume
-      }
-
-      return {
-        workingFileList: newList
-      }
-    })
+    set(
+      produce((state: AudioStore) => {
+        if (state.editingGroup.effects.length > index) {
+          state.editingGroup.effects[index].volume = volume
+        }
+      })
+    )
   },
   setEditingGroupID(id) {
     set({
@@ -92,13 +100,15 @@ export const useAudioStore = create<AudioStore>((set) => ({
     })
   },
   setSelectedIcon(icon) {
-    set({
-      selectedIcon: icon
-    })
+    set(
+      produce((state: AudioStore) => {
+        state.editingGroup.icon = icon
+      })
+    )
   },
-  setBoardBeingAddedTo: (id) => {
+  setEffectBoardID: (id) => {
     set({
-      boardBeingAddedToId: id
+      effectBoardID: id
     })
   },
   async playGroup(groupID) {
@@ -140,21 +150,26 @@ export const useAudioStore = create<AudioStore>((set) => ({
     }
   },
   resetWorkingFiles(list) {
-    set({
-      workingFileList: list ?? []
-    })
+    set(
+      produce((state: AudioStore) => {
+        state.editingGroup.effects = list ?? []
+      })
+    )
   },
   setGroupName(name) {
-    set({
-      groupName: name
-    })
+    set(
+      produce((state: AudioStore) => {
+        state.editingGroup.name = name ?? ''
+      })
+    )
   },
   updateGroup(req) {
     const updatedGroup = window.audio.UpdateGroup(req)
     const newBoards = window.audio.GetAllBoards({}).boards
+
     set({
       boards: newBoards,
-      workingFileList: []
+      editingGroup: getDefaultGroup()
     })
 
     return updatedGroup
@@ -162,9 +177,10 @@ export const useAudioStore = create<AudioStore>((set) => ({
   addGroup: (req) => {
     const newGroup = window.audio.CreateGroup(req)
     const newBoards = window.audio.GetAllBoards({}).boards
+
     set({
       boards: newBoards,
-      workingFileList: []
+      editingGroup: getDefaultGroup()
     })
 
     return newGroup
@@ -172,6 +188,7 @@ export const useAudioStore = create<AudioStore>((set) => ({
   addBoard(req) {
     const newBoard = window.audio.CreateBoard(req)
     const newBoards = window.audio.GetAllBoards({}).boards
+
     set({
       boards: newBoards
     })
