@@ -15,7 +15,8 @@ import { produce } from 'immer'
 export const EditingModes = {
   Off: 0,
   Editing: 1,
-  Dragging: 2
+  Dragging: 2,
+  Deleting: 3
 }
 
 export type EditingMode = keyof typeof EditingModes

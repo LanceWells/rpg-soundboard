@@ -13,12 +13,14 @@ import CloseIcon from '@renderer/assets/icons/close'
 export type EffectModalProps = {
   id: string
   handleSubmit: (req: CreateGroupRequest) => void
+  handleClose?: () => void
   actionName: string
   modalTitle: string
+  additionalActions?: JSX.Element[]
 }
 
 export default function EffectModal(props: EffectModalProps) {
-  const { id, handleSubmit, actionName, modalTitle } = props
+  const { id, handleSubmit, actionName, modalTitle, additionalActions, handleClose } = props
 
   const {
     setGroupName,
@@ -56,7 +58,10 @@ export default function EffectModal(props: EffectModalProps) {
 
   const onClose = useCallback(() => {
     resetEditingGroup()
-  }, [resetEditingGroup, editingGroup])
+    if (handleClose) {
+      handleClose()
+    }
+  }, [resetEditingGroup, editingGroup, handleClose])
 
   const onSubmit = useCallback<MouseEventHandler>(
     (e) => {
@@ -135,10 +140,13 @@ export default function EffectModal(props: EffectModalProps) {
           <CheckboxField formName="Repeat?" className="[grid-area:repeat]" />
         </div>
         <div className="modal-action">
-          <form method="dialog">
-            <button type="submit" className="btn btn-primary" onClick={onSubmit}>
-              {actionName}
-            </button>
+          <form method="dialog" className="w-full">
+            <div className="flex justify-between">
+              <div>{additionalActions}</div>
+              <button type="submit" className="btn btn-primary" onClick={onSubmit}>
+                {actionName}
+              </button>
+            </div>
             <button
               onClick={onClose}
               className="btn btn-circle absolute text-white font-bold -top-3 -right-3 bg-error"
