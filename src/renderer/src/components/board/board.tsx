@@ -1,7 +1,7 @@
 import { useCallback, useMemo } from 'react'
 import { GroupID, SoundBoard } from 'src/apis/audio/interface'
 import Group from '../group/group'
-import { useAudioStore } from '@renderer/stores/audioStore'
+import { EditingMode, useAudioStore } from '@renderer/stores/audioStore'
 import { NewEffectModalId } from '../modals/newEffectModal/newEffectModal'
 import AddIcon from '@renderer/assets/icons/add'
 import PencilIcon from '@renderer/assets/icons/pencil'
@@ -27,7 +27,7 @@ export default function Board(props: BoardProps) {
 
   const groups = useMemo(
     () => board.groups.map((g) => <Group boardID={board.id} group={g} key={g.id} />),
-    [board, board.groups, board.groups.length]
+    [board, board.groups, board.groups.length, editingMode]
   )
 
   const groupIDs = useMemo(() => board.groups.map((g) => g.id), [board.groups])
@@ -38,7 +38,8 @@ export default function Board(props: BoardProps) {
   }, [])
 
   const onClickEdit = useCallback(() => {
-    setEditingMode(!editingMode)
+    const newEditingMode: EditingMode = editingMode === 'Off' ? 'Editing' : 'Off'
+    setEditingMode(newEditingMode)
   }, [editingMode, setEditingMode])
 
   const onDragEnd = useCallback(
@@ -52,8 +53,6 @@ export default function Board(props: BoardProps) {
       const activeIndex = groupIDs.indexOf(active.id as GroupID)
       const overIndex = groupIDs.indexOf(over.id as GroupID)
 
-      // const newIndex = overIndex > activeIndex ? overIndex - 1 : overIndex
-
       const arrayCopy = [...Array.from(groupIDs).values()]
       const [movingItem] = arrayCopy.splice(activeIndex, 1)
       arrayCopy.splice(overIndex, 0, movingItem)
@@ -62,9 +61,15 @@ export default function Board(props: BoardProps) {
         boardID: board.id,
         newOrder: arrayCopy
       })
+
+      setEditingMode('Editing')
     },
     [groupIDs]
   )
+
+  const onDragStart = useCallback(() => {
+    setEditingMode('Dragging')
+  }, [editingMode, setEditingMode])
 
   return (
     <div
@@ -92,7 +97,7 @@ export default function Board(props: BoardProps) {
             right-0
             btn
             btn-square
-            ${editingMode ? 'btn-secondary' : 'btn-outline'}
+            ${editingMode === 'Off' ? 'btn-outline' : 'btn-secondary'}
             [grid-area:editbutton]
           `}
         >
@@ -100,7 +105,7 @@ export default function Board(props: BoardProps) {
         </button>
       </div>
       <div className="rounded-md p-3 flex flex-row items-start flex-wrap gap-4 [grid-area:boards]">
-        <DndContext onDragEnd={onDragEnd} sensors={sensors}>
+        <DndContext onDragStart={onDragStart} onDragEnd={onDragEnd} sensors={sensors}>
           <SortableContext items={groupIDs}>{groups}</SortableContext>
         </DndContext>
       </div>

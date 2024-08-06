@@ -12,6 +12,14 @@ import { ColorOptions } from '@renderer/components/modals/newEffectModal/colorPi
 import { SoundContainer } from '@renderer/utils/soundContainer'
 import { produce } from 'immer'
 
+export const EditingModes = {
+  Off: 0,
+  Editing: 1,
+  Dragging: 2
+}
+
+export type EditingMode = keyof typeof EditingModes
+
 /**
  * The state for the soundboard application. Does not contain methods.
  */
@@ -33,7 +41,7 @@ export type AudioState = {
    * If true, the view is currently in "editing mode", which implies that button presses should not
    * perform actions, but should rather open an editable node for that element.
    */
-  editingMode: boolean
+  editingMode: EditingMode
 
   /**
    * The set of IDs for groups that are actively playing a sound effect.
@@ -57,7 +65,7 @@ export type AudioStoreMethods = {
   updateGroup: IAudioApi['UpdateGroup']
   addBoard: IAudioApi['CreateBoard']
   reorderGroups: IAudioApi['ReorderGroups']
-  setEditingMode: (isEditing: boolean) => void
+  setEditingMode: (isEditing: EditingMode) => void
 
   setEditingGroupID: (id: GroupID) => void
 
@@ -91,7 +99,7 @@ const getDefaultGroup = () => ({
 
 export const useAudioStore = create<AudioStore>((set) => ({
   editingGroup: getDefaultGroup(),
-  editingMode: false,
+  editingMode: 'Off',
   boards: window.audio.GetAllBoards({}).boards,
   playingGroups: [],
   editingBoardID: undefined,

@@ -5,6 +5,7 @@ import { useAudioStore } from '@renderer/stores/audioStore'
 import { EditEffectModalId } from '../modals/newEffectModal/editEffectModal'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
+import PencilIcon from '@renderer/assets/icons/pencil'
 
 export type GroupProps = {
   group: SoundGroup
@@ -26,7 +27,10 @@ export default function Group(props: GroupProps) {
     setEditingBoardID
   } = useAudioStore()
 
-  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: group.id })
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
+    id: group.id,
+    disabled: editingMode === 'Off'
+  })
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -55,14 +59,15 @@ export default function Group(props: GroupProps) {
   }, [group, boardID])
 
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      {...attributes}
-      {...listeners}
-      onClick={editingMode ? onClickEdit : onClickPlay}
-      role="button"
-      className={`
+    <div className="relative">
+      <div
+        ref={setNodeRef}
+        style={style}
+        {...attributes}
+        {...listeners}
+        onClick={onClickPlay}
+        role="button"
+        className={`
         cursor-pointer
         hover:brightness-125
         hover:drop-shadow-lg
@@ -70,9 +75,9 @@ export default function Group(props: GroupProps) {
         hover
         z-0
       `}
-    >
-      <div
-        className={`
+      >
+        <div
+          className={`
         relative
           z-0
           ${
@@ -100,10 +105,28 @@ export default function Group(props: GroupProps) {
           before:animate-radialspin
           before:bg-[radial-gradient(circle_at_center,red,_rebeccapurple)]
           `}
-      >
-        <IconEffect icon={group.icon} />
+        >
+          <IconEffect icon={group.icon} />
+        </div>
+        <span className="text-sm flex justify-center">{group.name}</span>
       </div>
-      <span className="text-sm flex justify-center">{group.name}</span>
+      <button
+        onClick={editingMode ? onClickEdit : undefined}
+        className={`
+          absolute
+          -top-2
+          -right-2
+          btn
+          btn-circle
+          z-10
+          btn-secondary
+          transition-opacity
+          ${editingMode === 'Off' ? 'hidden' : 'visible'}
+          ${editingMode === 'Editing' ? 'opacity-100' : 'opacity-0'}
+        `}
+      >
+        <PencilIcon />
+      </button>
     </div>
   )
 }
