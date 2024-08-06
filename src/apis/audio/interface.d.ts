@@ -229,6 +229,13 @@ export type PreviewSoundResponse = {
   volume: number
 }
 
+export type ReorderGroupsRequest = {
+  boardID: BoardID
+  newOrder: GroupID[]
+}
+
+export type ReorderGroupsResponse = {}
+
 export type AudioApiConfig = {
   boards: SoundBoard[]
 }
@@ -240,13 +247,16 @@ export type GroupID = `grp-${string}-${string}-${string}-${string}-${string}`
 export type EffectID = `eff-${string}-${string}-${string}-${string}-${string}`
 
 export interface IAudioApi {
+  GetGroup(request: GetGroupRequest): GetGroupResponse
   CreateGroup(request: CreateGroupRequest): CreateGroupResponse
   UpdateGroup(request: UpdateGroupRequest): UpdateGroupResponse
-  CreateBoard(request: CreateBoardRequest): CreateBoardResponse
   AddEffectToGroup(request: AddEffectToGroupRequest): AddEffectToGroupResponse
-  GetGroup(request: GetGroupRequest): GetGroupResponse
-  GetBoard(request: GetBoardRequest): GetBoardResponse
-  GetAllBoards(request: GetAllBoardsRequest): GetAllBoardsResponse
   PlayGroup(request: PlayGroupRequest): Promise<PlayGroupResponse>
+
+  GetBoard(request: GetBoardRequest): GetBoardResponse
+  CreateBoard(request: CreateBoardRequest): CreateBoardResponse
+  GetAllBoards(request: GetAllBoardsRequest): GetAllBoardsResponse
+  ReorderGroups(request: ReorderGroupsRequest): ReorderGroupsResponse
+
   PreviewSound(request: PreviewSoundRequest): Promise<PreviewSoundResponse>
 }

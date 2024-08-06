@@ -29,6 +29,7 @@
     "@tanstack/react-virtual": "^3.8.4",
     "@types/howler": "^2.2.11",
     "electron-updater": "^6.1.7",
+    "framer-motion": "^11.3.21",
     "howler": "^2.2.4",
     "html-to-react": "^1.7.0",
     "immer": "^10.1.1",

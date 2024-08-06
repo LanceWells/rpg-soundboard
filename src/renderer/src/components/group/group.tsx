@@ -47,21 +47,20 @@ export default function Group(props: GroupProps) {
 
   return (
     <div
-      onClick={editingMode ? onClickEdit : onClickPlay}
-      role="button"
       className={`
-        cursor-pointer
-        hover:brightness-125
-        hover:drop-shadow-lg
-        shadow-purple-200
-        hover
         z-0
+        relative
       `}
     >
-      <div
+      <button
+        onClick={editingMode ? onClickEdit : onClickPlay}
         className={`
-        relative
+          relative
+          hover:brightness-125
+          hover:drop-shadow-lg
+          shadow-purple-200
           z-0
+          cursor-pointer
           ${
             isPlaying
               ? `
@@ -89,7 +88,7 @@ export default function Group(props: GroupProps) {
           `}
       >
         <IconEffect icon={group.icon} />
-      </div>
+      </button>
       <span className="text-sm flex justify-center">{group.name}</span>
     </div>
   )
