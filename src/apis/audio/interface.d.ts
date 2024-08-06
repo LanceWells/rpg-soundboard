@@ -82,6 +82,12 @@ export type SoundGroup = {
    * The icon that will be displayed as the button for the sound effect.
    */
   icon: SoundIcon
+
+  /**
+   * If true, this sound effect should keep playing indefinitely, starting over from the beginning
+   * once the sound has ended. Must be stopped manually.
+   */
+  repeats: boolean
 }
 
 /**
@@ -131,25 +137,10 @@ export type SoundBoard = {
  */
 export type CreateGroupRequest = {
   /**
-   * The name of the group to be created.
-   */
-  name: string
-
-  /**
    * The ID for the board that this group should be a part of.
    */
   boardID: BoardID
-
-  /**
-   * The set of sound effects that should be contained by this group.
-   */
-  soundEffects: SoundEffectEditableFields[]
-
-  /**
-   * An icon that represents the group to be created.
-   */
-  icon: SoundIcon
-}
+} & SoundGroupEditableFields
 
 export type CreateGroupResponse = {
   group: SoundGroup
@@ -177,10 +168,7 @@ export type AddEffectToGroupResponse = {
 export type UpdateGroupRequest = {
   boardID: BoardID
   groupID: GroupID
-  name: string
-  soundFilePaths: SoundEffectEditableFields[]
-  icon: SoundIcon
-}
+} & SoundGroupEditableFields
 
 export type UpdateGroupResponse = {
   group: SoundGroup
@@ -208,15 +196,16 @@ export type GetAllBoardsResponse = {
   boards: SoundBoard[]
 }
 
-export type PlayGroupRequest = {
+export type GetGroupSoundRequest = {
   groupID: GroupID
   relFile: string
 }
 
-export type PlayGroupResponse = {
+export type GetGroupSound = {
   soundB64: string
   format: SupportedFileType
   volume: number
+  repeats: boolean
 }
 
 export type PreviewSoundRequest = {
@@ -251,7 +240,7 @@ export interface IAudioApi {
   CreateGroup(request: CreateGroupRequest): CreateGroupResponse
   UpdateGroup(request: UpdateGroupRequest): UpdateGroupResponse
   AddEffectToGroup(request: AddEffectToGroupRequest): AddEffectToGroupResponse
-  PlayGroup(request: PlayGroupRequest): Promise<PlayGroupResponse>
+  GetGroupSound(request: GetGroupSoundRequest): Promise<GetGroupSound>
 
   GetBoard(request: GetBoardRequest): GetBoardResponse
   CreateBoard(request: CreateBoardRequest): CreateBoardResponse

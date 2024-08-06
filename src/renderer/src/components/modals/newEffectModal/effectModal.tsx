@@ -1,5 +1,5 @@
 import { useAudioStore } from '@renderer/stores/audioStore'
-import { MouseEventHandler, useCallback, useState } from 'react'
+import { ChangeEventHandler, MouseEventHandler, useCallback, useState } from 'react'
 import IconLookup from '../../effect/iconLookup'
 import { ColorResult } from 'react-color'
 import { IconEffect } from '../../effect/icon-effect'
@@ -28,7 +28,8 @@ export default function EffectModal(props: EffectModalProps) {
     editingBoardID,
     setSelectedIcon,
     editingGroup,
-    resetEditingGroup
+    resetEditingGroup,
+    setGroupRepeating
   } = useAudioStore()
 
   const [effectNameErr, setEffectNameErr] = useState('')
@@ -54,6 +55,13 @@ export default function EffectModal(props: EffectModalProps) {
       })
     },
     [editingGroup.icon, setSelectedIcon]
+  )
+
+  const handleRepeatsCheck = useCallback<ChangeEventHandler<HTMLInputElement>>(
+    (e) => {
+      setGroupRepeating(e.target.checked)
+    },
+    [setGroupRepeating, editingGroup.repeats]
   )
 
   const onClose = useCallback(() => {
@@ -89,9 +97,7 @@ export default function EffectModal(props: EffectModalProps) {
       if (editingGroup.icon && editingBoardID) {
         handleSubmit({
           boardID: editingBoardID,
-          icon: editingGroup.icon,
-          name: editingGroup.name,
-          soundEffects: editingGroup.effects
+          ...editingGroup
         })
       }
 
@@ -137,7 +143,12 @@ export default function EffectModal(props: EffectModalProps) {
             onColorChange={handleBackgroundSelect}
             className="[grid-area:_background]"
           />
-          <CheckboxField formName="Repeat?" className="[grid-area:repeat]" />
+          <CheckboxField
+            formName="Repeat?"
+            className="[grid-area:repeat]"
+            checked={editingGroup.repeats}
+            onChange={handleRepeatsCheck}
+          />
         </div>
         <div className="modal-action">
           <form method="dialog" className="w-full">

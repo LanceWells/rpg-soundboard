@@ -75,6 +75,7 @@ export type AudioStoreMethods = {
   removeWorkingFile: (index: number) => void
   updateWorkingFile: (index: number, volume: number) => void
   setGroupName: (name: string | undefined) => void
+  setGroupRepeating: (shouldRepeat: boolean) => void
   setSelectedIcon: (icon: SoundIcon) => void
   resetEditingGroup: () => void
 
@@ -88,14 +89,15 @@ export type AudioStore = AudioState & AudioStoreMethods
 
 export const GroupStopHandles: Map<GroupID, () => void> = new Map()
 
-const getDefaultGroup = () => ({
+const getDefaultGroup = (): SoundGroupEditableFields => ({
   effects: [],
   icon: {
     backgroundColor: ColorOptions.black,
     foregroundColor: ColorOptions.white,
     name: 'moon'
   },
-  name: ''
+  name: '',
+  repeats: false
 })
 
 export const useAudioStore = create<AudioStore>((set) => ({
@@ -153,7 +155,10 @@ export const useAudioStore = create<AudioStore>((set) => ({
     })
   },
   async playGroup(groupID) {
-    const audio = await window.audio.PlayGroup({ groupID: groupID, relFile: import.meta.dirname })
+    const audio = await window.audio.GetGroupSound({
+      groupID: groupID,
+      relFile: import.meta.dirname
+    })
 
     const handleHowlStop = (groupID: GroupID) => {
       set((state) => {
@@ -172,7 +177,8 @@ export const useAudioStore = create<AudioStore>((set) => ({
         handler: handleHowlStop
       },
       src: audio.soundB64,
-      volume: audio.volume
+      volume: audio.volume,
+      repeats: audio.repeats
     })
 
     GroupStopHandles.set(groupID, sound.GetStopHandle())
@@ -201,6 +207,13 @@ export const useAudioStore = create<AudioStore>((set) => ({
     set(
       produce((state: AudioStore) => {
         state.editingGroup.name = name ?? ''
+      })
+    )
+  },
+  setGroupRepeating(shouldRepeat) {
+    set(
+      produce((state: AudioStore) => {
+        state.editingGroup.repeats = shouldRepeat
       })
     )
   },

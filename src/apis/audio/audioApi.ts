@@ -98,7 +98,7 @@ export const audioApi: IAudioApi = {
 
     const newGroupID: GroupID = `grp-${crypto.randomUUID()}`
 
-    const newEffects = request.soundEffects.map((eff) => {
+    const newEffects = request.effects.map((eff) => {
       const newEffectID: EffectID = `eff-${crypto.randomUUID()}`
       const savedFile = saveSoundEffect(request.boardID, newGroupID, eff.path)
       const newEffect: SoundEffect = {
@@ -115,7 +115,8 @@ export const audioApi: IAudioApi = {
       effects: newEffects,
       id: newGroupID,
       name: request.name,
-      icon: request.icon
+      icon: request.icon,
+      repeats: request.repeats
     }
 
     const newConfig = produce(config.Config, (draft) => {
@@ -137,7 +138,7 @@ export const audioApi: IAudioApi = {
     }
 
     const appDataPath = GetAppDataPath()
-    const updatedEffects = request.soundFilePaths.map((eff) => {
+    const updatedEffects = request.effects.map((eff) => {
       const newEffectID: EffectID = `eff-${crypto.randomUUID()}`
 
       if (eff.path.startsWith(appDataPath)) {
@@ -167,7 +168,8 @@ export const audioApi: IAudioApi = {
       effects: updatedEffects,
       id: request.groupID,
       name: request.name,
-      icon: request.icon
+      icon: request.icon,
+      repeats: request.repeats
     }
 
     const newConfig = produce(config.Config, (draft) => {
@@ -259,13 +261,14 @@ export const audioApi: IAudioApi = {
       boards: config.Config.boards
     }
   },
-  async PlayGroup(request) {
+  async GetGroupSound(request) {
     const group = groupMap.get(request.groupID)
     if (!group || group.effects.length === 0) {
       return {
         soundB64: '',
         format: '.mp3',
-        volume: 100
+        volume: 100,
+        repeats: false
       }
     }
 
@@ -288,7 +291,8 @@ export const audioApi: IAudioApi = {
     return {
       soundB64: r?.toString() ?? '',
       format: effect.format as SupportedFileTypes,
-      volume: effect.volume
+      volume: effect.volume,
+      repeats: group.repeats
     }
   },
   async PreviewSound(request): Promise<PreviewSoundResponse> {

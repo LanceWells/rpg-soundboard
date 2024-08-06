@@ -6,6 +6,7 @@ import { EditEffectModalId } from '../modals/newEffectModal/editEffectModal'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import PencilIcon from '@renderer/assets/icons/pencil'
+import RepeatIcon from '@renderer/assets/icons/repeat'
 
 export type GroupProps = {
   group: SoundGroup
@@ -24,7 +25,8 @@ export default function Group(props: GroupProps) {
     setSelectedIcon,
     setGroupName,
     resetWorkingFiles,
-    setEditingBoardID
+    setEditingBoardID,
+    setGroupRepeating
   } = useAudioStore()
 
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
@@ -55,6 +57,7 @@ export default function Group(props: GroupProps) {
     setGroupName(group.name)
     resetWorkingFiles(group.effects)
     setEditingBoardID(boardID)
+    setGroupRepeating(group.repeats)
     ;(document.getElementById(EditEffectModalId) as HTMLDialogElement).showModal()
   }, [group, boardID])
 
@@ -78,7 +81,8 @@ export default function Group(props: GroupProps) {
       >
         <div
           className={`
-        relative
+          indicator
+          relative
           z-0
           ${
             isPlaying
@@ -107,6 +111,18 @@ export default function Group(props: GroupProps) {
           `}
         >
           <IconEffect icon={group.icon} />
+          <span
+            className={`
+              indicator-item
+              rounded-full
+              indicator-bottom
+              indicator-start
+              badge-neutral
+              ${group.repeats ? 'visible' : 'hidden'}
+            `}
+          >
+            <RepeatIcon className="h-4 w-4 m-1" />
+          </span>
         </div>
         <span className="text-sm flex justify-center">{group.name}</span>
       </div>
