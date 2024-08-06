@@ -7,7 +7,7 @@ import DeleteIcon from '@renderer/assets/icons/delete'
 export const EditEffectModalId = 'edit-effect-modal'
 
 export default function EditEffectModal() {
-  const { editingGroupID, updateGroup, editingMode, setEditingMode } = useAudioStore()
+  const { editingGroupID, updateGroup, editingMode, setEditingMode, deleteGroup } = useAudioStore()
 
   const handleSubmit = useCallback(
     (req: CreateGroupRequest) => {
@@ -32,9 +32,12 @@ export default function EditEffectModal() {
   }, [editingMode, setEditingMode])
 
   const onDelete = useCallback(() => {
+    if (editingGroupID) {
+      deleteGroup(editingGroupID)
+    }
+
     setEditingMode('Editing')
-    // TODO: Call to delete effect
-  }, [])
+  }, [editingGroupID])
 
   const deleteButton = useMemo(() => {
     return <DeleteButton onDelete={onDelete} />
@@ -46,9 +49,10 @@ export default function EditEffectModal() {
       actionName="Update"
       handleSubmit={handleSubmit}
       id={EditEffectModalId}
-      additionalActions={[deleteButton]}
       handleClose={handleClose}
-    />
+    >
+      {deleteButton}
+    </EffectModal>
   )
 }
 

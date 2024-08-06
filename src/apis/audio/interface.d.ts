@@ -225,6 +225,12 @@ export type ReorderGroupsRequest = {
 
 export type ReorderGroupsResponse = {}
 
+export type DeleteGroupRequest = {
+  groupID: GroupID
+}
+
+export type DeleteGroupResponse = {}
+
 export type AudioApiConfig = {
   boards: SoundBoard[]
 }
@@ -246,6 +252,7 @@ export interface IAudioApi {
   CreateBoard(request: CreateBoardRequest): CreateBoardResponse
   GetAllBoards(request: GetAllBoardsRequest): GetAllBoardsResponse
   ReorderGroups(request: ReorderGroupsRequest): ReorderGroupsResponse
+  DeleteGroup(request: DeleteGroupRequest): DeleteGroupResponse
 
   PreviewSound(request: PreviewSoundRequest): Promise<PreviewSoundResponse>
 }

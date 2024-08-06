@@ -349,5 +349,34 @@ export const audioApi: IAudioApi = {
     config.UpdateConfig(newConfig)
 
     return {}
+  },
+  DeleteGroup(request) {
+    // Get the board for this group in the map.
+    // Remove the group from that board.
+    const boardFromMap = [...boardMap.values()].find((b) =>
+      b.groups.some((g) => g.id === request.groupID)
+    )
+
+    if (boardFromMap) {
+      boardFromMap.groups = boardFromMap.groups.filter((g) => g.id !== request.groupID)
+    }
+
+    // Delete the group from the group map.
+    groupMap.delete(request.groupID)
+
+    // Edit the config so that the appropriate board does not include the group to delete.
+    const newConfig = produce(config.Config, (draft) => {
+      if (boardFromMap) {
+        const boardFromConfig = draft.boards.find((b) => b.id === boardFromMap.id)
+
+        if (boardFromConfig) {
+          boardFromConfig.groups = boardFromConfig.groups.filter((g) => g.id !== request.groupID)
+        }
+      }
+    })
+
+    config.UpdateConfig(newConfig)
+
+    return {}
   }
 }

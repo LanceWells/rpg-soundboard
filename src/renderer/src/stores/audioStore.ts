@@ -78,6 +78,7 @@ export type AudioStoreMethods = {
   setGroupRepeating: (shouldRepeat: boolean) => void
   setSelectedIcon: (icon: SoundIcon) => void
   resetEditingGroup: () => void
+  deleteGroup: (id: GroupID) => void
 
   setEditingBoardID: (id: BoardID) => void
 
@@ -232,6 +233,17 @@ export const useAudioStore = create<AudioStore>((set) => ({
     })
 
     return updatedGroup
+  },
+  deleteGroup(id) {
+    window.audio.DeleteGroup({
+      groupID: id
+    })
+
+    const newBoards = window.audio.GetAllBoards({}).boards
+    set({
+      boards: newBoards,
+      editingGroup: getDefaultGroup()
+    })
   },
   addGroup: (req) => {
     const newGroup = window.audio.CreateGroup(req)

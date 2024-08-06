@@ -1,5 +1,11 @@
 import { useAudioStore } from '@renderer/stores/audioStore'
-import { ChangeEventHandler, MouseEventHandler, useCallback, useState } from 'react'
+import {
+  ChangeEventHandler,
+  MouseEventHandler,
+  PropsWithChildren,
+  useCallback,
+  useState
+} from 'react'
 import IconLookup from '../../effect/iconLookup'
 import { ColorResult } from 'react-color'
 import { IconEffect } from '../../effect/icon-effect'
@@ -16,11 +22,10 @@ export type EffectModalProps = {
   handleClose?: () => void
   actionName: string
   modalTitle: string
-  additionalActions?: JSX.Element[]
 }
 
-export default function EffectModal(props: EffectModalProps) {
-  const { id, handleSubmit, actionName, modalTitle, additionalActions, handleClose } = props
+export default function EffectModal(props: PropsWithChildren<EffectModalProps>) {
+  const { id, handleSubmit, actionName, modalTitle, children, handleClose } = props
 
   const {
     setGroupName,
@@ -153,7 +158,7 @@ export default function EffectModal(props: EffectModalProps) {
         <div className="modal-action">
           <form method="dialog" className="w-full">
             <div className="flex justify-between">
-              <div>{additionalActions}</div>
+              <div>{children}</div>
               <button type="submit" className="btn btn-primary" onClick={onSubmit}>
                 {actionName}
               </button>
