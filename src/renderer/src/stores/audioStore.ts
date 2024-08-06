@@ -56,6 +56,7 @@ export type AudioStoreMethods = {
   addGroup: IAudioApi['CreateGroup']
   updateGroup: IAudioApi['UpdateGroup']
   addBoard: IAudioApi['CreateBoard']
+  reorderGroups: IAudioApi['ReorderGroups']
   setEditingMode: (isEditing: boolean) => void
 
   setEditingGroupID: (id: GroupID) => void
@@ -230,5 +231,15 @@ export const useAudioStore = create<AudioStore>((set) => ({
     })
 
     return newBoard
+  },
+  reorderGroups(request) {
+    window.audio.ReorderGroups(request)
+    const newBoards = window.audio.GetAllBoards({}).boards
+
+    set({
+      boards: newBoards
+    })
+
+    return {}
   }
 }))

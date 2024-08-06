@@ -3,6 +3,8 @@ import { IconEffect } from '../effect/icon-effect'
 import { useCallback, useMemo } from 'react'
 import { useAudioStore } from '@renderer/stores/audioStore'
 import { EditEffectModalId } from '../modals/newEffectModal/editEffectModal'
+import { useSortable } from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 
 export type GroupProps = {
   group: SoundGroup
@@ -23,6 +25,13 @@ export default function Group(props: GroupProps) {
     resetWorkingFiles,
     setEditingBoardID
   } = useAudioStore()
+
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: group.id })
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition
+  }
 
   const isPlaying = useMemo(() => {
     return playingGroups.includes(group.id)
@@ -47,6 +56,10 @@ export default function Group(props: GroupProps) {
 
   return (
     <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
       onClick={editingMode ? onClickEdit : onClickPlay}
       role="button"
       className={`

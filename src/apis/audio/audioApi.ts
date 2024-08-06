@@ -17,6 +17,8 @@ import {
   GroupID,
   IAudioApi,
   PreviewSoundResponse,
+  ReorderGroupsRequest as MoveGroupRequest,
+  ReorderGroupsResponse as MoveGroupResponse,
   SoundBoard,
   SoundEffect,
   SoundGroup
@@ -310,5 +312,38 @@ export const audioApi: IAudioApi = {
       soundB64: r?.toString() ?? '',
       volume: request.effect.volume
     }
+  },
+  ReorderGroups: function (request: MoveGroupRequest): MoveGroupResponse {
+    const board = boardMap.get(request.boardID)
+
+    if (!board) {
+      console.error(`${this.ReorderGroups.name}: board not found with id (${request.boardID})`)
+      return {}
+    }
+
+    if (request.newOrder.length !== board.groups.length) {
+      console.error(
+        `${this.ReorderGroups.name}: new order is (${request.newOrder.length}) which does not match (${board.groups.length})`
+      )
+      return {}
+    }
+
+    const groupsInNewOrder = request.newOrder.map((g) => {
+      const group = groupMap.get(g)
+      if (group === undefined) {
+        throw new Error(`Provided invalid group ID ${g}`)
+      }
+      return group
+    })
+
+    const newConfig = produce(config.Config, (draft) => {
+      const matchingBoard = draft.boards.find((b) => b.id === request.boardID)
+      matchingBoard!.groups = groupsInNewOrder
+    })
+
+    board.groups = groupsInNewOrder
+    config.UpdateConfig(newConfig)
+
+    return {}
   }
 }

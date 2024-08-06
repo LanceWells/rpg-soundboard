@@ -1,24 +1,36 @@
 import { useCallback, useMemo } from 'react'
-import { SoundBoard } from 'src/apis/audio/interface'
+import { GroupID, SoundBoard } from 'src/apis/audio/interface'
 import Group from '../group/group'
 import { useAudioStore } from '@renderer/stores/audioStore'
 import { NewEffectModalId } from '../modals/newEffectModal/newEffectModal'
 import AddIcon from '@renderer/assets/icons/add'
 import PencilIcon from '@renderer/assets/icons/pencil'
+import {
+  DndContext,
+  DragEndEvent,
+  PointerSensor,
+  TouchSensor,
+  useSensor,
+  useSensors
+} from '@dnd-kit/core'
+import { SortableContext } from '@dnd-kit/sortable'
 
 export type BoardProps = {
   board: SoundBoard
 }
 
 export default function Board(props: BoardProps) {
-  const { setEditingBoardID, setEditingMode, editingMode } = useAudioStore()
-
   const { board } = props
+  const { setEditingBoardID, setEditingMode, editingMode, reorderGroups } = useAudioStore()
+
+  const sensors = useSensors(useSensor(PointerSensor), useSensor(TouchSensor))
 
   const groups = useMemo(
     () => board.groups.map((g) => <Group boardID={board.id} group={g} key={g.id} />),
     [board, board.groups, board.groups.length]
   )
+
+  const groupIDs = useMemo(() => board.groups.map((g) => g.id), [board.groups])
 
   const onNewGroup = useCallback(() => {
     setEditingBoardID(board.id)
@@ -28,6 +40,31 @@ export default function Board(props: BoardProps) {
   const onClickEdit = useCallback(() => {
     setEditingMode(!editingMode)
   }, [editingMode, setEditingMode])
+
+  const onDragEnd = useCallback(
+    (event: DragEndEvent) => {
+      const { active, over } = event
+
+      if (over === null) {
+        return
+      }
+
+      const activeIndex = groupIDs.indexOf(active.id as GroupID)
+      const overIndex = groupIDs.indexOf(over.id as GroupID)
+
+      // const newIndex = overIndex > activeIndex ? overIndex - 1 : overIndex
+
+      const arrayCopy = [...Array.from(groupIDs).values()]
+      const [movingItem] = arrayCopy.splice(activeIndex, 1)
+      arrayCopy.splice(overIndex, 0, movingItem)
+
+      reorderGroups({
+        boardID: board.id,
+        newOrder: arrayCopy
+      })
+    },
+    [groupIDs]
+  )
 
   return (
     <div
@@ -63,7 +100,9 @@ export default function Board(props: BoardProps) {
         </button>
       </div>
       <div className="rounded-md p-3 flex flex-row items-start flex-wrap gap-4 [grid-area:boards]">
-        {groups}
+        <DndContext onDragEnd={onDragEnd} sensors={sensors}>
+          <SortableContext items={groupIDs}>{groups}</SortableContext>
+        </DndContext>
       </div>
       <button
         className={`
