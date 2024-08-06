@@ -11,18 +11,15 @@ export type IconPreviewProps = {
 export function IconPreview(props: IconPreviewProps) {
   const { icon } = props
 
-  const { selectedIcon, setSelectedIcon } = useAudioStore((state) => ({
-    selectedIcon: state.selectedIcon,
-    setSelectedIcon: state.setSelectedIcon
-  }))
+  const { editingGroup, setSelectedIcon } = useAudioStore()
 
   const handlePickIcon = useCallback(() => {
     setSelectedIcon({
       name: icon.name,
-      backgroundColor: selectedIcon?.backgroundColor ?? ColorOptions.black,
-      foregroundColor: selectedIcon?.foregroundColor ?? ColorOptions.white
+      backgroundColor: editingGroup.icon.backgroundColor ?? ColorOptions.black,
+      foregroundColor: editingGroup.icon.foregroundColor ?? ColorOptions.white
     })
-  }, [icon.name, selectedIcon, setSelectedIcon])
+  }, [icon.name, editingGroup.icon, setSelectedIcon])
 
   const readableName = icon.name
     .split('-')
@@ -43,15 +40,15 @@ export function IconPreview(props: IconPreviewProps) {
         w-full
         btn
         h-fit
-        ${selectedIcon?.name === icon.name ? 'bg-base-100' : ''}
+        ${editingGroup.icon.name === icon.name ? 'bg-base-100' : ''}
       `}
       onClick={handlePickIcon}
     >
       <IconEffect
         icon={{
           name: icon.name,
-          backgroundColor: selectedIcon.backgroundColor,
-          foregroundColor: selectedIcon.foregroundColor
+          backgroundColor: editingGroup.icon.backgroundColor,
+          foregroundColor: editingGroup.icon.foregroundColor
         }}
       />
       <span>{readableName}</span>
