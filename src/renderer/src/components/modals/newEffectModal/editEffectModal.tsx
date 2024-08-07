@@ -37,11 +37,11 @@ export default function EditEffectModal() {
     }
 
     setEditingMode('Editing')
-  }, [editingGroupID])
+  }, [editingGroupID, deleteGroup, setEditingMode])
 
   const deleteButton = useMemo(() => {
     return <DeleteButton onDelete={onDelete} />
-  }, [editingMode])
+  }, [editingMode, onDelete])
 
   return (
     <EffectModal

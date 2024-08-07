@@ -129,6 +129,20 @@ const deleteGroupFolder = (boardID: BoardID, groupID: GroupID) => {
   })
 }
 
+const SaveConfig = (newConfig: AudioApiConfig) => {
+  boardMap.clear()
+  groupMap.clear()
+
+  newConfig.boards.forEach((b) => {
+    boardMap.set(b.id, b)
+    b.groups.forEach((g) => {
+      groupMap.set(g.id, g)
+    })
+  })
+
+  config.UpdateConfig(newConfig)
+}
+
 export const audioApi: IAudioApi = {
   CreateGroup: function (request: CreateGroupRequest): CreateGroupResponse {
     const matchingBoard = this.GetBoard({ boardID: request.boardID })
@@ -164,8 +178,7 @@ export const audioApi: IAudioApi = {
       matchingBoard?.groups.push(newGroup)
     })
 
-    config.UpdateConfig(newConfig)
-    groupMap.set(newGroupID, newGroup)
+    SaveConfig(newConfig)
 
     return {
       group: newGroup
@@ -182,7 +195,12 @@ export const audioApi: IAudioApi = {
       // This effect is already saved, so just add it to the list and move on.
       if (existingEffectMap.has(curr.path)) {
         const existingEffect = existingEffectMap.get(curr.path)!
-        acc.push(existingEffect)
+        const updatedEffect: SoundEffect = {
+          ...existingEffect,
+          ...curr
+        }
+
+        acc.push(updatedEffect)
 
         existingEffectMap.delete(curr.path)
         return acc
@@ -208,32 +226,6 @@ export const audioApi: IAudioApi = {
       deleteFile(s)
     })
 
-    // const updatedEffects = request.effects.map((eff) => {
-    //   const newEffectID: EffectID = `eff-${crypto.randomUUID()}`
-
-    //   if (eff.path.startsWith(appDataPath)) {
-    //     const parsedPath = path.parse(eff.path)
-    //     const updatedEffect: SoundEffect = {
-    //       id: newEffectID,
-    //       path: eff.path,
-    //       format: parsedPath.ext as SupportedFileTypes,
-    //       volume: eff.volume
-    //     }
-
-    //     return updatedEffect
-    //   }
-
-    //   const savedFile = saveSoundEffect(request.boardID, request.groupID, eff.path)
-    //   const newEffect: SoundEffect = {
-    //     id: newEffectID,
-    //     path: savedFile.path,
-    //     format: savedFile.format,
-    //     volume: eff.volume
-    //   }
-
-    //   return newEffect
-    // })
-
     const updatedGroup: SoundGroup = {
       effects: newEffects,
       id: request.groupID,
@@ -257,8 +249,7 @@ export const audioApi: IAudioApi = {
       }
     })
 
-    config.UpdateConfig(newConfig)
-    groupMap.set(request.groupID, updatedGroup)
+    SaveConfig(newConfig)
 
     return {
       group: updatedGroup
@@ -277,8 +268,7 @@ export const audioApi: IAudioApi = {
       draft.boards.push(newBoard)
     })
 
-    config.UpdateConfig(newConfig)
-    boardMap.set(newBoardID, newBoard)
+    SaveConfig(newConfig)
 
     return {
       board: newBoard
@@ -307,7 +297,7 @@ export const audioApi: IAudioApi = {
       matchingGroup?.effects.push(newEffect)
     })
 
-    config.UpdateConfig(newConfig)
+    SaveConfig(newConfig)
 
     return {
       effect: newEffect
@@ -415,8 +405,7 @@ export const audioApi: IAudioApi = {
       matchingBoard!.groups = groupsInNewOrder
     })
 
-    board.groups = groupsInNewOrder
-    config.UpdateConfig(newConfig)
+    SaveConfig(newConfig)
 
     return {}
   },
@@ -429,13 +418,6 @@ export const audioApi: IAudioApi = {
 
     const boardID = boardFromMap?.id
 
-    if (boardFromMap) {
-      boardFromMap.groups = boardFromMap.groups.filter((g) => g.id !== request.groupID)
-    }
-
-    // Delete the group from the group map.
-    groupMap.delete(request.groupID)
-
     // Edit the config so that the appropriate board does not include the group to delete.
     const newConfig = produce(config.Config, (draft) => {
       if (boardFromMap) {
@@ -447,7 +429,7 @@ export const audioApi: IAudioApi = {
       }
     })
 
-    config.UpdateConfig(newConfig)
+    SaveConfig(newConfig)
 
     if (boardID) {
       deleteGroupFolder(boardID, request.groupID)
