@@ -57,13 +57,24 @@ export const SupportedFileTypes = {
 
 export type SupportedFileTypes = keyof typeof SupportedFileTypes
 
+const getGroupPath = (boardID: BoardID, groupID: GroupID): string => {
+  const appDataPath = GetAppDataPath()
+  const effDir = path.join(appDataPath, boardID, groupID)
+
+  return effDir
+}
+
+const getGroupEffectsPath = (boardID: BoardID, groupID: GroupID): string => {
+  const effDir = path.join(getGroupPath(boardID, groupID), 'effects')
+
+  return effDir
+}
+
 const saveSoundEffect = (
   boardID: BoardID,
   groupID: GroupID,
   srcFilePath: string
 ): { path: string; format: SupportedFileTypes } => {
-  const appDataPath = GetAppDataPath()
-
   if (!fs.existsSync(srcFilePath)) {
     throw new Error(`Path does not exist ${srcFilePath}`)
   }
@@ -74,7 +85,7 @@ const saveSoundEffect = (
     throw new Error(`Unsupported file type ${srcFileData.ext}`)
   }
 
-  const dstFileDir = path.join(appDataPath, boardID, groupID, 'effects')
+  const dstFileDir = getGroupEffectsPath(boardID, groupID)
   if (!fs.existsSync(dstFileDir)) {
     fs.mkdirSync(dstFileDir, { recursive: true })
   }
@@ -87,6 +98,35 @@ const saveSoundEffect = (
   fs.copyFileSync(srcFilePath, dstFilePath)
 
   return { path: dstFilePath, format: srcFileData.ext as SupportedFileTypes }
+}
+
+const deleteFile = (pathToDelete: string) => {
+  const appDataPath = GetAppDataPath()
+
+  if (!pathToDelete.startsWith(appDataPath)) {
+    console.error(`Attempt to delete a file outside of app directory (${pathToDelete})`)
+    return
+  }
+
+  if (!fs.existsSync(pathToDelete)) {
+    console.error(`Attempt to delete a file that does not exist (${pathToDelete})`)
+    return
+  }
+
+  fs.rmSync(pathToDelete)
+}
+
+const deleteGroupFolder = (boardID: BoardID, groupID: GroupID) => {
+  const groupPath = getGroupPath(boardID, groupID)
+
+  if (!fs.existsSync(groupPath)) {
+    console.error(`Attempt to delete a folder that does not exist (${groupPath})`)
+  }
+
+  fs.rmSync(groupPath, {
+    recursive: true,
+    force: true
+  })
 }
 
 export const audioApi: IAudioApi = {
@@ -137,35 +177,65 @@ export const audioApi: IAudioApi = {
       throw new Error(`Could not find matching grup with ID ${request.groupID}.`)
     }
 
-    const appDataPath = GetAppDataPath()
-    const updatedEffects = request.effects.map((eff) => {
-      const newEffectID: EffectID = `eff-${crypto.randomUUID()}`
+    const existingEffectMap = new Map(matchingGroup.group?.effects.map((e) => [e.path, e]))
+    const newEffects = request.effects.reduce((acc, curr) => {
+      // This effect is already saved, so just add it to the list and move on.
+      if (existingEffectMap.has(curr.path)) {
+        const existingEffect = existingEffectMap.get(curr.path)!
+        acc.push(existingEffect)
 
-      if (eff.path.startsWith(appDataPath)) {
-        const parsedPath = path.parse(eff.path)
-        const updatedEffect: SoundEffect = {
-          id: newEffectID,
-          path: eff.path,
-          format: parsedPath.ext as SupportedFileTypes,
-          volume: eff.volume
-        }
-
-        return updatedEffect
+        existingEffectMap.delete(curr.path)
+        return acc
       }
 
-      const savedFile = saveSoundEffect(request.boardID, request.groupID, eff.path)
+      const newEffectID: EffectID = `eff-${crypto.randomUUID()}`
+      const savedFile = saveSoundEffect(request.boardID, request.groupID, curr.path)
       const newEffect: SoundEffect = {
         id: newEffectID,
         path: savedFile.path,
         format: savedFile.format,
-        volume: eff.volume
+        volume: curr.volume
       }
 
-      return newEffect
+      acc.push(newEffect)
+
+      return acc
+    }, [] as SoundEffect[])
+
+    const soundsToDeleteByPath = [...existingEffectMap.keys()]
+
+    soundsToDeleteByPath.forEach((s) => {
+      deleteFile(s)
     })
 
+    // const updatedEffects = request.effects.map((eff) => {
+    //   const newEffectID: EffectID = `eff-${crypto.randomUUID()}`
+
+    //   if (eff.path.startsWith(appDataPath)) {
+    //     const parsedPath = path.parse(eff.path)
+    //     const updatedEffect: SoundEffect = {
+    //       id: newEffectID,
+    //       path: eff.path,
+    //       format: parsedPath.ext as SupportedFileTypes,
+    //       volume: eff.volume
+    //     }
+
+    //     return updatedEffect
+    //   }
+
+    //   const savedFile = saveSoundEffect(request.boardID, request.groupID, eff.path)
+    //   const newEffect: SoundEffect = {
+    //     id: newEffectID,
+    //     path: savedFile.path,
+    //     format: savedFile.format,
+    //     volume: eff.volume
+    //   }
+
+    //   return newEffect
+    // })
+
     const updatedGroup: SoundGroup = {
-      effects: updatedEffects,
+      effects: newEffects,
       id: request.groupID,
       name: request.name,
       icon: request.icon,
@@ -357,6 +427,8 @@ export const audioApi: IAudioApi = {
       b.groups.some((g) => g.id === request.groupID)
     )
 
+    const boardID = boardFromMap?.id
+
     if (boardFromMap) {
       boardFromMap.groups = boardFromMap.groups.filter((g) => g.id !== request.groupID)
     }
@@ -376,6 +448,10 @@ export const audioApi: IAudioApi = {
     })
 
     config.UpdateConfig(newConfig)
+
+    if (boardID) {
+      deleteGroupFolder(boardID, request.groupID)
+    }
 
     return {}
   }

@@ -33,14 +33,15 @@ export class SoundContainer {
 
     this._stopHandler = stopHandler
 
-    this._howl
-      .on('end', () => {
-        // If an effect repeats, then this 'end' event will fire every time that the loop restarts.
-        // In that case, don't stop the sound effect.
-        if (!this._repeats) {
-          this.HandleHowlStop()
-        }
+    // If an effect repeats, then this 'end' event will fire every time that the loop restarts.
+    // In that case, don't stop the sound effect.
+    if (!this._repeats) {
+      this._howl.once('end', () => {
+        this.HandleHowlStop()
       })
+    }
+
+    this._howl
       .once('loaderror', (id, err) => {
         console.error(`Failed to load sound ${id}: ${err}`)
         this.HandleHowlStop()
