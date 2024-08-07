@@ -70,7 +70,7 @@ export type AudioStoreMethods = {
 
   setEditingGroupID: (id: GroupID) => void
 
-  addWorkingFile: (list: SoundEffectEditableFields) => void
+  addWorkingFiles: (list: SoundEffectEditableFields | SoundEffectEditableFields[]) => void
   resetWorkingFiles: (list?: SoundEffectEditableFields[]) => void
   removeWorkingFile: (index: number) => void
   updateWorkingFile: (index: number, volume: number) => void
@@ -113,10 +113,11 @@ export const useAudioStore = create<AudioStore>((set) => ({
       editingMode: isEditing
     })
   },
-  addWorkingFile(newItem) {
+  addWorkingFiles(newItem) {
     set(
       produce((state: AudioStore) => {
-        state.editingGroup.effects.push(newItem)
+        const newEffects = Array.isArray(newItem) ? newItem : [newItem]
+        state.editingGroup.effects.push(...newEffects)
       })
     )
   },

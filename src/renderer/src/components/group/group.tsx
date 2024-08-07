@@ -52,6 +52,7 @@ export default function Group(props: GroupProps) {
   }, [group, isPlaying])
 
   const onClickEdit = useCallback(() => {
+    stopGroup(group.id)
     setEditingGroupID(group.id)
     setSelectedIcon(group.icon)
     setGroupName(group.name)
@@ -74,7 +75,6 @@ export default function Group(props: GroupProps) {
         cursor-pointer
         hover:brightness-125
         hover:drop-shadow-lg
-        shadow-purple-200
         hover
         z-0
       `}
@@ -87,10 +87,10 @@ export default function Group(props: GroupProps) {
           ${
             isPlaying
               ? `
-            before:-top-1
-            before:-right-1
-            before:-left-1
-            before:-bottom-1
+            before:-top-2
+            before:-right-2
+            before:-left-2
+            before:-bottom-2
             `
               : `
             before:-top-0
@@ -107,7 +107,7 @@ export default function Group(props: GroupProps) {
           
           before:rounded-lg
           before:animate-radialspin
-          before:bg-[radial-gradient(circle_at_center,red,_rebeccapurple)]
+          before:bg-[radial-gradient(circle_at_center,lightgreen,_rebeccapurple)]
           `}
         >
           <IconEffect icon={group.icon} />

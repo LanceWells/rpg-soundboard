@@ -104,7 +104,7 @@ export default function Board(props: BoardProps) {
           <PencilIcon />
         </button>
       </div>
-      <div className="rounded-md p-3 flex flex-row items-start flex-wrap gap-4 [grid-area:boards]">
+      <div className="rounded-md p-3 flex flex-row items-start flex-wrap gap-8 [grid-area:boards]">
         <DndContext onDragStart={onDragStart} onDragEnd={onDragEnd} sensors={sensors}>
           <SortableContext items={groupIDs}>{groups}</SortableContext>
         </DndContext>

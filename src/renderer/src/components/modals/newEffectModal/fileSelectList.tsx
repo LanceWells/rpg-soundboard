@@ -16,7 +16,7 @@ export type FileSelectInputProps = {
 
 export function FileSelectInput(props: FileSelectInputProps) {
   const { className, error } = props
-  const { addWorkingFile } = useAudioStore()
+  const { addWorkingFiles: addWorkingFile } = useAudioStore()
 
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -128,7 +128,8 @@ function FileEntry(props: FileEntryProps) {
     const sound = new SoundContainer({
       format: soundData.format,
       src: soundData.soundB64,
-      volume: file.volume
+      volume: file.volume,
+      repeats: false
     })
 
     sound.Play()
