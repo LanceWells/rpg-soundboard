@@ -163,8 +163,7 @@ export const useAudioStore = create<AudioStore>((set) => ({
   },
   async playGroup(groupID) {
     const audio = await window.audio.GetGroupSound({
-      groupID: groupID,
-      relFile: import.meta.dirname
+      groupID: groupID
     })
 
     const handleHowlStop = (groupID: GroupID) => {

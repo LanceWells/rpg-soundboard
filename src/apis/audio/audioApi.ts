@@ -17,8 +17,8 @@ import {
   GroupID,
   IAudioApi,
   PreviewSoundResponse,
-  ReorderGroupsRequest as MoveGroupRequest,
-  ReorderGroupsResponse as MoveGroupResponse,
+  ReorderGroupsRequest,
+  ReorderGroupsResponse,
   SoundBoard,
   SoundEffect,
   SoundGroup
@@ -29,7 +29,11 @@ import { produce } from 'immer'
 import fs from 'node:fs'
 import path from 'node:path'
 import { GetAppDataPath } from '../../utils/paths'
+import { SupportedFileTypes } from './supportedFileTypes'
 
+/**
+ * An instantiation of the config for information related to this audio API.
+ */
 const config: ConfigStorage<AudioApiConfig> = new ConfigStorage('audio', {
   boards: []
 })
@@ -37,25 +41,6 @@ const config: ConfigStorage<AudioApiConfig> = new ConfigStorage('audio', {
 const allGroups = config.Config.boards.flatMap((b) => b.groups)
 const boardMap = new Map(config.Config.boards.map((b) => [b.id, b]))
 const groupMap = new Map(allGroups.map((g) => [g.id, g]))
-
-export const SupportedFileTypes = {
-  '.mp3': 0,
-  '.mpeg': 1,
-  '.opus': 2,
-  '.ogg': 3,
-  '.oga': 4,
-  '.wav': 5,
-  '.aac': 6,
-  '.caf': 7,
-  '.m4a': 8,
-  '.mp4': 9,
-  '.weba': 10,
-  '.webm': 11,
-  '.dolby': 12,
-  '.flac': 13
-}
-
-export type SupportedFileTypes = keyof typeof SupportedFileTypes
 
 const getBoardPath = (boardID: BoardID): string => {
   const appDataPath = GetAppDataPath()
@@ -160,7 +145,7 @@ const SaveConfig = (newConfig: AudioApiConfig) => {
     })
   })
 
-  config.UpdateConfig(newConfig)
+  config.Config = newConfig
 }
 
 export const audioApi: IAudioApi = {
@@ -442,7 +427,7 @@ export const audioApi: IAudioApi = {
       volume: request.effect.volume
     }
   },
-  ReorderGroups: function (request: MoveGroupRequest): MoveGroupResponse {
+  ReorderGroups: function (request: ReorderGroupsRequest): ReorderGroupsResponse {
     const board = boardMap.get(request.boardID)
 
     if (!board) {

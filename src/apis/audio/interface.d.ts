@@ -1,4 +1,4 @@
-import { SupportedFileTypes as SupportedFileType } from './audioApi'
+import { SupportedFileTypes } from './supportedFileTypes'
 
 /**
  * Represents the icon associated with an {@link SoundGroup}.
@@ -41,7 +41,7 @@ export type SoundEffect = {
    * The file type associated with this given sound effect. Used with howler to determine how to
    * play the given audio, considering that the audio will be translated into a base64 data URL.
    */
-  format: SupportedFileType
+  format: SupportedFileTypes
 
   /**
    * The volume associated with the sound effect. Represented by a number from 0 to 100, where 100
@@ -89,8 +89,14 @@ export type SoundGroup = {
    */
   repeats: boolean
 
+  /**
+   * If true, this effect should fade in when starting.
+   */
   fadeIn: boolean
 
+  /**
+   * If true, this effect should fade out when ending.
+   */
   fadeOut: boolean
 }
 
@@ -136,10 +142,13 @@ export type SoundBoard = {
   groups: SoundGroup[]
 }
 
+/**
+ * A set of editable fields as a subset of a {@link SoundBoard}.
+ */
 export type SoundBoardEditableFields = Omit<SoundBoard, 'id' | 'groups'>
 
 /**
- * A request for {@link IAudioApi.CreateGroup}.
+ * The request object for {@link IAudioApi.CreateGroup}.
  */
 export type CreateGroupRequest = {
   /**
@@ -148,134 +157,421 @@ export type CreateGroupRequest = {
   boardID: BoardID
 } & SoundGroupEditableFields
 
+/**
+ * The response object for {@link IAudioApi.CreateGroup}.
+ */
 export type CreateGroupResponse = {
+  /**
+   * The group that has been created.
+   */
   group: SoundGroup
 }
 
-export type CreateBoardRequest = {
-  name: string
-}
+/**
+ * The request object for {@link IAudioApi.CreateBoard}.
+ */
+export type CreateBoardRequest = SoundBoardEditableFields
 
+/**
+ * The response object for {@link IAudioApi.CreateBoard}.
+ */
 export type CreateBoardResponse = {
+  /**
+   * The board that has been created.
+   */
   board: SoundBoard
 }
 
+/**
+ * The request object for {@link IAudioApi.AddEffectToGroup}.
+ */
 export type AddEffectToGroupRequest = {
+  /**
+   * The group to add the effect to.
+   */
   groupID: GroupID
+
+  /**
+   * The board that the group is a part of.
+   */
   boardID: BoardID
+
+  /**
+   * The path to the originating sound effect file.
+   */
   effectPath: string
+
+  /**
+   * The target volume for the sound effect. Should range from 0-100.
+   */
   effectVolume: number
 }
 
+/**
+ * The response object for {@link IAudioApi.AddEffectToGroupResponse}.
+ */
 export type AddEffectToGroupResponse = {
+  /**
+   * The sound effect that has been created.
+   */
   effect: SoundEffect
 }
 
+/**
+ * The request object for {@link IAudioApi.UpdateGroup}.
+ */
 export type UpdateGroupRequest = {
+  /**
+   * The ID for the board that this group belongs to.
+   */
   boardID: BoardID
+
+  /**
+   * The ID for the group that should be updated.
+   */
   groupID: GroupID
 } & SoundGroupEditableFields
 
+/**
+ * The response object for {@link IAudioApi.UpdateGroup}.
+ */
 export type UpdateGroupResponse = {
+  /**
+   * The sound group that has been updated.
+   */
   group: SoundGroup
 }
 
+/**
+ * The request object for {@link IAudioApi.GetGroup}.
+ */
 export type GetGroupRequest = {
+  /**
+   * The ID for the group to fetch.
+   */
   groupID: GroupID
 }
 
+/**
+ * The response object for {@link IAudioApi.GetGroup}.
+ */
 export type GetGroupResponse = {
+  /**
+   * The group that has been fetched, or undefined if the group was not found.
+   */
   group: SoundGroup | undefined
 }
 
+/**
+ * The request object for {@link IAudioApi.GetBoard}.
+ */
 export type GetBoardRequest = {
+  /**
+   * The ID for the board to fetch.
+   */
   boardID: BoardID
 }
 
+/**
+ * The response object for {@link IAudioApi.GetBoard}.
+ */
 export type GetBoardResponse = {
+  /**
+   * The board that has been fetched, or undefined if the board was not found.
+   */
   board: SoundBoard | undefined
 }
 
-export type GetAllBoardsRequest = NonNullable<unknown>
+/**
+ * The request object for {@link IAudioApi.GetAllBoardsRequest}.
+ */
+export type GetAllBoardsRequest = {}
 
+/**
+ * The response object for {@link IAudioApi.GetAllBoards}.
+ */
 export type GetAllBoardsResponse = {
+  /**
+   * All of the soundboards that are currently stored.
+   */
   boards: SoundBoard[]
 }
 
+/**
+ * The request object for {@link IAudioApi.GetGroupSound}.
+ */
 export type GetGroupSoundRequest = {
+  /**
+   * The ID for the group to get the sound effect for.
+   */
   groupID: GroupID
-  relFile: string
 }
 
-export type GetGroupSound = {
+/**
+ * The response object for {@link IAudioApi.GetGroupSound}.
+ */
+export type GetGroupSoundResponse = {
+  /**
+   * The base64 data URL for the file. This can be handed off directly to an audio player to load
+   * the sound effect.
+   */
   soundB64: string
+
+  /**
+   * The file format from the original file. This is necessary when sending a data URL into an audio
+   * player.
+   */
   format: SupportedFileType
+
+  /**
+   * The volume of the effect to play. Will range from 0 to 100.
+   */
   volume: number
+
+  /**
+   * If true, this audio should repeat.
+   */
   repeats: boolean
+
+  /**
+   * If true, this audio should fade in when starting.
+   */
   fadeIn: boolean
+
+  /**
+   * If true, this audio should fade out when stopping.
+   */
   fadeOut: boolean
 }
 
+/**
+ * The request object for {@link IAudioApi.PreviewSound}.
+ */
 export type PreviewSoundRequest = {
+  /**
+   * The set of editable fields for a given sound effect. Note that we only require the editable
+   * fields as there is no ID, etc. that can be attributed to an unsaved sound.
+   */
   effect: SoundEffectEditableFields
 }
 
+/**
+ * The response object for {@link IAudioApi.PreviewSound}.
+ */
 export type PreviewSoundResponse = {
+  /**
+   * The base64, data URL for a given sound effect.
+   */
   soundB64: string
+
+  /**
+   * The format for the original sound effect. Note that this is required when playing a sound via
+   * a data URL.
+   */
   format: SupportedFileType
+
+  /**
+   * The volume to play for the sound effect. Will range from 0 to 100.
+   */
   volume: number
 }
 
+/**
+ * The request object for {@link IAudioApi.ReorderGroups}.
+ */
 export type ReorderGroupsRequest = {
+  /**
+   * The ID for the board that should have its groups reordered.
+   */
   boardID: BoardID
+
+  /**
+   * The new order that the groups should be rearranged in.
+   */
   newOrder: GroupID[]
 }
 
+/**
+ * The response object for {@link IAudioApi.ReorderGroups}.
+ */
 export type ReorderGroupsResponse = {}
 
+/**
+ * The request object for {@link IAudioApi.DeleteGroup}.
+ */
 export type DeleteGroupRequest = {
+  /**
+   * The ID for the group that should be deleted.
+   */
   groupID: GroupID
 }
 
+/**
+ * The response object for {@link IAudioApi.DeleteGroup}.
+ */
 export type DeleteGroupResponse = {}
 
+/**
+ * The request object for {@link IAudioApi.UpdateBoard}.
+ */
 export type UpdateBoardRequest = {
+  /**
+   * The ID for the board that should be updated.
+   */
   boardID: BoardID
+
+  /**
+   * The new fields that should be configured for the given board.
+   */
   fields: SoundBoardEditableFields
 }
 
+/**
+ * The response object for {@link IAudioApi.UpdateBoard}.
+ */
+export type UpdateBoardResponse = { board: SoundBoard }
+
+/**
+ * The request object for {@link IAudioApi.DeleteBoardRequest}.
+ */
 export type DeleteBoardRequest = {
+  /**
+   * The ID for the board to be deleted.
+   */
   boardID: BoardID
 }
 
+/**
+ * The response object for {@link IAudioApi.DeleteBoard}.
+ */
 export type DeleteBoardResponse = {}
 
-export type UpdateBoardResponse = { board: SoundBoard }
-
+/**
+ * The root object for the audio API, and the storage for all soundboards.
+ */
 export type AudioApiConfig = {
+  /**
+   * The set of soundboards that are stored in the relevant config file.
+   */
   boards: SoundBoard[]
 }
 
+/**
+ * An ID that refers to a particular soundboard.
+ */
 export type BoardID = `brd-${string}-${string}-${string}-${string}-${string}`
 
+/**
+ * An ID that refers to a particular sound group.
+ */
 export type GroupID = `grp-${string}-${string}-${string}-${string}-${string}`
 
+/**
+ * An ID that refers to a particular sound effect.
+ */
 export type EffectID = `eff-${string}-${string}-${string}-${string}-${string}`
 
+/**
+ * An interface used to define the set of methods that comprise the "Audio" side of the application.
+ */
 export interface IAudioApi {
+  /**
+   * Gets a specific group from the soundboard storage.
+   *
+   * @param request See {@link GetGroupRequest}.
+   */
   GetGroup(request: GetGroupRequest): GetGroupResponse
-  CreateGroup(request: CreateGroupRequest): CreateGroupResponse
-  UpdateGroup(request: UpdateGroupRequest): UpdateGroupResponse
-  AddEffectToGroup(request: AddEffectToGroupRequest): AddEffectToGroupResponse
-  GetGroupSound(request: GetGroupSoundRequest): Promise<GetGroupSound>
 
+  /**
+   * Creates a new group for a particular soundboard.
+   *
+   * @param request See {@link CreateGroupRequest}.
+   */
+  CreateGroup(request: CreateGroupRequest): CreateGroupResponse
+
+  /**
+   * Updates a particular group with a new set of specified values.
+   *
+   * @param request See {@link UpdateGroupRequest}.
+   */
+  UpdateGroup(request: UpdateGroupRequest): UpdateGroupResponse
+
+  /**
+   * Adds a sound effect to a given sound group.
+   *
+   * @param request See {@link AddEffectToGroupRequest}.
+   */
+  AddEffectToGroup(request: AddEffectToGroupRequest): AddEffectToGroupResponse
+
+  /**
+   * Gets a sound effect from a given group.
+   *
+   * Note that if a particular group has multiple sound effects, that one will be chosen from that
+   * group at random.
+   *
+   * To simplify the setup process, there are no weighted values to determine which sound effect is
+   * retrieved.
+   *
+   * @param request See {@link GetGroupSoundRequest}.
+   */
+  GetGroupSound(request: GetGroupSoundRequest): Promise<GetGroupSoundResponse>
+
+  /**
+   * Gets a particular soundboard.
+   *
+   * @param request See {@link GetBoardRequest}.
+   */
   GetBoard(request: GetBoardRequest): GetBoardResponse
+
+  /**
+   * Creates a new soundboard.
+   *
+   * @param request See {@link CreateBoardRequest}.
+   */
   CreateBoard(request: CreateBoardRequest): CreateBoardResponse
+
+  /**
+   * Updates a particular soundboard.
+   *
+   * @param request See {@link UpdateBoardRequest}.
+   */
   UpdateBoard(request: UpdateBoardRequest): UpdateBoardResponse
+
+  /**
+   * Deletes a given soundboard. Note that this will delete not only the board, but it will delete
+   * information about all of the groups that it contains as well as the stored sound effects for
+   * each group in this board.
+   *
+   * @param request See {@link DeleteBoardRequest}.
+   */
   DeleteBoard(request: DeleteBoardRequest): DeleteBoardResponse
+
+  /**
+   * Gets all soundboards that are currently stored by the system.
+   *
+   * @param request See {@link GetAllBoardsRequest}.
+   */
   GetAllBoards(request: GetAllBoardsRequest): GetAllBoardsResponse
+
+  /**
+   * Reorders groups in a particular soundboard.
+   *
+   * @param request See {@link ReorderGroupsRequest}.
+   */
   ReorderGroups(request: ReorderGroupsRequest): ReorderGroupsResponse
+
+  /**
+   * Deletes a particular group. Note that this will also delete all related sound effect files.
+   *
+   * @param request See {@link DeleteGroupRequest}.
+   */
   DeleteGroup(request: DeleteGroupRequest): DeleteGroupResponse
 
+  /**
+   * Used to preview a particular sound effect. Useful when we don't quite want to store a sound
+   * effect before we try to listen to it.
+   *
+   * @param request See {@link PreviewSoundRequest}.
+   */
   PreviewSound(request: PreviewSoundRequest): Promise<PreviewSoundResponse>
 }
