@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react'
+import { ChangeEvent, ChangeEventHandler, useCallback, useMemo, useState } from 'react'
 import { GroupID, SoundBoard } from 'src/apis/audio/interface'
 import Group from '../group/group'
 import { EditingMode, useAudioStore } from '@renderer/stores/audioStore'
@@ -14,6 +14,8 @@ import {
   useSensors
 } from '@dnd-kit/core'
 import { SortableContext } from '@dnd-kit/sortable'
+import TextField from '../modals/newEffectModal/textField'
+import debounce from 'debounce'
 
 export type BoardProps = {
   board: SoundBoard
@@ -21,7 +23,8 @@ export type BoardProps = {
 
 export default function Board(props: BoardProps) {
   const { board } = props
-  const { setEditingBoardID, setEditingMode, editingMode, reorderGroups } = useAudioStore()
+  const { setEditingBoardID, setEditingMode, editingMode, reorderGroups, updateBoard } =
+    useAudioStore()
 
   const sensors = useSensors(useSensor(PointerSensor), useSensor(TouchSensor))
 
@@ -71,6 +74,21 @@ export default function Board(props: BoardProps) {
     setEditingMode('Dragging')
   }, [editingMode, setEditingMode])
 
+  const onUpdateTitle = useCallback<ChangeEventHandler<HTMLInputElement>>(
+    debounce((e: ChangeEvent<HTMLInputElement>) => {
+      if (e.target.value) {
+        updateBoard({
+          boardID: board.id,
+          fields: {
+            ...board,
+            name: e.target.value
+          }
+        })
+      }
+    }, 200),
+    [board.name]
+  )
+
   return (
     <div
       className={`
@@ -81,30 +99,56 @@ export default function Board(props: BoardProps) {
       mx-4
       rounded-lg
       shadow-sm
-      justify-items-center
       items-center
-      justify-between
-      flex
-      flex-col
+      grid
+      [grid-template-areas:_"._title_editbutton"_"groups_groups_groups"_"delete_add_."]
+      [grid-template-columns:_1fr_max-content_1fr]
+      [grid-template-rows:_min-content_1fr_min-content]
     `}
     >
-      <div className="flex relative w-full">
-        <h3 className="text-center w-full text-xl [grid-area:_title]">{board.name}</h3>
-        <button
-          onClick={onClickEdit}
+      <div className="justify-center w-full text-center text-xl [grid-area:title]">
+        <h3
           className={`
-            absolute
-            right-0
-            btn
-            btn-square
-            ${editingMode === 'Off' ? 'btn-outline' : 'btn-secondary'}
-            [grid-area:editbutton]
+              h-12
+              ${editingMode === 'Off' ? 'visible' : 'hidden'}
           `}
         >
-          <PencilIcon />
-        </button>
+          {board.name}
+        </h3>
+        <TextField
+          className={`
+              h-12
+              ${editingMode === 'Off' ? 'hidden' : 'visible'}
+            `}
+          formName="Board Title"
+          onChange={onUpdateTitle}
+          defaultValue={board.name}
+        />
       </div>
-      <div className="rounded-md p-3 flex flex-row items-start flex-wrap gap-8 [grid-area:boards]">
+      <button
+        onClick={onClickEdit}
+        className={`
+            btn
+            justify-self-end
+            btn-square
+            [grid-area:editbutton]
+            ${editingMode === 'Off' ? 'btn-outline' : 'btn-secondary'}
+          `}
+      >
+        <PencilIcon />
+      </button>
+      <div
+        className={`
+          rounded-md
+          p-3
+          flex
+          flex-row
+          justify-self-center
+          flex-wrap
+          gap-8
+          [grid-area:groups]
+      `}
+      >
         <DndContext onDragStart={onDragStart} onDragEnd={onDragEnd} sensors={sensors}>
           <SortableContext items={groupIDs}>{groups}</SortableContext>
         </DndContext>
@@ -113,9 +157,9 @@ export default function Board(props: BoardProps) {
         className={`
           btn-primary
           btn
-          place-content-center
           w-40
-          [grid-area:_neweff]
+          justify-self-center
+          [grid-area:_add]
         `}
         onClick={onNewGroup}
       >

@@ -278,10 +278,31 @@ export const audioApi: IAudioApi = {
       board: newBoard
     }
   },
+  UpdateBoard(request) {
+    const matchingBoard = this.GetBoard({ boardID: request.boardID })
+    if (!matchingBoard.board) {
+      throw new Error(`Could not find matching board with ID ${request.boardID}.`)
+    }
+
+    const newConfig = produce(config.Config, (draft) => {
+      const matchingBoard = draft.boards.find((b) => b.id === request.boardID)
+      if (matchingBoard) {
+        matchingBoard.name = request.fields.name
+      }
+    })
+
+    SaveConfig(newConfig)
+
+    const updatedBoard = this.GetBoard({ boardID: request.boardID })
+
+    return {
+      board: updatedBoard.board!
+    }
+  },
   AddEffectToGroup: function (request: AddEffectToGroupRequest): AddEffectToGroupResponse {
     const matchingGroup = this.GetGroup({ groupID: request.groupID })
     if (!matchingGroup) {
-      throw new Error(`Could not find matching board with ID ${request.boardID}.`)
+      throw new Error(`Could not find matching group with ID ${request.groupID}.`)
     }
 
     const pathExt = path.parse(request.effectPath).ext

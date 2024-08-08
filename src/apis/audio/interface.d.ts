@@ -136,6 +136,8 @@ export type SoundBoard = {
   groups: SoundGroup[]
 }
 
+export type SoundBoardEditableFields = Omit<SoundBoard, 'id' | 'groups'>
+
 /**
  * A request for {@link IAudioApi.CreateGroup}.
  */
@@ -237,6 +239,13 @@ export type DeleteGroupRequest = {
 
 export type DeleteGroupResponse = {}
 
+export type UpdateBoardRequest = {
+  boardID: BoardID
+  fields: SoundBoardEditableFields
+}
+
+export type UpdateBoardResponse = { board: SoundBoard }
+
 export type AudioApiConfig = {
   boards: SoundBoard[]
 }
@@ -256,6 +265,7 @@ export interface IAudioApi {
 
   GetBoard(request: GetBoardRequest): GetBoardResponse
   CreateBoard(request: CreateBoardRequest): CreateBoardResponse
+  UpdateBoard(request: UpdateBoardRequest): UpdateBoardResponse
   GetAllBoards(request: GetAllBoardsRequest): GetAllBoardsResponse
   ReorderGroups(request: ReorderGroupsRequest): ReorderGroupsResponse
   DeleteGroup(request: DeleteGroupRequest): DeleteGroupResponse
