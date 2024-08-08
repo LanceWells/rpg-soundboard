@@ -76,6 +76,8 @@ export type AudioStoreMethods = {
   updateWorkingFile: (index: number, volume: number) => void
   setGroupName: (name: string | undefined) => void
   setGroupRepeating: (shouldRepeat: boolean) => void
+  setFadeIn: (fade: boolean) => void
+  setFadeOut: (fade: boolean) => void
   setSelectedIcon: (icon: SoundIcon) => void
   resetEditingGroup: () => void
   deleteGroup: (id: GroupID) => void
@@ -98,7 +100,9 @@ const getDefaultGroup = (): SoundGroupEditableFields => ({
     name: 'moon'
   },
   name: '',
-  repeats: false
+  repeats: false,
+  fadeIn: false,
+  fadeOut: false
 })
 
 export const useAudioStore = create<AudioStore>((set) => ({
@@ -180,7 +184,9 @@ export const useAudioStore = create<AudioStore>((set) => ({
       },
       src: audio.soundB64,
       volume: audio.volume,
-      repeats: audio.repeats
+      repeats: audio.repeats,
+      fadeIn: audio.fadeIn,
+      fadeOut: audio.fadeOut
     })
 
     GroupStopHandles.set(groupID, sound.GetStopHandle())
@@ -216,6 +222,20 @@ export const useAudioStore = create<AudioStore>((set) => ({
     set(
       produce((state: AudioStore) => {
         state.editingGroup.repeats = shouldRepeat
+      })
+    )
+  },
+  setFadeIn(fade) {
+    set(
+      produce((state: AudioStore) => {
+        state.editingGroup.fadeIn = fade
+      })
+    )
+  },
+  setFadeOut(fade) {
+    set(
+      produce((state: AudioStore) => {
+        state.editingGroup.fadeOut = fade
       })
     )
   },

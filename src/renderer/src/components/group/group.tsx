@@ -26,7 +26,9 @@ export default function Group(props: GroupProps) {
     setGroupName,
     resetWorkingFiles,
     setEditingBoardID,
-    setGroupRepeating
+    setGroupRepeating,
+    setFadeIn,
+    setFadeOut
   } = useAudioStore()
 
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
@@ -59,6 +61,8 @@ export default function Group(props: GroupProps) {
     resetWorkingFiles(group.effects)
     setEditingBoardID(boardID)
     setGroupRepeating(group.repeats)
+    setFadeIn(group.fadeIn)
+    setFadeOut(group.fadeOut)
     ;(document.getElementById(EditEffectModalId) as HTMLDialogElement).showModal()
   }, [group, boardID])
 
@@ -105,7 +109,7 @@ export default function Group(props: GroupProps) {
           before:-z-10
           before:absolute
           
-          before:rounded-lg
+          before:rounded-xl
           before:animate-radialspin
           before:bg-[radial-gradient(circle_at_center,lightgreen,_rebeccapurple)]
           `}

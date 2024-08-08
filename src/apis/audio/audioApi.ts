@@ -170,7 +170,9 @@ export const audioApi: IAudioApi = {
       id: newGroupID,
       name: request.name,
       icon: request.icon,
-      repeats: request.repeats
+      repeats: request.repeats,
+      fadeIn: request.fadeIn,
+      fadeOut: request.fadeOut
     }
 
     const newConfig = produce(config.Config, (draft) => {
@@ -231,7 +233,9 @@ export const audioApi: IAudioApi = {
       id: request.groupID,
       name: request.name,
       icon: request.icon,
-      repeats: request.repeats
+      repeats: request.repeats,
+      fadeIn: request.fadeIn,
+      fadeOut: request.fadeOut
     }
 
     const newConfig = produce(config.Config, (draft) => {
@@ -328,7 +332,9 @@ export const audioApi: IAudioApi = {
         soundB64: '',
         format: '.mp3',
         volume: 100,
-        repeats: false
+        repeats: false,
+        fadeIn: group?.fadeIn ?? false,
+        fadeOut: group?.fadeOut ?? false
       }
     }
 
@@ -352,7 +358,9 @@ export const audioApi: IAudioApi = {
       soundB64: r?.toString() ?? '',
       format: effect.format as SupportedFileTypes,
       volume: effect.volume,
-      repeats: group.repeats
+      repeats: group.repeats,
+      fadeIn: group?.fadeIn ?? false,
+      fadeOut: group?.fadeOut ?? false
     }
   },
   async PreviewSound(request): Promise<PreviewSoundResponse> {

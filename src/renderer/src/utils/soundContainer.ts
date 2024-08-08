@@ -12,6 +12,8 @@ export type SoundContainerSetup = {
   format: string
   repeats: boolean
   stopHandler?: StopHandler
+  fadeIn?: boolean
+  fadeOut?: boolean
 }
 
 export class SoundContainer {
@@ -19,15 +21,25 @@ export class SoundContainer {
   private _stopHandler: StopHandler | undefined
   private _repeats: boolean
 
+  private _targetVolume: number
+  private _fadeIn: boolean
+  private _fadeOut: boolean
+  private _fadeOutRef: NodeJS.Timeout | undefined
+
+  static FadeTime = 200
+
   constructor(setup: SoundContainerSetup) {
-    const { format, src, volume, stopHandler, repeats } = setup
+    const { format, src, volume, stopHandler, repeats, fadeIn, fadeOut } = setup
 
     this._repeats = repeats
+    this._targetVolume = volume / 100
+    this._fadeIn = fadeIn ?? false
+    this._fadeOut = fadeOut ?? false
 
     this._howl = new Howl({
       src,
       format: format.replace('.', ''),
-      volume: volume / 100,
+      volume: this._fadeIn ? 0 : this._targetVolume,
       loop: repeats
     })
 
@@ -53,7 +65,21 @@ export class SoundContainer {
   }
 
   Play() {
+    const timeToFade = this._howl.duration() - SoundContainer.FadeTime
+
+    if (this._fadeOut && timeToFade > 0) {
+      this._fadeOutRef = setTimeout(() => {
+        if (this && this._howl) {
+          this._howl.fade(this._targetVolume, 0, SoundContainer.FadeTime)
+        }
+      }, SoundContainer.FadeTime)
+    }
+
     this._howl.play()
+
+    if (this._fadeIn) {
+      this._howl.fade(0, 1, SoundContainer.FadeTime)
+    }
   }
 
   GetStopHandle() {
@@ -61,6 +87,7 @@ export class SoundContainer {
   }
 
   private HandleHowlStop() {
+    clearTimeout(this._fadeOutRef)
     this._howl.off()
     if (this._stopHandler) {
       this._stopHandler.handler(this._stopHandler.id)
@@ -68,6 +95,16 @@ export class SoundContainer {
   }
 
   private StopSound() {
+    if (this._fadeOut && this._repeats) {
+      this._howl.fade(this._targetVolume, 0, SoundContainer.FadeTime)
+      setTimeout(() => {
+        this._howl.stop()
+        this.HandleHowlStop()
+      }, SoundContainer.FadeTime)
+
+      return
+    }
+
     this._howl.stop()
     this.HandleHowlStop()
   }

@@ -88,6 +88,10 @@ export type SoundGroup = {
    * once the sound has ended. Must be stopped manually.
    */
   repeats: boolean
+
+  fadeIn: boolean
+
+  fadeOut: boolean
 }
 
 /**
@@ -206,6 +210,8 @@ export type GetGroupSound = {
   format: SupportedFileType
   volume: number
   repeats: boolean
+  fadeIn: boolean
+  fadeOut: boolean
 }
 
 export type PreviewSoundRequest = {

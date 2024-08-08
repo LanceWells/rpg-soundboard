@@ -34,7 +34,9 @@ export default function EffectModal(props: PropsWithChildren<EffectModalProps>) 
     setSelectedIcon,
     editingGroup,
     resetEditingGroup,
-    setGroupRepeating
+    setGroupRepeating,
+    setFadeIn,
+    setFadeOut
   } = useAudioStore()
 
   const [effectNameErr, setEffectNameErr] = useState('')
@@ -67,6 +69,20 @@ export default function EffectModal(props: PropsWithChildren<EffectModalProps>) 
       setGroupRepeating(e.target.checked)
     },
     [setGroupRepeating, editingGroup.repeats]
+  )
+
+  const handleFadeInCheck = useCallback<ChangeEventHandler<HTMLInputElement>>(
+    (e) => {
+      setFadeIn(e.target.checked)
+    },
+    [setFadeIn, editingGroup.fadeIn]
+  )
+
+  const handleFadeOutCheck = useCallback<ChangeEventHandler<HTMLInputElement>>(
+    (e) => {
+      setFadeOut(e.target.checked)
+    },
+    [setFadeOut, editingGroup.fadeOut]
   )
 
   const onClose = useCallback(() => {
@@ -119,7 +135,7 @@ export default function EffectModal(props: PropsWithChildren<EffectModalProps>) 
           className={`
             grid
             gap-4
-            [grid-template-areas:_"icon_form_fileselect"_"lookup_lookup_files"_"foreground_background_repeat"]
+            [grid-template-areas:_"icon_form_fileselect"_"lookup_lookup_files"_"foreground_background_toggles"]
             items-center
             w-full
           `}
@@ -148,12 +164,26 @@ export default function EffectModal(props: PropsWithChildren<EffectModalProps>) 
             onColorChange={handleBackgroundSelect}
             className="[grid-area:_background]"
           />
-          <CheckboxField
-            formName="Repeat?"
-            className="[grid-area:repeat]"
-            checked={editingGroup.repeats}
-            onChange={handleRepeatsCheck}
-          />
+          <div className="flex [grid-area:toggles]">
+            <CheckboxField
+              formName="Repeat?"
+              className="[grid-area:repeat]"
+              checked={editingGroup.repeats}
+              onChange={handleRepeatsCheck}
+            />
+            <CheckboxField
+              formName="Fade In?"
+              className="[grid-area:repeat]"
+              checked={editingGroup.fadeIn}
+              onChange={handleFadeInCheck}
+            />
+            <CheckboxField
+              formName="Fade-Out?"
+              className="[grid-area:repeat]"
+              checked={editingGroup.fadeOut}
+              onChange={handleFadeOutCheck}
+            />
+          </div>
         </div>
         <div className="modal-action">
           <form method="dialog" className="w-full">
