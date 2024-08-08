@@ -1,9 +1,10 @@
-import { ChangeEventHandler, useCallback, useMemo, useRef } from 'react'
+import { ChangeEventHandler, useCallback, useMemo, useRef, useState } from 'react'
 import { useAudioStore } from '@renderer/stores/audioStore'
 import SoundIcon from '@renderer/assets/icons/sound'
 import CloseIcon from '@renderer/assets/icons/close'
 import { SoundContainer } from '@renderer/utils/soundContainer'
 import { SoundEffectEditableFields } from 'src/apis/audio/interface'
+import StopIcon from '@renderer/assets/icons/stop'
 
 export type FileSelectListProps = {
   className?: string
@@ -106,6 +107,10 @@ type FileEntryProps = {
 function FileEntry(props: FileEntryProps) {
   const { file, index, onClick } = props
 
+  const [isPlaying, setIsPlaying] = useState(false)
+  const stopHandler = useRef<() => void>()
+  const volumeHandler = useRef<(volume: number) => void>()
+
   const { updateWorkingFile } = useAudioStore()
 
   const fileName = useMemo(() => {
@@ -118,30 +123,58 @@ function FileEntry(props: FileEntryProps) {
   }, [index, onclick])
 
   const onClickTest = useCallback(async () => {
-    const soundData = await window.audio.PreviewSound({
-      effect: {
-        path: file.path,
-        volume: file.volume
+    if (!isPlaying) {
+      const soundData = await window.audio.PreviewSound({
+        effect: {
+          path: file.path,
+          volume: file.volume
+        }
+      })
+
+      const handleStop = () => {
+        setIsPlaying(false)
+        stopHandler.current = undefined
       }
-    })
 
-    const sound = new SoundContainer({
-      format: soundData.format,
-      src: soundData.soundB64,
-      volume: file.volume,
-      repeats: false
-    })
+      const sound = new SoundContainer({
+        format: soundData.format,
+        src: soundData.soundB64,
+        volume: file.volume,
+        repeats: false,
+        stopHandler: {
+          id: undefined,
+          handler: handleStop
+        }
+      })
 
-    sound.Play()
-  }, [file, file.volume])
+      setIsPlaying(true)
+
+      stopHandler.current = sound.GetStopHandle()
+      volumeHandler.current = sound.GetVolumeHandle()
+
+      sound.Play()
+    } else {
+      if (stopHandler.current) {
+        stopHandler.current()
+      }
+
+      stopHandler.current = undefined
+      setIsPlaying(false)
+    }
+  }, [file, file.volume, isPlaying, stopHandler])
 
   const onChangeVolume = useCallback<ChangeEventHandler<HTMLInputElement>>(
     (e) => {
       const parsedVol = parseInt(e.target.value)
       const volToSet = isNaN(parsedVol) ? 100 : parsedVol
+
       updateWorkingFile(index, volToSet)
+
+      if (isPlaying && volumeHandler.current) {
+        volumeHandler.current(volToSet)
+      }
     },
-    [file.volume, index, updateWorkingFile]
+    [file.volume, index, updateWorkingFile, volumeHandler, isPlaying]
   )
 
   return (
@@ -197,7 +230,8 @@ function FileEntry(props: FileEntryProps) {
         [grid-area:_preview]
       `}
       >
-        <SoundIcon />
+        <SoundIcon className={isPlaying ? 'hidden' : 'visible'} />
+        <StopIcon className={isPlaying ? 'visible' : 'hidden'} />
       </button>
     </div>
   )

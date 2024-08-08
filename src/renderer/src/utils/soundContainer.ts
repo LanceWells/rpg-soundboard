@@ -1,24 +1,24 @@
 import { Howl } from 'howler'
 import { GroupID } from 'src/apis/audio/interface'
 
-type StopHandler = {
-  id: GroupID
-  handler: (groupID: GroupID) => void
+type StopHandler<T extends GroupID | undefined> = {
+  id: T
+  handler: (groupID: T) => void
 }
 
-export type SoundContainerSetup = {
+export type SoundContainerSetup<T extends GroupID | undefined> = {
   src: string
   volume: number
   format: string
   repeats: boolean
-  stopHandler?: StopHandler
+  stopHandler?: StopHandler<T>
   fadeIn?: boolean
   fadeOut?: boolean
 }
 
-export class SoundContainer {
+export class SoundContainer<T extends GroupID | undefined = GroupID> {
   private _howl: Howl
-  private _stopHandler: StopHandler | undefined
+  private _stopHandler: StopHandler<T> | undefined
   private _repeats: boolean
 
   private _targetVolume: number
@@ -28,7 +28,7 @@ export class SoundContainer {
 
   static FadeTime = 200
 
-  constructor(setup: SoundContainerSetup) {
+  constructor(setup: SoundContainerSetup<T>) {
     const { format, src, volume, stopHandler, repeats, fadeIn, fadeOut } = setup
 
     this._repeats = repeats
@@ -84,6 +84,15 @@ export class SoundContainer {
 
   GetStopHandle() {
     return () => this.StopSound()
+  }
+
+  GetVolumeHandle() {
+    return (volume: number) => {
+      if (this._howl.playing()) {
+        const newVolume = volume / 100
+        this._howl.volume(newVolume)
+      }
+    }
   }
 
   private HandleHowlStop() {
