@@ -15,8 +15,7 @@ import { produce } from 'immer'
 export const EditingModes = {
   Off: 0,
   Editing: 1,
-  Dragging: 2,
-  Deleting: 3
+  Dragging: 2
 }
 
 export type EditingMode = keyof typeof EditingModes
@@ -82,6 +81,7 @@ export type AudioStoreMethods = {
   setSelectedIcon: (icon: SoundIcon) => void
   resetEditingGroup: () => void
   deleteGroup: (id: GroupID) => void
+  deleteBoard: (id: BoardID) => void
 
   setEditingBoardID: (id: BoardID) => void
 
@@ -265,6 +265,16 @@ export const useAudioStore = create<AudioStore>((set) => ({
     set({
       boards: newBoards,
       editingGroup: getDefaultGroup()
+    })
+  },
+  deleteBoard(id) {
+    window.audio.DeleteBoard({
+      boardID: id
+    })
+
+    const newBoards = window.audio.GetAllBoards({}).boards
+    set({
+      boards: newBoards
     })
   },
   addGroup: (req) => {

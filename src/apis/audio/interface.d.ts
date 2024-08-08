@@ -244,6 +244,12 @@ export type UpdateBoardRequest = {
   fields: SoundBoardEditableFields
 }
 
+export type DeleteBoardRequest = {
+  boardID: BoardID
+}
+
+export type DeleteBoardResponse = {}
+
 export type UpdateBoardResponse = { board: SoundBoard }
 
 export type AudioApiConfig = {
@@ -266,6 +272,7 @@ export interface IAudioApi {
   GetBoard(request: GetBoardRequest): GetBoardResponse
   CreateBoard(request: CreateBoardRequest): CreateBoardResponse
   UpdateBoard(request: UpdateBoardRequest): UpdateBoardResponse
+  DeleteBoard(request: DeleteBoardRequest): DeleteBoardResponse
   GetAllBoards(request: GetAllBoardsRequest): GetAllBoardsResponse
   ReorderGroups(request: ReorderGroupsRequest): ReorderGroupsResponse
   DeleteGroup(request: DeleteGroupRequest): DeleteGroupResponse

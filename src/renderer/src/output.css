@@ -2834,6 +2834,10 @@ html {
   align-self: center;
 }
 
+.justify-self-start {
+  justify-self: start;
+}
+
 .justify-self-end {
   justify-self: end;
 }
@@ -3076,6 +3080,10 @@ html {
 
 .\[grid-area\:_title\] {
   grid-area: title;
+}
+
+.\[grid-area\:delete\] {
+  grid-area: delete;
 }
 
 .\[grid-area\:editbutton\] {

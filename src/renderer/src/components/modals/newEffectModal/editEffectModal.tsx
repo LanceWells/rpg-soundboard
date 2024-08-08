@@ -1,13 +1,15 @@
 import { useAudioStore } from '@renderer/stores/audioStore'
 import EffectModal from './effectModal'
-import { MouseEventHandler, useCallback, useMemo } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { CreateGroupRequest } from 'src/apis/audio/interface'
-import DeleteIcon from '@renderer/assets/icons/delete'
+import DeleteButton from '@renderer/components/generic/deleteButton'
 
 export const EditEffectModalId = 'edit-effect-modal'
 
 export default function EditEffectModal() {
   const { editingGroupID, updateGroup, editingMode, setEditingMode, deleteGroup } = useAudioStore()
+
+  const [isConfirmingDelete, setIsConfirmingDelete] = useState(false)
 
   const handleSubmit = useCallback(
     (req: CreateGroupRequest) => {
@@ -31,6 +33,7 @@ export default function EditEffectModal() {
   // where the user begins to delete an effect, but closes the window instead.
   const handleClose = useCallback(() => {
     setEditingMode('Editing')
+    setIsConfirmingDelete(false)
   }, [editingMode, setEditingMode])
 
   const onDelete = useCallback(() => {
@@ -41,9 +44,24 @@ export default function EditEffectModal() {
     setEditingMode('Editing')
   }, [editingGroupID, deleteGroup, setEditingMode])
 
+  const onAskConfirm = useCallback(() => {
+    setIsConfirmingDelete(true)
+  }, [setIsConfirmingDelete])
+
+  const onCancelDelete = useCallback(() => {
+    setIsConfirmingDelete(false)
+  }, [setIsConfirmingDelete])
+
   const deleteButton = useMemo(() => {
-    return <DeleteButton onDelete={onDelete} />
-  }, [editingMode, onDelete])
+    return (
+      <DeleteButton
+        onAskConfirm={onAskConfirm}
+        onCancelDelete={onCancelDelete}
+        isConfirming={isConfirmingDelete}
+        onDelete={onDelete}
+      />
+    )
+  }, [editingMode, onDelete, isConfirmingDelete])
 
   return (
     <EffectModal
@@ -55,63 +73,5 @@ export default function EditEffectModal() {
     >
       {deleteButton}
     </EffectModal>
-  )
-}
-
-type DeleteButtonProps = {
-  onDelete: () => void
-}
-
-function DeleteButton(props: DeleteButtonProps) {
-  const { onDelete } = props
-
-  const { editingMode, setEditingMode } = useAudioStore()
-
-  const onClickDelete = useCallback<MouseEventHandler<HTMLButtonElement>>(
-    (e) => {
-      e.preventDefault()
-      setEditingMode('Deleting')
-    },
-    [setEditingMode]
-  )
-
-  const onClickNope = useCallback<MouseEventHandler>(
-    (e) => {
-      e.preventDefault()
-      setEditingMode('Editing')
-    },
-    [setEditingMode]
-  )
-
-  return (
-    <div>
-      <button
-        onClick={onClickDelete}
-        className={`
-        ${editingMode === 'Editing' ? 'visible' : 'hidden'}
-        btn
-        btn-error
-      `}
-      >
-        <DeleteIcon />
-        Delete
-      </button>
-      <div
-        className={`
-        ${editingMode === 'Deleting' ? 'visible' : 'hidden'}
-        flex
-        items-center
-        gap-4
-      `}
-      >
-        <i>Really delete?</i>
-        <button className="btn btn-primary" onClick={onClickNope}>
-          Nope
-        </button>
-        <button className="btn btn-error" onClick={onDelete}>
-          Yes, really
-        </button>
-      </div>
-    </div>
   )
 }

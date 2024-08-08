@@ -16,6 +16,7 @@ import {
 import { SortableContext } from '@dnd-kit/sortable'
 import TextField from '../modals/newEffectModal/textField'
 import debounce from 'debounce'
+import DeleteButton from '../generic/deleteButton'
 
 export type BoardProps = {
   board: SoundBoard
@@ -23,8 +24,16 @@ export type BoardProps = {
 
 export default function Board(props: BoardProps) {
   const { board } = props
-  const { setEditingBoardID, setEditingMode, editingMode, reorderGroups, updateBoard } =
-    useAudioStore()
+  const {
+    setEditingBoardID,
+    setEditingMode,
+    editingMode,
+    reorderGroups,
+    updateBoard,
+    deleteBoard
+  } = useAudioStore()
+
+  const [isConfirmingDelete, setIsConfirmingDelete] = useState(false)
 
   const sensors = useSensors(useSensor(PointerSensor), useSensor(TouchSensor))
 
@@ -88,6 +97,18 @@ export default function Board(props: BoardProps) {
     }, 200),
     [board.name]
   )
+
+  const onDelete = useCallback(() => {
+    deleteBoard(board.id)
+  }, [deleteBoard, board.id])
+
+  const onAskConfirm = useCallback(() => {
+    setIsConfirmingDelete(true)
+  }, [setIsConfirmingDelete])
+
+  const onCancelDelete = useCallback(() => {
+    setIsConfirmingDelete(false)
+  }, [setIsConfirmingDelete])
 
   return (
     <div
@@ -165,6 +186,16 @@ export default function Board(props: BoardProps) {
       >
         <AddIcon />
       </button>
+      <DeleteButton
+        onAskConfirm={onAskConfirm}
+        onCancelDelete={onCancelDelete}
+        isConfirming={isConfirmingDelete}
+        onDelete={onDelete}
+        className={`
+          justify-self-start
+          [grid-area:delete]
+        `}
+      />
     </div>
   )
 }

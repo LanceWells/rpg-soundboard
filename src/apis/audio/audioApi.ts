@@ -57,9 +57,16 @@ export const SupportedFileTypes = {
 
 export type SupportedFileTypes = keyof typeof SupportedFileTypes
 
+const getBoardPath = (boardID: BoardID): string => {
+  const appDataPath = GetAppDataPath()
+  const boardDir = path.join(appDataPath, 'board-data', boardID)
+
+  return boardDir
+}
+
 const getGroupPath = (boardID: BoardID, groupID: GroupID): string => {
   const appDataPath = GetAppDataPath()
-  const effDir = path.join(appDataPath, boardID, groupID)
+  const effDir = path.join(appDataPath, 'board-data', boardID, groupID)
 
   return effDir
 }
@@ -124,6 +131,19 @@ const deleteGroupFolder = (boardID: BoardID, groupID: GroupID) => {
   }
 
   fs.rmSync(groupPath, {
+    recursive: true,
+    force: true
+  })
+}
+
+const deleteBoardFolder = (boardID: BoardID) => {
+  const boardPath = getBoardPath(boardID)
+
+  if (!fs.existsSync(boardPath)) {
+    console.error(`Attempt to delete a folder that does not exist (${boardPath})`)
+  }
+
+  fs.rmSync(boardPath, {
     recursive: true,
     force: true
   })
@@ -298,6 +318,22 @@ export const audioApi: IAudioApi = {
     return {
       board: updatedBoard.board!
     }
+  },
+  DeleteBoard(request) {
+    const matchingBoard = this.GetBoard({ boardID: request.boardID })
+    if (matchingBoard.board === undefined) {
+      throw new Error(`Could not find matching board with ID ${request.boardID}.`)
+    }
+
+    const newConfig = produce(config.Config, (draft) => {
+      draft.boards = draft.boards.filter((b) => b.id !== matchingBoard.board?.id)
+    })
+
+    SaveConfig(newConfig)
+
+    deleteBoardFolder(request.boardID)
+
+    return {}
   },
   AddEffectToGroup: function (request: AddEffectToGroupRequest): AddEffectToGroupResponse {
     const matchingGroup = this.GetGroup({ groupID: request.groupID })
