@@ -1,6 +1,7 @@
 import DeleteIcon from '@renderer/assets/icons/delete'
 import { useAudioStore } from '@renderer/stores/audioStore'
 import { useCallback, MouseEventHandler } from 'react'
+import { useShallow } from 'zustand/react/shallow'
 
 export type DeleteButtonProps = {
   className?: string
@@ -13,23 +14,21 @@ export type DeleteButtonProps = {
 export default function DeleteButton(props: DeleteButtonProps) {
   const { onDelete, onAskConfirm, onCancelDelete, isConfirming, className } = props
 
-  const { editingMode, setEditingMode } = useAudioStore()
-
-  const onClickDelete = useCallback<MouseEventHandler<HTMLButtonElement>>(
-    (e) => {
-      e.preventDefault()
-      onAskConfirm()
-    },
-    [setEditingMode]
+  const { editingMode } = useAudioStore(
+    useShallow((state) => ({
+      editingMode: state.editingMode
+    }))
   )
 
-  const onClickNope = useCallback<MouseEventHandler>(
-    (e) => {
-      e.preventDefault()
-      onCancelDelete()
-    },
-    [setEditingMode]
-  )
+  const onClickDelete = useCallback<MouseEventHandler<HTMLButtonElement>>((e) => {
+    e.preventDefault()
+    onAskConfirm()
+  }, [])
+
+  const onClickNope = useCallback<MouseEventHandler>((e) => {
+    e.preventDefault()
+    onCancelDelete()
+  }, [])
 
   return (
     <div className={className}>

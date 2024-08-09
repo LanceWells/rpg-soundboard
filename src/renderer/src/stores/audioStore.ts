@@ -12,12 +12,29 @@ import { ColorOptions } from '@renderer/components/modals/newEffectModal/colorPi
 import { SoundContainer } from '@renderer/utils/soundContainer'
 import { produce } from 'immer'
 
+/**
+ * A set of editing modes that the view might exist in.
+ */
 export const EditingModes = {
+  /**
+   * The view is not being edited currently.
+   */
   Off: 0,
+
+  /**
+   * The view is currently in "editing" mode, and element interaction should reflect that.
+   */
   Editing: 1,
+
+  /**
+   * Some groups are currently being dragged and re-arranged.
+   */
   Dragging: 2
 }
 
+/**
+ * A set of editing modes that the view might exist in.
+ */
 export type EditingMode = keyof typeof EditingModes
 
 /**
@@ -60,36 +77,45 @@ export type AudioState = {
   editingGroup: SoundGroupEditableFields
 }
 
-export type AudioStoreMethods = {
+export type AudioStoreGroupMethods = {
   addGroup: IAudioApi['CreateGroup']
   updateGroup: IAudioApi['UpdateGroup']
+  deleteGroup: (id: GroupID) => void
+}
+
+export type AudioStoreBoardMethods = {
   addBoard: IAudioApi['CreateBoard']
-  updateBoard: IAudioApi['UpdateBoard']
   reorderGroups: IAudioApi['ReorderGroups']
+  updateBoard: IAudioApi['UpdateBoard']
+  deleteBoard: (id: BoardID) => void
+}
+
+export type AudioStoreSoundMethods = {
+  playGroup: (groupID: GroupID) => void
+  stopGroup: (groupID: GroupID) => void
+}
+
+export type AudioStoreEditingModeMethods = {
+  resetEditingGroup: () => void
   setEditingMode: (isEditing: EditingMode) => void
-
   setEditingGroupID: (id: GroupID) => void
-
   addWorkingFiles: (list: SoundEffectEditableFields | SoundEffectEditableFields[]) => void
   resetWorkingFiles: (list?: SoundEffectEditableFields[]) => void
   removeWorkingFile: (index: number) => void
   updateWorkingFile: (index: number, volume: number) => void
+  setEditingBoardID: (id: BoardID) => void
   setGroupName: (name: string | undefined) => void
   setGroupRepeating: (shouldRepeat: boolean) => void
   setFadeIn: (fade: boolean) => void
   setFadeOut: (fade: boolean) => void
   setSelectedIcon: (icon: SoundIcon) => void
-  resetEditingGroup: () => void
-  deleteGroup: (id: GroupID) => void
-  deleteBoard: (id: BoardID) => void
-
-  setEditingBoardID: (id: BoardID) => void
-
-  playGroup: (groupID: GroupID) => void
-  stopGroup: (groupID: GroupID) => void
 }
 
-export type AudioStore = AudioState & AudioStoreMethods
+export type AudioStore = AudioState &
+  AudioStoreGroupMethods &
+  AudioStoreBoardMethods &
+  AudioStoreSoundMethods &
+  AudioStoreEditingModeMethods
 
 export const GroupStopHandles: Map<GroupID, () => void> = new Map()
 

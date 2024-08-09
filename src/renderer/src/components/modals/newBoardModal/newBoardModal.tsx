@@ -9,7 +9,7 @@ type NewBoardForm = {
 }
 
 export default function NewBoardModal() {
-  const { addBoard } = useAudioStore()
+  const addBoard = useAudioStore((state) => state.addBoard)
 
   const { register, handleSubmit } = useForm<NewBoardForm>({})
 

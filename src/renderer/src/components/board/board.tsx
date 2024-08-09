@@ -17,6 +17,7 @@ import { SortableContext } from '@dnd-kit/sortable'
 import TextField from '../modals/newEffectModal/textField'
 import debounce from 'debounce'
 import DeleteButton from '../generic/deleteButton'
+import { useShallow } from 'zustand/react/shallow'
 
 export type BoardProps = {
   board: SoundBoard
@@ -25,13 +26,22 @@ export type BoardProps = {
 export default function Board(props: BoardProps) {
   const { board } = props
   const {
+    editingMode,
     setEditingBoardID,
     setEditingMode,
-    editingMode,
     reorderGroups,
     updateBoard,
     deleteBoard
-  } = useAudioStore()
+  } = useAudioStore(
+    useShallow((state) => ({
+      editingMode: state.editingMode,
+      setEditingBoardID: state.setEditingBoardID,
+      setEditingMode: state.setEditingMode,
+      reorderGroups: state.reorderGroups,
+      updateBoard: state.updateBoard,
+      deleteBoard: state.deleteBoard
+    }))
+  )
 
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false)
 

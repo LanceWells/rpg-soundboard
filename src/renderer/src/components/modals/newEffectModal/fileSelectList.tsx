@@ -17,7 +17,8 @@ export type FileSelectInputProps = {
 
 export function FileSelectInput(props: FileSelectInputProps) {
   const { className, error } = props
-  const { addWorkingFiles: addWorkingFile } = useAudioStore()
+
+  const addWorkingFiles = useAudioStore((state) => state.addWorkingFiles)
 
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -29,12 +30,12 @@ export function FileSelectInput(props: FileSelectInputProps) {
 
       const newFile = e.target.files.item(0)!
 
-      addWorkingFile({
+      addWorkingFiles({
         path: newFile.path,
         volume: 100
       })
     },
-    [fileInputRef, addWorkingFile]
+    [fileInputRef, addWorkingFiles]
   )
 
   return (

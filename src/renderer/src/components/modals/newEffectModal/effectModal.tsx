@@ -15,6 +15,7 @@ import FileSelectList, { FileSelectInput } from './fileSelectList'
 import { CreateGroupRequest } from 'src/apis/audio/interface'
 import CheckboxField from './checkboxField'
 import CloseIcon from '@renderer/assets/icons/close'
+import { useShallow } from 'zustand/react/shallow'
 
 export type EffectModalProps = {
   id: string
@@ -28,16 +29,28 @@ export default function EffectModal(props: PropsWithChildren<EffectModalProps>) 
   const { id, handleSubmit, actionName, modalTitle, children, handleClose } = props
 
   const {
+    editingBoardID,
+    editingGroup,
     setGroupName,
     addGroup,
-    editingBoardID,
     setSelectedIcon,
-    editingGroup,
     resetEditingGroup,
     setGroupRepeating,
     setFadeIn,
     setFadeOut
-  } = useAudioStore()
+  } = useAudioStore(
+    useShallow((state) => ({
+      editingBoardID: state.editingBoardID,
+      editingGroup: state.editingGroup,
+      setGroupName: state.setGroupName,
+      addGroup: state.addGroup,
+      setSelectedIcon: state.setSelectedIcon,
+      resetEditingGroup: state.resetEditingGroup,
+      setGroupRepeating: state.setGroupRepeating,
+      setFadeIn: state.setFadeIn,
+      setFadeOut: state.setFadeOut
+    }))
+  )
 
   const [effectNameErr, setEffectNameErr] = useState('')
   const [fileListErr, setFileListErr] = useState('')

@@ -3,6 +3,7 @@ import { IconBody } from '@renderer/utils/fetchIcons'
 import { useCallback } from 'react'
 import { IconEffect } from '../../effect/icon-effect'
 import { ColorOptions } from './colorPicker'
+import { useShallow } from 'zustand/react/shallow'
 
 export type IconPreviewProps = {
   icon: IconBody
@@ -11,7 +12,12 @@ export type IconPreviewProps = {
 export function IconPreview(props: IconPreviewProps) {
   const { icon } = props
 
-  const { editingGroup, setSelectedIcon } = useAudioStore()
+  const { editingGroup, setSelectedIcon } = useAudioStore(
+    useShallow((state) => ({
+      editingGroup: state.editingGroup,
+      setSelectedIcon: state.setSelectedIcon
+    }))
+  )
 
   const handlePickIcon = useCallback(() => {
     setSelectedIcon({

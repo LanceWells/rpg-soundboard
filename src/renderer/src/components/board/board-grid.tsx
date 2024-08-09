@@ -4,7 +4,7 @@ import Board from './board'
 import { NewBoardModalId } from '../modals/newBoardModal/newBoardModal'
 
 export default function BoardGrid() {
-  const { boards } = useAudioStore()
+  const boards = useAudioStore((state) => state.boards)
 
   const onNewBoard = useCallback(() => {
     ;(document.getElementById(NewBoardModalId) as HTMLDialogElement).showModal()

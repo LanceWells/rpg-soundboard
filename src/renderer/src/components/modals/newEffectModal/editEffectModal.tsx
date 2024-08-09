@@ -3,11 +3,20 @@ import EffectModal from './effectModal'
 import { useCallback, useMemo, useState } from 'react'
 import { CreateGroupRequest } from 'src/apis/audio/interface'
 import DeleteButton from '@renderer/components/generic/deleteButton'
+import { useShallow } from 'zustand/react/shallow'
 
 export const EditEffectModalId = 'edit-effect-modal'
 
 export default function EditEffectModal() {
-  const { editingGroupID, updateGroup, editingMode, setEditingMode, deleteGroup } = useAudioStore()
+  const { editingGroupID, updateGroup, editingMode, setEditingMode, deleteGroup } = useAudioStore(
+    useShallow((state) => ({
+      editingGroupID: state.editingGroupID,
+      updateGroup: state.updateGroup,
+      editingMode: state.editingMode,
+      setEditingMode: state.setEditingMode,
+      deleteGroup: state.deleteGroup
+    }))
+  )
 
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false)
 

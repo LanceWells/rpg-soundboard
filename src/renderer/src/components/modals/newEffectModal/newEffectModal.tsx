@@ -4,7 +4,7 @@ import EffectModal from './effectModal'
 export const NewEffectModalId = 'new-effect-modal'
 
 export default function NewEffectModal() {
-  const { addGroup } = useAudioStore()
+  const addGroup = useAudioStore((state) => state.addGroup)
 
   return (
     <EffectModal
