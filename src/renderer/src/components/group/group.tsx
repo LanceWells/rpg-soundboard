@@ -7,6 +7,7 @@ import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import PencilIcon from '@renderer/assets/icons/pencil'
 import RepeatIcon from '@renderer/assets/icons/repeat'
+import { useDraggable, useDroppable } from '@dnd-kit/core'
 
 export type GroupProps = {
   group: SoundGroup
@@ -31,14 +32,23 @@ export default function Group(props: GroupProps) {
     setFadeOut
   } = useAudioStore()
 
-  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
+  const dropProps = useDroppable({
+    id: group.id,
+    disabled: editingMode === 'Off'
+  })
+
+  const dragProps = useDraggable({
     id: group.id,
     disabled: editingMode === 'Off'
   })
 
   const style = {
-    transform: CSS.Transform.toString(transform),
-    transition
+    transform: CSS.Transform.toString({
+      x: dragProps.transform?.x ?? 0,
+      y: dragProps.transform?.y ?? 0,
+      scaleX: 1.0,
+      scaleY: 1.0
+    })
   }
 
   const isPlaying = useMemo(() => {
@@ -67,12 +77,12 @@ export default function Group(props: GroupProps) {
   }, [group, boardID])
 
   return (
-    <div className="relative">
+    <div ref={dropProps.setNodeRef} className="relative">
       <div
-        ref={setNodeRef}
+        ref={dragProps.setNodeRef}
         style={style}
-        {...attributes}
-        {...listeners}
+        {...dragProps.attributes}
+        {...dragProps.listeners}
         onClick={onClickPlay}
         role="button"
         className={`

@@ -400,6 +400,8 @@ export type ReorderGroupsRequest = {
    * The new order that the groups should be rearranged in.
    */
   newOrder: GroupID[]
+
+  category: CategoryID | undefined
 }
 
 /**

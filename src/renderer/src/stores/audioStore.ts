@@ -82,6 +82,11 @@ export type AudioState = {
 export type AudioStoreGroupMethods = {
   addGroup: IAudioApi['CreateGroup']
   updateGroup: IAudioApi['UpdateGroup']
+  updateGroupPartial: (
+    boardID: BoardID,
+    groupID: GroupID,
+    updatedFields: Partial<SoundGroupEditableFields>
+  ) => void
   deleteGroup: (id: GroupID) => void
 }
 
@@ -291,6 +296,32 @@ export const useAudioStore = create<AudioStore>((set) => ({
     })
 
     return updatedGroup
+  },
+  updateGroupPartial(boardID, groupID, updatedFields) {
+    const currentGroup = window.audio.GetGroup({
+      groupID
+    }).group
+
+    if (!currentGroup) {
+      return
+    }
+
+    const newGroup = produce(currentGroup, (draft) => {
+      Object.assign(draft, updatedFields)
+    }) as SoundGroup
+
+    window.audio.UpdateGroup({
+      boardID,
+      groupID,
+      ...newGroup
+    })
+
+    const newBoards = window.audio.GetAllBoards({}).boards
+
+    set({
+      boards: newBoards,
+      editingGroup: getDefaultGroup()
+    })
   },
   deleteGroup(id) {
     window.audio.DeleteGroup({

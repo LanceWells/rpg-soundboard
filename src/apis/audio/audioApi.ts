@@ -18,8 +18,6 @@ import {
   GroupID,
   IAudioApi,
   PreviewSoundResponse,
-  ReorderGroupsRequest,
-  ReorderGroupsResponse,
   SoundBoard,
   SoundCategory,
   SoundEffect,
@@ -242,7 +240,8 @@ export const audioApi: IAudioApi = {
       icon: request.icon,
       repeats: request.repeats,
       fadeIn: request.fadeIn,
-      fadeOut: request.fadeOut
+      fadeOut: request.fadeOut,
+      category: request.category
     }
 
     const newConfig = produce(config.Config, (draft) => {
@@ -429,7 +428,8 @@ export const audioApi: IAudioApi = {
       volume: request.effect.volume
     }
   },
-  ReorderGroups: function (request: ReorderGroupsRequest): ReorderGroupsResponse {
+  ReorderGroups: function (request) {
+    const nocategoryid: 'nocategory' = 'nocategory'
     const board = boardMap.get(request.boardID)
 
     if (!board) {
@@ -437,20 +437,73 @@ export const audioApi: IAudioApi = {
       return {}
     }
 
-    if (request.newOrder.length !== board.groups.length) {
+    if (request.category && !board.categories?.map((c) => c.id).includes(request.category)) {
+      console.error(`${this.ReorderGroups.name}: category not found with id (${request.category})`)
+      return {}
+    }
+
+    const groupsByCategory = board.groups.reduce((acc, curr) => {
+      if (!curr.category) {
+        if (!acc.has(nocategoryid)) {
+          acc.set(nocategoryid, [])
+        }
+        acc.get(nocategoryid)!.push(curr)
+        return acc
+      }
+
+      if (!acc.has(curr.category)) {
+        acc.set(curr.category, [])
+      }
+
+      acc.get(curr.category)!.push(curr)
+      return acc
+    }, new Map<CategoryID | typeof nocategoryid, SoundGroup[]>())
+
+    const thisCategoryID = request['category'] ?? nocategoryid
+    const thisCategoryGroups = groupsByCategory.get(thisCategoryID)
+
+    if (!thisCategoryGroups) {
+      console.error(`${this.ReorderGroups.name}: invalid category ${thisCategoryID}`)
+      return {}
+    }
+
+    if (request.newOrder.length !== thisCategoryGroups!.length) {
       console.error(
         `${this.ReorderGroups.name}: new order is (${request.newOrder.length}) which does not match (${board.groups.length})`
       )
       return {}
     }
 
-    const groupsInNewOrder = request.newOrder.map((g) => {
-      const group = groupMap.get(g)
-      if (group === undefined) {
-        throw new Error(`Provided invalid group ID ${g}`)
+    const getUncategorizedGroupsInOrder = () => {
+      const uncategorizedGroups = groupsByCategory.get('nocategory') ?? []
+      if (request.category !== undefined) {
+        return uncategorizedGroups
       }
-      return group
-    })
+
+      const groupMap = new Map(uncategorizedGroups.map((g) => [g.id, g]))
+      const newOrder = request.newOrder
+        .map((o) => groupMap.get(o))
+        .filter((o) => o !== undefined) as SoundGroup[]
+
+      return newOrder
+    }
+
+    const groupsInNewOrder = [
+      ...(board.categories?.flatMap((c) => {
+        const theseGroups = groupsByCategory.get(c.id) ?? []
+        if (request.category !== c.id) {
+          return theseGroups
+        }
+
+        const groupMap = new Map(theseGroups.map((g) => [g.id, g]))
+        const newOrder = request.newOrder
+          .map((o) => groupMap.get(o))
+          .filter((o) => o !== undefined) as SoundGroup[]
+
+        return newOrder
+      }) ?? []),
+      ...getUncategorizedGroupsInOrder()
+    ]
 
     const newConfig = produce(config.Config, (draft) => {
       const matchingBoard = draft.boards.find((b) => b.id === request.boardID)

@@ -1,6 +1,5 @@
-import { ChangeEvent, ChangeEventHandler, useCallback, useMemo, useState } from 'react'
-import { CategoryID, GroupID, SoundBoard, SoundCategory } from 'src/apis/audio/interface'
-import Group from '../group/group'
+import { ChangeEvent, ChangeEventHandler, act, useCallback, useMemo, useState } from 'react'
+import { GroupID, SoundBoard } from 'src/apis/audio/interface'
 import { EditingMode, useAudioStore } from '@renderer/stores/audioStore'
 import { NewEffectModalId } from '../modals/newEffectModal/newEffectModal'
 import AddIcon from '@renderer/assets/icons/add'
@@ -13,14 +12,15 @@ import {
   useSensor,
   useSensors
 } from '@dnd-kit/core'
-import { SortableContext } from '@dnd-kit/sortable'
 import TextField from '../modals/newEffectModal/textField'
 import debounce from 'debounce'
 import DeleteButton from '../generic/deleteButton'
 import { useShallow } from 'zustand/react/shallow'
 import { NewCategoryModalId } from '../modals/newCategoryModal/newCategoryModal'
-import Category from '../category/category'
-import UncategorizedGroups from '../category/uncategorizedGroups'
+import Category from '../category/categorized'
+import { IdIsCategory, IdIsGroup } from '@renderer/utils/id'
+import Uncategorized from '../category/uncategorized'
+import { SortableContext } from '@dnd-kit/sortable'
 
 const UncategorizedGroupId = 'uncategorized-groups'
 
@@ -36,7 +36,10 @@ export default function Board(props: BoardProps) {
     setEditingMode,
     reorderGroups,
     updateBoard,
-    deleteBoard
+    deleteBoard,
+    updateGroupPartial,
+    getGroupsForCategory,
+    getUncategorizedGroups
   } = useAudioStore(
     useShallow((state) => ({
       editingMode: state.editingMode,
@@ -44,7 +47,10 @@ export default function Board(props: BoardProps) {
       setEditingMode: state.setEditingMode,
       reorderGroups: state.reorderGroups,
       updateBoard: state.updateBoard,
-      deleteBoard: state.deleteBoard
+      deleteBoard: state.deleteBoard,
+      updateGroupPartial: state.updateGroupPartial,
+      getGroupsForCategory: state.getGroupsForCategory,
+      getUncategorizedGroups: state.getUncategorizedGroups
     }))
   )
 
@@ -113,38 +119,60 @@ export default function Board(props: BoardProps) {
   //   [board, board.groups, board.groups.length, editingMode]
   // )
 
-  const { ids: groupCategoryIDs, elements: groupCategoryElements } = useMemo(() => {
-    // const groups = board.groups.filter((g) => g.category === undefined)
+  // const { ids: groupCategoryIDs, elements: groupCategoryElements } = useMemo(() => {
+  //   // const groups = board.groups.filter((g) => g.category === undefined)
+  //   const categories = board.categories ?? []
+  //   // const uncategorizedGroups = board.groups.filter((g) => g.category === undefined)
+
+  //   // const groupIDs = groups.map((g) => g.id)
+  //   const categoryIDs = categories.map((c) => c.id)
+  //   // const groupIDs = uncategorizedGroups.map((g) => g.id)
+
+  //   // const groupElements = groups.map((g) => <Group boardID={board.id} group={g} key={g.id} />)
+  //   const categoryElements =
+  //     categories.map((c) => <Category boardID={board.id} category={c} key={c.id} />) ?? []
+
+  //   // const groupElements = uncategorizedGroups.map((g) => (
+  //   //   <Group boardID={board.id} group={g} key={g.id} />
+  //   // ))
+
+  //   // const uncategorizedContainer = (
+  //   //   <UncategorizedGroups boardID={board.id} key={UncategorizedGroupId} />
+  //   // )
+
+  //   return {
+  //     ids: [...categoryIDs],
+  //     elements: [...categoryElements]
+  //   }
+
+  //   // return {
+  //   //   ids: [...categoryIDs, ...groupIDs],
+  //   //   elements: [...categoryElements, ...groupElements]
+  //   // }
+
+  //   // return {
+  //   // ids: [...groupIDs, ...categoryIDs],
+  //   // elements: [...groupElements, ...categoryElements]
+  //   // }
+
+  //   // return {
+  //   //   ids: [...groupIDs, ...categoryIDs],
+  //   //   elements: [...groupElements, ...categoryElements]
+  //   // }
+  // }, [board.groups, board, board.categories, editingMode])
+
+  const { elements: categoryElements, ids: categoryIDs } = useMemo(() => {
     const categories = board.categories ?? []
-
-    // const groupIDs = groups.map((g) => g.id)
-    const categoryIDs = categories.map((c) => c.id)
-
-    // const groupElements = groups.map((g) => <Group boardID={board.id} group={g} key={g.id} />)
-    const categoryElements =
-      categories.map((c) => <Category boardID={board.id} category={c} key={c.id} />) ?? []
-
-    // const uncategorizedContainer = (
-    //   <UncategorizedGroups boardID={board.id} key={UncategorizedGroupId} />
-    // )
+    const ids = categories.map((c) => c.id)
+    const elements = categories.map((c) => <Category boardID={board.id} category={c} key={c.id} />)
 
     return {
-      ids: categoryIDs,
-      elements: categoryElements
+      ids,
+      elements
     }
+  }, [board.categories, board.groups, board.id])
 
-    // return {
-    // ids: [...groupIDs, ...categoryIDs],
-    // elements: [...groupElements, ...categoryElements]
-    // }
-
-    // return {
-    //   ids: [...groupIDs, ...categoryIDs],
-    //   elements: [...groupElements, ...categoryElements]
-    // }
-  }, [board.groups, board, board.categories, editingMode])
-
-  const groupIDs = useMemo(() => board.groups.map((g) => g.id), [board.groups])
+  // const groupIDs = useMemo(() => board.groups.map((g) => g.id), [board.groups])
 
   const onNewGroup = useCallback(() => {
     setEditingBoardID(board.id)
@@ -161,8 +189,150 @@ export default function Board(props: BoardProps) {
     setEditingMode(newEditingMode)
   }, [editingMode, setEditingMode])
 
+  const groupCategories = board.groups.map((g) => g.category)
+
   const onDragEnd = useCallback(
     (event: DragEndEvent) => {
+      const { active, over } = event
+
+      const activeID = active.id as string
+
+      // If over is null, it means that we dragged an item into a space that does not collide with
+      // any droppable area. When that happens, it's most likely that we're dragging a group out of
+      // a container.
+      if (over === null) {
+        if (IdIsGroup(activeID)) {
+          const activeGroup = board.groups.find((g) => g.id === activeID)
+          if (activeGroup && activeGroup.category !== undefined) {
+            updateGroupPartial(board.id, activeID, {
+              category: undefined
+            })
+          }
+        }
+        setEditingMode('Editing')
+        return
+      }
+
+      const overID = over.id as string
+
+      // Not sure if this can happen, but if the over target is in a category, and active is in a
+      // different category, the primary action should be to change the active item's category to
+      // the category for the over item.
+      if (IdIsGroup(overID) && IdIsGroup(activeID)) {
+        const overGroup = board.groups.find((g) => g.id === overID)
+        const activeGroup = board.groups.find((g) => g.id === activeID)
+
+        if (!overGroup || !activeGroup) {
+          setEditingMode('Editing')
+          return
+        }
+
+        if (overGroup?.category !== activeGroup?.category) {
+          updateGroupPartial(board.id, activeID, {
+            category: overGroup?.category
+          })
+          setEditingMode('Editing')
+          return
+        }
+
+        // Alternatively, if they have the same category, then that means that we want to move the
+        // active group into the position of the target group.
+        const category = activeGroup.category
+        const categoryGroups = category
+          ? getGroupsForCategory(category)
+          : getUncategorizedGroups({ boardID: board.id }).groups
+
+        const categoryGroupIDs = categoryGroups.map((c) => c.id)
+        const activeIndex = categoryGroupIDs.indexOf(activeID)
+        const overIndex = categoryGroupIDs.indexOf(overID)
+
+        // Make a copy of the array so that we're not modifying the original.
+        const newOrder = [...Array.from(categoryGroupIDs).values()]
+
+        // Remove the item from the array, at the location that it was.
+        const [movingItem] = newOrder.splice(activeIndex, 1)
+
+        // Use splice to insert an item at the intended position, not removing anything in the
+        // process.
+        newOrder.splice(overIndex, 0, movingItem)
+
+        reorderGroups({
+          boardID: board.id,
+          category,
+          newOrder
+        })
+
+        setEditingMode('Editing')
+        return
+      }
+
+      // If we're moving a category onto another category, reorganize them.
+      if (IdIsCategory(activeID) && IdIsCategory(overID)) {
+        // TODO: Reorganize categories.
+        setEditingMode('Editing')
+        return
+      }
+
+      // If we're moving a group onto a category, and it's different from the group's category, then
+      // assign that group to the over category.
+      if (IdIsGroup(activeID) && IdIsCategory(overID)) {
+        const activeGroup = board.groups.find((g) => g.id === activeID)
+
+        if (activeGroup?.category !== overID) {
+          updateGroupPartial(board.id, activeID, {
+            category: overID
+          })
+          setEditingMode('Editing')
+          return
+        }
+      }
+
+      setEditingMode('Editing')
+      return
+
+      // if (IdIsCategory(activeID)) {
+      //   if (IdIsGroup(overID)) {
+      //     // Do nothing. If a category is dropped over a group, that's not a valid action.
+      //     setEditingMode('Editing')
+      //     return
+      //   }
+      //   if (IdIsCategory(overID)) {
+      //     // Reorder categories. This means that the user reorganized the categories.
+      //     setEditingMode('Editing')
+      //     return
+      //   }
+      //   setEditingMode('Editing')
+      //   return
+      // }
+
+      // if (IdIsGroup(activeID)) {
+      //   if (IdIsGroup(overID)) {
+      //     const groups = getUncategorizedGroups({ boardID: board.id }).groups
+      //     const groupIDs = groups.map((g) => g.id)
+
+      //     const activeIndex = groupIDs.indexOf(activeID)
+      //     const overIndex = groupIDs.indexOf()
+
+      //     // reorderGroups({
+      //     //   boardID,
+      //     //   category: categoryID,
+      //     //   newOrder: newOrder
+      //     // })
+
+      //     // Reorder groups. This means that the user reorganized the uncategorized groups.
+      //     setEditingMode('Editing')
+      //     return
+      //   }
+      //   if (IdIsCategory(overID)) {
+      //     // Set category for group. This means that the user dragged a group over a category.
+      //     updateGroupPartial(activeID, {
+      //       category: overID
+      //     })
+      //     setEditingMode('Editing')
+      //     return
+      //   }
+      // }
+
       // const { active, over } = event
       // if (over === null) {
       //   return
@@ -178,7 +348,7 @@ export default function Board(props: BoardProps) {
       // })
       // setEditingMode('Editing')
     },
-    [groupCategoryIDs]
+    [categoryIDs, board.id, board.groups, groupCategories, board.categories, JSON.stringify(board)]
   )
 
   const onDragStart = useCallback(() => {
@@ -272,10 +442,16 @@ export default function Board(props: BoardProps) {
           [grid-area:groups]
       `}
       >
-        <DndContext onDragStart={onDragStart} onDragEnd={onDragEnd} sensors={sensors}>
-          <SortableContext items={groupCategoryIDs}>{groupCategoryElements}</SortableContext>
+        <DndContext onDragStart={onDragStart} onDragEnd={onDragEnd}>
+          <SortableContext items={categoryIDs} disabled={editingMode == 'Off'}>
+            {categoryElements}
+          </SortableContext>
+          <Uncategorized boardID={board.id} />
         </DndContext>
-        <UncategorizedGroups key={UncategorizedGroupId} boardID={board.id} />
+        {/* <DndContext onDragStart={onDragStart} onDragEnd={onDragEnd} sensors={sensors}>
+          <SortableContext items={groupCategoryIDs}>{groupCategoryElements}</SortableContext>
+        </DndContext> */}
+        {/* <UncategorizedGroups key={UncategorizedGroupId} boardID={board.id} /> */}
       </div>
       <div className="[grid-area:_add] flex flex-row gap-x-4">
         <button
