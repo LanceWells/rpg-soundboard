@@ -21,7 +21,6 @@ export default function TextField(props: TextFieldProps) {
           max-w-xs
           ${error ? 'input-error' : ''}
         `}
-        placeholder="My New Sound"
         {...others}
       />
       <div className="label">

@@ -98,6 +98,8 @@ export type SoundGroup = {
    * If true, this effect should fade out when ending.
    */
   fadeOut: boolean
+
+  category?: CategoryID
 }
 
 /**
@@ -110,6 +112,13 @@ export type SoundGroupEditableFields = Omit<SoundGroup, 'id' | 'effects'> & {
    */
   effects: SoundEffectEditableFields[]
 }
+
+export type SoundCategory = {
+  id: CategoryID
+  name: string
+}
+
+export type SoundCategoryEditableFields = Omit<SoundCategory, 'id'>
 
 /**
  * Represents an individual sound board object. The sound board is the "root" container for all
@@ -140,6 +149,8 @@ export type SoundBoard = {
    * individual button on a given soundboard.
    */
   groups: SoundGroup[]
+
+  categories?: SoundCategory[]
 }
 
 /**
@@ -441,6 +452,46 @@ export type DeleteBoardRequest = {
   boardID: BoardID
 }
 
+export type CreateCategoryRequest = {
+  boardID: BoardID
+} & SoundCategoryEditableFields
+
+export type CreateCategoryResponse = {
+  category: SoundCategory
+}
+
+export type DeleteCategoryRequest = {
+  boardID: BoardID
+  categoryID: CategoryID
+}
+
+export type DeleteCategoryResponse = {}
+
+export type UpdateCategoryRequest = {
+  boardID: BoardID
+  categoryID: CategoryID
+} & SoundCategoryEditableFields
+
+export type UpdateCategoryResponse = {
+  category: SoundCategory
+}
+
+export type GetGroupsForCategoryRequest = {
+  categoryID: CategoryID
+}
+
+export type GetGroupsForCategoryResponse = {
+  groups: SoundGroup[]
+}
+
+export type GetUncategorizedGroupsRequest = {
+  boardID: BoardID
+}
+
+export type GetUncategorizedGroupsResponse = {
+  groups: SoundGroup[]
+}
+
 /**
  * The response object for {@link IAudioApi.DeleteBoard}.
  */
@@ -470,6 +521,11 @@ export type GroupID = `grp-${string}-${string}-${string}-${string}-${string}`
  * An ID that refers to a particular sound effect.
  */
 export type EffectID = `eff-${string}-${string}-${string}-${string}-${string}`
+
+/**
+ * An ID that refers to a particular sound category.
+ */
+export type CategoryID = `cat-${string}-${string}-${string}-${string}-${string}`
 
 /**
  * An interface used to define the set of methods that comprise the "Audio" side of the application.
@@ -574,4 +630,14 @@ export interface IAudioApi {
    * @param request See {@link PreviewSoundRequest}.
    */
   PreviewSound(request: PreviewSoundRequest): Promise<PreviewSoundResponse>
+
+  CreateCategory(request: CreateCategoryRequest): CreateCategoryResponse
+
+  DeleteCategory(request: DeleteCategoryRequest): DeleteBoardResponse
+
+  UpdateCategory(request: UpdateCategoryRequest): UpdateCategoryResponse
+
+  GetGroupsForCategory(request: GetGroupsForCategoryRequest): GetGroupsForCategoryResponse
+
+  GetUncategorizedGroups(request: GetUncategorizedGroupsRequest): GetUncategorizedGroupsResponse
 }

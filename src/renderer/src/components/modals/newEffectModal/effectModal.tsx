@@ -160,6 +160,7 @@ export default function EffectModal(props: PropsWithChildren<EffectModalProps>) 
             formName="Name"
             value={editingGroup.name}
             error={effectNameErr}
+            placeholder="My Sound Effect"
             onChange={(e) => setGroupName(e.target.value)}
           />
           <FileSelectInput error={fileListErr} className="[grid-area:_fileselect]" />

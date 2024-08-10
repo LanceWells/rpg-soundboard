@@ -1,3 +1,4 @@
+import CloseIcon from '@renderer/assets/icons/close'
 import { useAudioStore } from '@renderer/stores/audioStore'
 import { useCallback } from 'react'
 import { useForm } from 'react-hook-form'
@@ -44,7 +45,7 @@ export default function NewBoardModal() {
               Create
             </button>
             <button className="btn btn-circle absolute text-white font-bold -top-3 -right-3 bg-error">
-              X
+              <CloseIcon />
             </button>
           </form>
         </div>

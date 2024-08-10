@@ -5,7 +5,9 @@ import {
   SoundEffectEditableFields,
   SoundBoard,
   SoundGroupEditableFields,
-  SoundIcon
+  SoundIcon,
+  CategoryID,
+  SoundGroup
 } from 'src/apis/audio/interface'
 import { create } from 'zustand'
 import { ColorOptions } from '@renderer/components/modals/newEffectModal/colorPicker'
@@ -111,11 +113,20 @@ export type AudioStoreEditingModeMethods = {
   setSelectedIcon: (icon: SoundIcon) => void
 }
 
+export type AudioStoreCategoryMethods = {
+  addCategory: IAudioApi['CreateCategory']
+  deleteCategory: IAudioApi['DeleteCategory']
+  updateCategory: IAudioApi['UpdateCategory']
+  getGroupsForCategory: (categoryID: CategoryID) => SoundGroup[]
+  getUncategorizedGroups: IAudioApi['GetUncategorizedGroups']
+}
+
 export type AudioStore = AudioState &
   AudioStoreGroupMethods &
   AudioStoreBoardMethods &
   AudioStoreSoundMethods &
-  AudioStoreEditingModeMethods
+  AudioStoreEditingModeMethods &
+  AudioStoreCategoryMethods
 
 export const GroupStopHandles: Map<GroupID, () => void> = new Map()
 
@@ -342,5 +353,47 @@ export const useAudioStore = create<AudioStore>((set) => ({
     })
 
     return {}
+  },
+  addCategory(request) {
+    const resp = window.audio.CreateCategory(request)
+    const newBoards = window.audio.GetAllBoards({}).boards
+
+    set({
+      boards: newBoards
+    })
+
+    return resp
+  },
+  deleteCategory(request) {
+    const resp = window.audio.DeleteCategory(request)
+    const newBoards = window.audio.GetAllBoards({}).boards
+
+    set({
+      boards: newBoards
+    })
+
+    return resp
+  },
+  updateCategory(request) {
+    const resp = window.audio.UpdateCategory(request)
+    const newBoards = window.audio.GetAllBoards({}).boards
+
+    set({
+      boards: newBoards
+    })
+
+    return resp
+  },
+  getGroupsForCategory(categoryID) {
+    const groups = window.audio.GetGroupsForCategory({
+      categoryID
+    })
+
+    return groups.groups
+  },
+  getUncategorizedGroups(request) {
+    const resp = window.audio.GetUncategorizedGroups(request)
+
+    return resp
   }
 }))

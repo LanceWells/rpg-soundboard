@@ -1,5 +1,6 @@
 import BoardGrid from './components/board/board-grid'
 import NewBoardModal from './components/modals/newBoardModal/newBoardModal'
+import NewCategoryModal from './components/modals/newCategoryModal/newCategoryModal'
 import EditEffectModal from './components/modals/newEffectModal/editEffectModal'
 import NewEffectModal from './components/modals/newEffectModal/newEffectModal'
 
@@ -9,6 +10,7 @@ export default function App() {
       <NewEffectModal />
       <EditEffectModal />
       <NewBoardModal />
+      <NewCategoryModal />
       <h2 className="p-2 w-full text-center text-2xl">Soundboards</h2>
       <BoardGrid />
     </div>

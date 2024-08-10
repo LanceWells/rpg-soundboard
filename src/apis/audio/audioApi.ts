@@ -3,6 +3,7 @@ import {
   AddEffectToGroupResponse,
   AudioApiConfig,
   BoardID,
+  CategoryID,
   CreateBoardRequest,
   CreateBoardResponse,
   CreateGroupRequest,
@@ -20,6 +21,7 @@ import {
   ReorderGroupsRequest,
   ReorderGroupsResponse,
   SoundBoard,
+  SoundCategory,
   SoundEffect,
   SoundGroup
 } from './interface'
@@ -486,5 +488,134 @@ export const audioApi: IAudioApi = {
     }
 
     return {}
+  },
+  CreateCategory(request) {
+    const { boardID, ...categoryFields } = request
+
+    const board = this.GetBoard({ boardID: request.boardID })
+
+    if (!board) {
+      throw new Error(`${this.ReorderGroups.name}: board not found with id (${request.boardID})`)
+    }
+
+    const newCategoryID: CategoryID = `cat-${crypto.randomUUID()}`
+    const newCategory: SoundCategory = {
+      id: newCategoryID,
+      ...categoryFields
+    }
+
+    const newConfig = produce(config.Config, (draft) => {
+      const matchingBoard = draft.boards.find((b) => b.id === boardID)
+      if (!matchingBoard) {
+        return
+      }
+
+      if (!matchingBoard.categories) {
+        matchingBoard.categories = []
+      }
+
+      matchingBoard.categories.push(newCategory)
+    })
+
+    SaveConfig(newConfig)
+
+    return {
+      category: newCategory
+    }
+  },
+  DeleteCategory(request) {
+    const matchingBoard = this.GetBoard({ boardID: request.boardID })
+    if (matchingBoard.board === undefined) {
+      throw new Error(`Could not find matching board with ID ${request.boardID}.`)
+    }
+
+    const newConfig = produce(config.Config, (draft) => {
+      const matchingBoard = draft.boards.find((b) => b.id)
+      if (!matchingBoard?.categories) {
+        return
+      }
+
+      matchingBoard.categories = matchingBoard.categories.filter((c) => c.id !== request.categoryID)
+      matchingBoard.groups.forEach((g) => {
+        if (g.category === request.categoryID) {
+          g.category = undefined
+        }
+      })
+    })
+
+    SaveConfig(newConfig)
+
+    return {}
+  },
+  UpdateCategory(request) {
+    const { boardID, categoryID, ...categoryFields } = request
+
+    const matchingBoard = this.GetBoard({ boardID: boardID })
+    if (matchingBoard.board === undefined) {
+      throw new Error(`Could not find matching board with ID ${boardID}.`)
+    }
+
+    const updatedCategory: SoundCategory = {
+      id: categoryID,
+      ...categoryFields
+    }
+
+    const newConfig = produce(config.Config, (draft) => {
+      const matchingBoard = draft.boards.find((b) => b.id === boardID)
+      if (!matchingBoard || !matchingBoard.categories) {
+        return
+      }
+
+      const newCategories = matchingBoard.categories.map<SoundCategory>((c) => {
+        if (c.id === request.categoryID) {
+          return updatedCategory
+        }
+
+        return c
+      })
+
+      matchingBoard.categories = newCategories
+    })
+
+    SaveConfig(newConfig)
+
+    return {
+      category: updatedCategory
+    }
+  },
+  GetGroupsForCategory(request) {
+    const { categoryID } = request
+
+    const matchingBoard = this.GetAllBoards({}).boards.find((b) =>
+      (b.categories ?? []).some((c) => c.id === categoryID)
+    )
+
+    if (!matchingBoard) {
+      return {
+        groups: []
+      }
+    }
+
+    const categoryGroups = matchingBoard.groups.filter((g) => g.category === categoryID)
+
+    return {
+      groups: categoryGroups
+    }
+  },
+  GetUncategorizedGroups(request) {
+    const { boardID } = request
+
+    const matchingBoard = this.GetBoard({ boardID })
+    if (!matchingBoard.board) {
+      return {
+        groups: []
+      }
+    }
+
+    const uncategorizedGroups = matchingBoard.board?.groups.filter((g) => g.category === undefined)
+
+    return {
+      groups: uncategorizedGroups
+    }
   }
 }
