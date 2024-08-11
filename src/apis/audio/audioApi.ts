@@ -519,6 +519,41 @@ export const audioApi: IAudioApi = {
 
     return {}
   },
+  ReorderCategories(request) {
+    const board = boardMap.get(request.boardID)
+
+    if (!board) {
+      console.error(`${this.ReorderCategories.name}: board not found with id (${request.boardID})`)
+      return {}
+    }
+
+    if (!board.categories) {
+      console.error(
+        `${this.ReorderCategories.name}: board doesnt have categories (${request.boardID})`
+      )
+      return {}
+    }
+
+    if (request.newOrder.length !== board.categories.length) {
+      console.error(
+        `${this.ReorderCategories.name}: board doesnt have same number of categories (${request.boardID})`
+      )
+      return {}
+    }
+
+    const newConfig = produce(config.Config, (draft) => {
+      const matchingBoard = draft.boards.find((b) => b.id === request.boardID)
+      const catMap = new Map(board.categories!.map((c) => [c.id, c]))
+
+      const newOrder = request.newOrder.map((c) => catMap.get(c)) as SoundCategory[]
+
+      matchingBoard!.categories = newOrder
+    })
+
+    SaveConfig(newConfig)
+
+    return {}
+  },
   DeleteGroup(request) {
     // Get the board for this group in the map.
     // Remove the group from that board.
@@ -553,7 +588,7 @@ export const audioApi: IAudioApi = {
     const board = this.GetBoard({ boardID: request.boardID })
 
     if (!board) {
-      throw new Error(`${this.ReorderGroups.name}: board not found with id (${request.boardID})`)
+      throw new Error(`${this.CreateCategory.name}: board not found with id (${request.boardID})`)
     }
 
     const newCategoryID: CategoryID = `cat-${crypto.randomUUID()}`

@@ -129,6 +129,7 @@ export type AudioStoreCategoryMethods = {
   updateCategory: IAudioApi['UpdateCategory']
   getGroupsForCategory: (categoryID: CategoryID) => SoundGroup[]
   getUncategorizedGroups: IAudioApi['GetUncategorizedGroups']
+  reorderCategories: IAudioApi['ReorderCategories']
 }
 
 export type AudioStore = AudioState &
@@ -459,6 +460,16 @@ export const useAudioStore = create<AudioStore>((set) => ({
   },
   getUncategorizedGroups(request) {
     const resp = window.audio.GetUncategorizedGroups(request)
+
+    return resp
+  },
+  reorderCategories(request) {
+    const resp = window.audio.ReorderCategories(request)
+    const newBoards = window.audio.GetAllBoards({}).boards
+
+    set({
+      boards: newBoards
+    })
 
     return resp
   }

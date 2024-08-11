@@ -2,7 +2,8 @@ import { useAudioStore } from '@renderer/stores/audioStore'
 import { BoardID, SoundCategory } from 'src/apis/audio/interface'
 import { useShallow } from 'zustand/react/shallow'
 import GenericCategoryContainer from './genericCategoryContainer'
-import { useDroppable } from '@dnd-kit/core'
+import { CSS } from '@dnd-kit/utilities'
+import { useDraggable, useDroppable } from '@dnd-kit/core'
 import { useCallback } from 'react'
 import { EditCategoryModalId } from '../modals/editCategoryModal/editCategoryModal'
 import PencilIcon from '@renderer/assets/icons/pencil'
@@ -27,7 +28,24 @@ export default function Categorized(props: CategorizedProps) {
 
   const groups = getGroupsForCategory(category.id)
 
-  const { setNodeRef } = useDroppable({ disabled: editingMode === 'Off', id: category.id })
+  const { setNodeRef: dropNodeRef } = useDroppable({
+    disabled: editingMode === 'Off',
+    id: category.id
+  })
+
+  const dragProps = useDraggable({
+    id: category.id,
+    disabled: editingMode === 'Off'
+  })
+
+  const style = {
+    transform: CSS.Transform.toString({
+      x: dragProps.transform?.x ?? 0,
+      y: dragProps.transform?.y ?? 0,
+      scaleX: 1.0,
+      scaleY: 1.0
+    })
+  }
 
   const onClickEdit = useCallback(() => {
     prepEditingCategory(boardID, category.id)
@@ -37,8 +55,15 @@ export default function Categorized(props: CategorizedProps) {
 
   return (
     <div
-      ref={setNodeRef}
-      className={`
+      style={style}
+      {...dragProps.attributes}
+      {...dragProps.listeners}
+      ref={dragProps.setNodeRef}
+      role="button"
+    >
+      <div
+        ref={dropNodeRef}
+        className={`
         relative
         outline-dashed
         rounded-lg
@@ -47,16 +72,16 @@ export default function Categorized(props: CategorizedProps) {
         min-w-36
         justify-center
     `}
-    >
-      <h3 className="prose text-xl absolute top-0 left-0 w-full max-w-full text-center">
-        {category.name}
-      </h3>
-      <div className="flex flex-row flex-wrap gap-6">
-        <GenericCategoryContainer boardID={boardID} groups={groups} />
-      </div>
-      <button
-        onClick={editingMode ? onClickEdit : undefined}
-        className={`
+      >
+        <h3 className="prose text-xl absolute top-0 left-0 w-full max-w-full text-center">
+          {category.name}
+        </h3>
+        <div className="flex flex-row flex-wrap gap-6">
+          <GenericCategoryContainer boardID={boardID} groups={groups} />
+        </div>
+        <button
+          onClick={editingMode ? onClickEdit : undefined}
+          className={`
           absolute
           -top-8
           -right-8
@@ -68,9 +93,10 @@ export default function Categorized(props: CategorizedProps) {
           ${editingMode === 'Off' ? 'hidden' : 'visible'}
           ${editingMode === 'Editing' ? 'opacity-100' : 'opacity-0'}
         `}
-      >
-        <PencilIcon />
-      </button>
+        >
+          <PencilIcon />
+        </button>
+      </div>
     </div>
   )
 }

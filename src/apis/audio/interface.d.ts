@@ -86,22 +86,6 @@ export type SoundGroup = {
 
   variant: SoundVariant
 
-  // /**
-  //  * If true, this sound effect should keep playing indefinitely, starting over from the beginning
-  //  * once the sound has ended. Must be stopped manually.
-  //  */
-  // repeats: boolean
-
-  // /**
-  //  * If true, this effect should fade in when starting.
-  //  */
-  // fadeIn: boolean
-
-  // /**
-  //  * If true, this effect should fade out when ending.
-  //  */
-  // fadeOut: boolean
-
   category?: CategoryID
 }
 
@@ -502,6 +486,13 @@ export type GetUncategorizedGroupsResponse = {
   groups: SoundGroup[]
 }
 
+export type ReorderCategoriesRequest = {
+  boardID: BoardID
+  newOrder: CategoryID[]
+}
+
+export type ReorderCategoriesResponse = {}
+
 /**
  * The response object for {@link IAudioApi.DeleteBoard}.
  */
@@ -650,4 +641,6 @@ export interface IAudioApi {
   GetGroupsForCategory(request: GetGroupsForCategoryRequest): GetGroupsForCategoryResponse
 
   GetUncategorizedGroups(request: GetUncategorizedGroupsRequest): GetUncategorizedGroupsResponse
+
+  ReorderCategories(request: ReorderCategoriesRequest): ReorderCategoriesResponse
 }

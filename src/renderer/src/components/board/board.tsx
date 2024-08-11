@@ -30,7 +30,8 @@ export default function Board(props: BoardProps) {
     deleteBoard,
     updateGroupPartial,
     getGroupsForCategory,
-    getUncategorizedGroups
+    getUncategorizedGroups,
+    reodreCategories
   } = useAudioStore(
     useShallow((state) => ({
       editingMode: state.editingMode,
@@ -41,7 +42,8 @@ export default function Board(props: BoardProps) {
       deleteBoard: state.deleteBoard,
       updateGroupPartial: state.updateGroupPartial,
       getGroupsForCategory: state.getGroupsForCategory,
-      getUncategorizedGroups: state.getUncategorizedGroups
+      getUncategorizedGroups: state.getUncategorizedGroups,
+      reodreCategories: state.reorderCategories
     }))
   )
 
@@ -152,8 +154,24 @@ export default function Board(props: BoardProps) {
 
       // If we're moving a category onto another category, reorganize them.
       if (IdIsCategory(activeID) && IdIsCategory(overID)) {
-        // TODO: Reorganize categories.
+        const activeIndex = categoryIDs.indexOf(activeID)
+        const overIndex = categoryIDs.indexOf(overID)
+
+        // Make a copy of the array so that we're not modifying the original.
+        const newOrder = [...Array.from(categoryIDs).values()]
+
+        // Remove the item from the array, at the location that it was.
+        const [movingItem] = newOrder.splice(activeIndex, 1)
+
+        // Use splice to insert an item at the intended position, not removing anything in the
+        // process.
+        newOrder.splice(overIndex, 0, movingItem)
+
         setEditingMode('Editing')
+        reodreCategories({
+          boardID: board.id,
+          newOrder: newOrder
+        })
         return
       }
 
