@@ -119,6 +119,7 @@ export type AudioStoreEditingModeMethods = {
   prepEditingCategory: (boardID: BoardID, categoryID: CategoryID) => void
   setGroupName: (name: string | undefined) => void
   setGroupVariant: (variant: SoundVariant) => void
+  setGroupCategory: (categoryID: CategoryID | undefined) => void
   setSelectedIcon: (icon: SoundIcon) => void
 }
 
@@ -305,6 +306,13 @@ export const useAudioStore = create<AudioStore>((set) => ({
     set(
       produce((state: AudioStore) => {
         state.editingGroup.variant = variant
+      })
+    )
+  },
+  setGroupCategory(categoryID) {
+    set(
+      produce((state: AudioStore) => {
+        state.editingGroup.category = categoryID
       })
     )
   },

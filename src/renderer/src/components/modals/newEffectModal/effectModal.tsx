@@ -37,9 +37,6 @@ export default function EffectModal(props: PropsWithChildren<EffectModalProps>) 
     setSelectedIcon,
     resetEditingGroup,
     setGroupVariant
-    // setGroupRepeating,
-    // setFadeIn,
-    // setFadeOut
   } = useAudioStore(
     useShallow((state) => ({
       editingBoardID: state.editingBoardID,
@@ -49,9 +46,6 @@ export default function EffectModal(props: PropsWithChildren<EffectModalProps>) 
       setSelectedIcon: state.setSelectedIcon,
       resetEditingGroup: state.resetEditingGroup,
       setGroupVariant: state.setGroupVariant
-      // setGroupRepeating: state.setGroupRepeating,
-      // setFadeIn: state.setFadeIn,
-      // setFadeOut: state.setFadeOut
     }))
   )
 
@@ -79,27 +73,6 @@ export default function EffectModal(props: PropsWithChildren<EffectModalProps>) 
     },
     [editingGroup.icon, setSelectedIcon]
   )
-
-  // const handleRepeatsCheck = useCallback<ChangeEventHandler<HTMLInputElement>>(
-  //   (e) => {
-  //     setGroupRepeating(e.target.checked)
-  //   },
-  //   [setGroupRepeating, editingGroup.repeats]
-  // )
-
-  // const handleFadeInCheck = useCallback<ChangeEventHandler<HTMLInputElement>>(
-  //   (e) => {
-  //     setFadeIn(e.target.checked)
-  //   },
-  //   [setFadeIn, editingGroup.fadeIn]
-  // )
-
-  // const handleFadeOutCheck = useCallback<ChangeEventHandler<HTMLInputElement>>(
-  //   (e) => {
-  //     setFadeOut(e.target.checked)
-  //   },
-  //   [setFadeOut, editingGroup.fadeOut]
-  // )
 
   const onClose = useCallback(() => {
     resetEditingGroup()
@@ -136,7 +109,8 @@ export default function EffectModal(props: PropsWithChildren<EffectModalProps>) 
         handleSubmit({
           ...editingGroup,
           boardID: editingBoardID,
-          variant: editingGroup.variant
+          variant: editingGroup.variant,
+          category: editingGroup.category
         })
       }
 

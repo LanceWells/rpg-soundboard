@@ -27,7 +27,9 @@ export default function Group(props: GroupProps) {
     setSelectedIcon,
     setGroupName,
     resetWorkingFiles,
-    setEditingBoardID
+    setEditingBoardID,
+    setGroupVariant,
+    setGroupCategory
   } = useAudioStore(
     useShallow((state) => ({
       playGroup: state.playGroup,
@@ -39,7 +41,8 @@ export default function Group(props: GroupProps) {
       setGroupName: state.setGroupName,
       resetWorkingFiles: state.resetWorkingFiles,
       setEditingBoardID: state.setEditingBoardID,
-      setGroupVariant: state.setGroupVariant
+      setGroupVariant: state.setGroupVariant,
+      setGroupCategory: state.setGroupCategory
     }))
   )
 
@@ -81,6 +84,8 @@ export default function Group(props: GroupProps) {
     setGroupName(group.name)
     resetWorkingFiles(group.effects)
     setEditingBoardID(boardID)
+    setGroupVariant(group.variant)
+    setGroupCategory(group.category)
     ;(document.getElementById(EditEffectModalId) as HTMLDialogElement).showModal()
   }, [group, boardID])
 

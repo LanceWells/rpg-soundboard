@@ -29,10 +29,8 @@ export default function EditEffectModal() {
           name: req.name,
           effects: req.effects,
           groupID: editingGroupID,
-          variant: req.variant
-          // repeats: req.repeats,
-          // fadeIn: req.fadeIn,
-          // fadeOut: req.fadeOut
+          variant: req.variant,
+          category: req.category
         })
       }
     },
