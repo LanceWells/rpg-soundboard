@@ -3158,12 +3158,24 @@ html {
   right: -0.75rem;
 }
 
+.-right-8 {
+  right: -2rem;
+}
+
 .-top-2 {
   top: -0.5rem;
 }
 
 .-top-3 {
   top: -0.75rem;
+}
+
+.-top-8 {
+  top: -2rem;
+}
+
+.bottom-0 {
+  bottom: 0px;
 }
 
 .left-0 {
@@ -3190,34 +3202,6 @@ html {
   top: 50%;
 }
 
-.bottom-0 {
-  bottom: 0px;
-}
-
-.-bottom-4 {
-  bottom: -1rem;
-}
-
-.-left-4 {
-  left: -1rem;
-}
-
-.-right-4 {
-  right: -1rem;
-}
-
-.-top-4 {
-  top: -1rem;
-}
-
-.-right-8 {
-  right: -2rem;
-}
-
-.-top-8 {
-  top: -2rem;
-}
-
 .z-0 {
   z-index: 0;
 }
@@ -3228,10 +3212,6 @@ html {
 
 .m-1 {
   margin: 0.25rem;
-}
-
-.m-4 {
-  margin: 1rem;
 }
 
 .mx-4 {
@@ -3257,10 +3237,6 @@ html {
 
 .hidden {
   display: none;
-}
-
-.h-12 {
-  height: 3rem;
 }
 
 .h-24 {
@@ -3375,10 +3351,6 @@ html {
   cursor: pointer;
 }
 
-.grid-flow-col {
-  grid-auto-flow: column;
-}
-
 .grid-cols-\[minmax\(0\2c _1fr\)_min-content\] {
   grid-template-columns: minmax(0, 1fr) min-content;
 }
@@ -3401,10 +3373,6 @@ html {
 
 .items-center {
   align-items: center;
-}
-
-.justify-start {
-  justify-content: flex-start;
 }
 
 .justify-center {
@@ -3553,16 +3521,12 @@ html {
   padding-bottom: 0.5rem;
 }
 
-.pt-8 {
-  padding-top: 2rem;
+.pt-10 {
+  padding-top: 2.5rem;
 }
 
 .pt-4 {
   padding-top: 1rem;
-}
-
-.pt-10 {
-  padding-top: 2.5rem;
 }
 
 .text-center {
@@ -3711,10 +3675,6 @@ html {
 
 .\[grid-area\:slider\] {
   grid-area: slider;
-}
-
-.\[grid-area\:title\] {
-  grid-area: title;
 }
 
 .\[grid-area\:toggles\] {

@@ -316,6 +316,8 @@ export type GetGroupSoundRequest = {
    * The ID for the group to get the sound effect for.
    */
   groupID: GroupID
+
+  idsToSkip?: EffectID[]
 }
 
 /**
@@ -338,6 +340,8 @@ export type GetGroupSoundResponse = {
    * The volume of the effect to play. Will range from 0 to 100.
    */
   volume: number
+
+  effectID: EffectID
 
   /**
    * If true, this audio should repeat.

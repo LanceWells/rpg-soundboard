@@ -8,8 +8,8 @@ import {
   SoundIcon,
   CategoryID,
   SoundGroup,
-  SoundCategoryEditableFields,
-  SoundCategory
+  SoundCategory,
+  EffectID
 } from 'src/apis/audio/interface'
 import { create } from 'zustand'
 import { ColorOptions } from '@renderer/components/modals/newEffectModal/colorPicker'
@@ -138,7 +138,9 @@ export type AudioStore = AudioState &
   AudioStoreEditingModeMethods &
   AudioStoreCategoryMethods
 
-export const GroupStopHandles: Map<GroupID, () => void> = new Map()
+const GroupStopHandles: Map<GroupID, () => void> = new Map()
+
+const RepeatSoundHandles: Map<GroupID, EffectID> = new Map()
 
 const getDefaultGroup = (): SoundGroupEditableFields => ({
   effects: [],
@@ -227,9 +229,17 @@ export const useAudioStore = create<AudioStore>((set) => ({
     })
   },
   async playGroup(groupID) {
+    let soundsToAvoid: EffectID[] = []
+    if (RepeatSoundHandles.has(groupID)) {
+      soundsToAvoid = [RepeatSoundHandles.get(groupID)!]
+    }
+
     const audio = await window.audio.GetGroupSound({
-      groupID: groupID
+      groupID: groupID,
+      idsToSkip: soundsToAvoid
     })
+
+    RepeatSoundHandles.set(groupID, audio.effectID)
 
     const handleHowlStop = (groupID: GroupID) => {
       set((state) => {

@@ -371,18 +371,19 @@ export const audioApi: IAudioApi = {
   async GetGroupSound(request) {
     const group = groupMap.get(request.groupID)
     if (!group || group.effects.length === 0) {
-      return {
-        soundB64: '',
-        format: '.mp3',
-        volume: 100,
-        repeats: false,
-        fadeIn: group?.fadeIn ?? false,
-        fadeOut: group?.fadeOut ?? false
-      }
+      throw new Error(`Could not find group with effects with id ${request.groupID}.`)
     }
 
-    const effectIndex = crypto.randomInt(0, group.effects.length)
-    const effect = group.effects[effectIndex]
+    let idsToSkip: EffectID[] = []
+    if (request.idsToSkip && request.idsToSkip.length < group.effects.length) {
+      idsToSkip = request.idsToSkip
+    }
+
+    let effect: SoundEffect
+    do {
+      const effectIndex = crypto.randomInt(0, group.effects.length)
+      effect = group.effects[effectIndex]
+    } while (idsToSkip.includes(effect.id))
 
     const reader = new FileReader()
     const file = fs.readFileSync(effect.path)
@@ -402,6 +403,7 @@ export const audioApi: IAudioApi = {
       format: effect.format as SupportedFileTypes,
       volume: effect.volume,
       repeats: group.repeats,
+      effectID: effect.id,
       fadeIn: group?.fadeIn ?? false,
       fadeOut: group?.fadeOut ?? false
     }
