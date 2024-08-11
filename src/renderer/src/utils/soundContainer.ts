@@ -1,6 +1,7 @@
 import { Howl } from 'howler'
 import { GroupID } from 'src/apis/audio/interface'
 import { SoundVariant } from 'src/apis/audio/soundVariants'
+import { getRandomArbitrary } from './random'
 
 type StopHandler<T extends GroupID | undefined> = {
   id: T
@@ -13,20 +14,14 @@ export type SoundContainerSetup<T extends GroupID | undefined> = {
   format: string
   stopHandler?: StopHandler<T>
   variant: SoundVariant
-  // repeats: boolean
-  // fadeIn?: boolean
-  // fadeOut?: boolean
 }
 
 export class SoundContainer<T extends GroupID | undefined = GroupID> {
   private _howl: Howl
   private _stopHandler: StopHandler<T> | undefined
-  // private _repeats: boolean
 
   private _targetVolume: number
   private _variant: SoundVariant
-  // private _fadeIn: boolean
-  // private _fadeOut: boolean
   private _fadeOutRef: NodeJS.Timeout | undefined
 
   static FadeTime = 200
@@ -34,10 +29,7 @@ export class SoundContainer<T extends GroupID | undefined = GroupID> {
   constructor(setup: SoundContainerSetup<T>) {
     const { format, src, volume, stopHandler, variant } = setup
 
-    // this._repeats = repeats
     this._targetVolume = volume / 100
-    // this._fadeIn = fadeIn ?? false
-    // this._fadeOut = fadeOut ?? false
     this._variant = variant
 
     this._howl = new Howl({
@@ -80,6 +72,11 @@ export class SoundContainer<T extends GroupID | undefined = GroupID> {
     }
 
     this._howl.play()
+
+    if (this._variant === 'Rapid') {
+      const randomRate = getRandomArbitrary(0.85, 1.15)
+      this._howl.rate(randomRate)
+    }
 
     if (this._variant === 'Looping') {
       this._howl.fade(0, 1, SoundContainer.FadeTime)
