@@ -4,6 +4,7 @@ import {
   MouseEventHandler,
   PropsWithChildren,
   useCallback,
+  useMemo,
   useState
 } from 'react'
 import IconLookup from '../../effect/iconLookup'
@@ -13,9 +14,9 @@ import ColorPicker from './colorPicker'
 import TextField from './textField'
 import FileSelectList, { FileSelectInput } from './fileSelectList'
 import { CreateGroupRequest } from 'src/apis/audio/interface'
-import CheckboxField from './checkboxField'
 import CloseIcon from '@renderer/assets/icons/close'
 import { useShallow } from 'zustand/react/shallow'
+import { SoundVariant } from '@renderer/utils/soundVariants'
 
 export type EffectModalProps = {
   id: string
@@ -35,9 +36,10 @@ export default function EffectModal(props: PropsWithChildren<EffectModalProps>) 
     addGroup,
     setSelectedIcon,
     resetEditingGroup,
-    setGroupRepeating,
-    setFadeIn,
-    setFadeOut
+    setGroupVariant
+    // setGroupRepeating,
+    // setFadeIn,
+    // setFadeOut
   } = useAudioStore(
     useShallow((state) => ({
       editingBoardID: state.editingBoardID,
@@ -46,9 +48,10 @@ export default function EffectModal(props: PropsWithChildren<EffectModalProps>) 
       addGroup: state.addGroup,
       setSelectedIcon: state.setSelectedIcon,
       resetEditingGroup: state.resetEditingGroup,
-      setGroupRepeating: state.setGroupRepeating,
-      setFadeIn: state.setFadeIn,
-      setFadeOut: state.setFadeOut
+      setGroupVariant: state.setGroupVariant
+      // setGroupRepeating: state.setGroupRepeating,
+      // setFadeIn: state.setFadeIn,
+      // setFadeOut: state.setFadeOut
     }))
   )
 
@@ -77,29 +80,30 @@ export default function EffectModal(props: PropsWithChildren<EffectModalProps>) 
     [editingGroup.icon, setSelectedIcon]
   )
 
-  const handleRepeatsCheck = useCallback<ChangeEventHandler<HTMLInputElement>>(
-    (e) => {
-      setGroupRepeating(e.target.checked)
-    },
-    [setGroupRepeating, editingGroup.repeats]
-  )
+  // const handleRepeatsCheck = useCallback<ChangeEventHandler<HTMLInputElement>>(
+  //   (e) => {
+  //     setGroupRepeating(e.target.checked)
+  //   },
+  //   [setGroupRepeating, editingGroup.repeats]
+  // )
 
-  const handleFadeInCheck = useCallback<ChangeEventHandler<HTMLInputElement>>(
-    (e) => {
-      setFadeIn(e.target.checked)
-    },
-    [setFadeIn, editingGroup.fadeIn]
-  )
+  // const handleFadeInCheck = useCallback<ChangeEventHandler<HTMLInputElement>>(
+  //   (e) => {
+  //     setFadeIn(e.target.checked)
+  //   },
+  //   [setFadeIn, editingGroup.fadeIn]
+  // )
 
-  const handleFadeOutCheck = useCallback<ChangeEventHandler<HTMLInputElement>>(
-    (e) => {
-      setFadeOut(e.target.checked)
-    },
-    [setFadeOut, editingGroup.fadeOut]
-  )
+  // const handleFadeOutCheck = useCallback<ChangeEventHandler<HTMLInputElement>>(
+  //   (e) => {
+  //     setFadeOut(e.target.checked)
+  //   },
+  //   [setFadeOut, editingGroup.fadeOut]
+  // )
 
   const onClose = useCallback(() => {
     resetEditingGroup()
+
     if (handleClose) {
       handleClose()
     }
@@ -130,14 +134,32 @@ export default function EffectModal(props: PropsWithChildren<EffectModalProps>) 
 
       if (editingGroup.icon && editingBoardID) {
         handleSubmit({
+          ...editingGroup,
           boardID: editingBoardID,
-          ...editingGroup
+          variant: editingGroup.variant
         })
       }
 
       ;(document.getElementById(id) as HTMLDialogElement).close()
     },
     [addGroup, editingBoardID, editingGroup]
+  )
+
+  const onChangeVariant = useCallback<ChangeEventHandler<HTMLSelectElement>>(
+    (e) => {
+      setGroupVariant(e.target.value as SoundVariant)
+    },
+    [setGroupVariant]
+  )
+
+  const selectOptions = useMemo(
+    () =>
+      Object.entries(SoundVariant).map(([key, value]) => (
+        <option key={`opt-${key}`} value={key}>
+          {value}
+        </option>
+      )),
+    [SoundVariant]
   )
 
   return (
@@ -178,7 +200,19 @@ export default function EffectModal(props: PropsWithChildren<EffectModalProps>) 
             onColorChange={handleBackgroundSelect}
             className="[grid-area:_background]"
           />
-          <div className="flex [grid-area:toggles]">
+          <label className="form-control w-full max-w-xs">
+            <div className="label">
+              <span className="label-text">Sound Variant</span>
+            </div>
+            <select
+              value={editingGroup.variant}
+              onChange={onChangeVariant}
+              className="select select-bordered"
+            >
+              {selectOptions}
+            </select>
+          </label>
+          {/* <div className="flex [grid-area:toggles]">
             <CheckboxField
               formName="Repeat?"
               className="[grid-area:repeat]"
@@ -197,7 +231,7 @@ export default function EffectModal(props: PropsWithChildren<EffectModalProps>) 
               checked={editingGroup.fadeOut}
               onChange={handleFadeOutCheck}
             />
-          </div>
+          </div> */}
         </div>
         <div className="modal-action">
           <form method="dialog" className="w-full">

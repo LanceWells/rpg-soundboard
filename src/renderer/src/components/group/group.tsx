@@ -3,11 +3,12 @@ import { IconEffect } from '../effect/icon-effect'
 import { useCallback, useMemo } from 'react'
 import { useAudioStore } from '@renderer/stores/audioStore'
 import { EditEffectModalId } from '../modals/newEffectModal/editEffectModal'
-import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import PencilIcon from '@renderer/assets/icons/pencil'
 import RepeatIcon from '@renderer/assets/icons/repeat'
 import { useDraggable, useDroppable } from '@dnd-kit/core'
+import PistolIcon from '@renderer/assets/icons/pistol'
+import { useShallow } from 'zustand/react/shallow'
 
 export type GroupProps = {
   group: SoundGroup
@@ -26,11 +27,21 @@ export default function Group(props: GroupProps) {
     setSelectedIcon,
     setGroupName,
     resetWorkingFiles,
-    setEditingBoardID,
-    setGroupRepeating,
-    setFadeIn,
-    setFadeOut
-  } = useAudioStore()
+    setEditingBoardID
+  } = useAudioStore(
+    useShallow((state) => ({
+      playGroup: state.playGroup,
+      stopGroup: state.stopGroup,
+      playingGroups: state.playingGroups,
+      editingMode: state.editingMode,
+      setEditingGroupID: state.setEditingGroupID,
+      setSelectedIcon: state.setSelectedIcon,
+      setGroupName: state.setGroupName,
+      resetWorkingFiles: state.resetWorkingFiles,
+      setEditingBoardID: state.setEditingBoardID,
+      setGroupVariant: state.setGroupVariant
+    }))
+  )
 
   const dropProps = useDroppable({
     id: group.id,
@@ -56,7 +67,7 @@ export default function Group(props: GroupProps) {
   }, [playingGroups, group.id])
 
   const onClickPlay = useCallback(() => {
-    if (isPlaying) {
+    if (group.variant !== 'Rapid' && isPlaying) {
       stopGroup(group.id)
     } else {
       playGroup(group.id)
@@ -70,11 +81,46 @@ export default function Group(props: GroupProps) {
     setGroupName(group.name)
     resetWorkingFiles(group.effects)
     setEditingBoardID(boardID)
-    setGroupRepeating(group.repeats)
-    setFadeIn(group.fadeIn)
-    setFadeOut(group.fadeOut)
     ;(document.getElementById(EditEffectModalId) as HTMLDialogElement).showModal()
   }, [group, boardID])
+
+  const variantIcon = useMemo(() => {
+    switch (group.variant) {
+      case 'Looping': {
+        return (
+          <span
+            className={`
+              indicator-item
+              rounded-full
+              indicator-bottom
+              indicator-start
+              badge-neutral
+            `}
+          >
+            <RepeatIcon className="h-4 w-4 m-1" />
+          </span>
+        )
+      }
+      case 'Rapid': {
+        return (
+          <span
+            className={`
+              indicator-item
+              rounded-full
+              indicator-bottom
+              indicator-start
+              badge-neutral
+            `}
+          >
+            <PistolIcon className="h-4 w-4 m-1" />
+          </span>
+        )
+      }
+      default: {
+        return <></>
+      }
+    }
+  }, [group.variant])
 
   return (
     <div ref={dropProps.setNodeRef} className="relative prose">
@@ -125,18 +171,7 @@ export default function Group(props: GroupProps) {
           `}
         >
           <IconEffect icon={group.icon} />
-          <span
-            className={`
-              indicator-item
-              rounded-full
-              indicator-bottom
-              indicator-start
-              badge-neutral
-              ${group.repeats ? 'visible' : 'hidden'}
-            `}
-          >
-            <RepeatIcon className="h-4 w-4 m-1" />
-          </span>
+          {variantIcon}
         </div>
         <span className="text-sm flex justify-center">{group.name}</span>
       </div>

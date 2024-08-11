@@ -1,3 +1,4 @@
+import { SoundVariant } from './soundVariants'
 import { SupportedFileTypes } from './supportedFileTypes'
 
 /**
@@ -83,21 +84,23 @@ export type SoundGroup = {
    */
   icon: SoundIcon
 
-  /**
-   * If true, this sound effect should keep playing indefinitely, starting over from the beginning
-   * once the sound has ended. Must be stopped manually.
-   */
-  repeats: boolean
+  variant: SoundVariant
 
-  /**
-   * If true, this effect should fade in when starting.
-   */
-  fadeIn: boolean
+  // /**
+  //  * If true, this sound effect should keep playing indefinitely, starting over from the beginning
+  //  * once the sound has ended. Must be stopped manually.
+  //  */
+  // repeats: boolean
 
-  /**
-   * If true, this effect should fade out when ending.
-   */
-  fadeOut: boolean
+  // /**
+  //  * If true, this effect should fade in when starting.
+  //  */
+  // fadeIn: boolean
+
+  // /**
+  //  * If true, this effect should fade out when ending.
+  //  */
+  // fadeOut: boolean
 
   category?: CategoryID
 }
@@ -343,20 +346,21 @@ export type GetGroupSoundResponse = {
 
   effectID: EffectID
 
-  /**
-   * If true, this audio should repeat.
-   */
-  repeats: boolean
+  variant: SoundVariant
+  // /**
+  //  * If true, this audio should repeat.
+  //  */
+  // repeats: boolean
 
-  /**
-   * If true, this audio should fade in when starting.
-   */
-  fadeIn: boolean
+  // /**
+  //  * If true, this audio should fade in when starting.
+  //  */
+  // fadeIn: boolean
 
-  /**
-   * If true, this audio should fade out when stopping.
-   */
-  fadeOut: boolean
+  // /**
+  //  * If true, this audio should fade out when stopping.
+  //  */
+  // fadeOut: boolean
 }
 
 /**

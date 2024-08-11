@@ -15,6 +15,7 @@ import { create } from 'zustand'
 import { ColorOptions } from '@renderer/components/modals/newEffectModal/colorPicker'
 import { SoundContainer } from '@renderer/utils/soundContainer'
 import { produce } from 'immer'
+import { SoundVariant } from '@renderer/utils/soundVariants'
 
 /**
  * A set of editing modes that the view might exist in.
@@ -117,9 +118,7 @@ export type AudioStoreEditingModeMethods = {
   setEditingBoardID: (id: BoardID) => void
   prepEditingCategory: (boardID: BoardID, categoryID: CategoryID) => void
   setGroupName: (name: string | undefined) => void
-  setGroupRepeating: (shouldRepeat: boolean) => void
-  setFadeIn: (fade: boolean) => void
-  setFadeOut: (fade: boolean) => void
+  setGroupVariant: (variant: SoundVariant) => void
   setSelectedIcon: (icon: SoundIcon) => void
 }
 
@@ -138,7 +137,7 @@ export type AudioStore = AudioState &
   AudioStoreEditingModeMethods &
   AudioStoreCategoryMethods
 
-const GroupStopHandles: Map<GroupID, () => void> = new Map()
+const GroupStopHandles: Map<GroupID, Array<() => void>> = new Map()
 
 const RepeatSoundHandles: Map<GroupID, EffectID> = new Map()
 
@@ -150,9 +149,7 @@ const getDefaultGroup = (): SoundGroupEditableFields => ({
     name: 'moon'
   },
   name: '',
-  repeats: false,
-  fadeIn: false,
-  fadeOut: false
+  variant: 'Default'
 })
 
 export const useAudioStore = create<AudioStore>((set) => ({
@@ -242,13 +239,22 @@ export const useAudioStore = create<AudioStore>((set) => ({
     RepeatSoundHandles.set(groupID, audio.effectID)
 
     const handleHowlStop = (groupID: GroupID) => {
-      set((state) => {
-        const filteredGroups = state.playingGroups.filter((g) => g !== groupID)
+      if (GroupStopHandles.has(groupID)) {
+        const handles = GroupStopHandles.get(groupID)!
+
+        if (handles.length > 1) {
+          handles.splice(0, 1)
+        } else {
+          GroupStopHandles.delete(groupID)
+        }
+      }
+
+      set(() => {
+        const newGroups = [...GroupStopHandles.keys()]
         return {
-          playingGroups: filteredGroups
+          playingGroups: newGroups
         }
       })
-      GroupStopHandles.delete(groupID)
     }
 
     const sound = new SoundContainer({
@@ -259,12 +265,14 @@ export const useAudioStore = create<AudioStore>((set) => ({
       },
       src: audio.soundB64,
       volume: audio.volume,
-      repeats: audio.repeats,
-      fadeIn: audio.fadeIn,
-      fadeOut: audio.fadeOut
+      variant: audio.variant
     })
 
-    GroupStopHandles.set(groupID, sound.GetStopHandle())
+    if (!GroupStopHandles.has(groupID)) {
+      GroupStopHandles.set(groupID, [])
+    }
+
+    GroupStopHandles.get(groupID)?.push(sound.GetStopHandle())
 
     set((state) => ({
       playingGroups: [...state.playingGroups, groupID]
@@ -276,7 +284,7 @@ export const useAudioStore = create<AudioStore>((set) => ({
   },
   async stopGroup(groupID) {
     if (GroupStopHandles.has(groupID)) {
-      GroupStopHandles.get(groupID)!()
+      GroupStopHandles.get(groupID)?.forEach((handle) => handle())
     }
   },
   resetWorkingFiles(list) {
@@ -293,24 +301,10 @@ export const useAudioStore = create<AudioStore>((set) => ({
       })
     )
   },
-  setGroupRepeating(shouldRepeat) {
+  setGroupVariant(variant) {
     set(
       produce((state: AudioStore) => {
-        state.editingGroup.repeats = shouldRepeat
-      })
-    )
-  },
-  setFadeIn(fade) {
-    set(
-      produce((state: AudioStore) => {
-        state.editingGroup.fadeIn = fade
-      })
-    )
-  },
-  setFadeOut(fade) {
-    set(
-      produce((state: AudioStore) => {
-        state.editingGroup.fadeOut = fade
+        state.editingGroup.variant = variant
       })
     )
   },
