@@ -30,6 +30,10 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { GetAppDataPath } from '../../utils/paths'
 import { SupportedFileTypes } from './supportedFileTypes'
+import { BoardsAudioAPI } from './methods/boards'
+import { CategoriesAudioAPI } from './methods/categories'
+import { GroupsAudioAPI } from './methods/groups'
+import { SoundsAudioAPI } from './methods/sounds'
 
 /**
  * An instantiation of the config for information related to this audio API.
@@ -406,9 +410,6 @@ export const audioApi: IAudioApi = {
       volume: effect.volume,
       effectID: effect.id,
       variant: group.variant
-      // repeats: group.repeats,
-      // fadeIn: group?.fadeIn ?? false,
-      // fadeOut: group?.fadeOut ?? false
     }
   },
   async PreviewSound(request): Promise<PreviewSoundResponse> {
@@ -710,5 +711,9 @@ export const audioApi: IAudioApi = {
     return {
       groups: uncategorizedGroups
     }
-  }
+  },
+  Boards: BoardsAudioAPI,
+  Categories: CategoriesAudioAPI,
+  Groups: GroupsAudioAPI,
+  Sounds: SoundsAudioAPI
 }

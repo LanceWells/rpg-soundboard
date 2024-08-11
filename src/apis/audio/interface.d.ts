@@ -643,4 +643,40 @@ export interface IAudioApi {
   GetUncategorizedGroups(request: GetUncategorizedGroupsRequest): GetUncategorizedGroupsResponse
 
   ReorderCategories(request: ReorderCategoriesRequest): ReorderCategoriesResponse
+
+  Boards: Boards
+  Groups: Groups
+  Categories: Categories
+  Sounds: Sounds
+}
+
+export interface Categories {
+  Create(request: CreateCategoryRequest): CreateCategoryResponse
+  Update(request: UpdateCategoryRequest): UpdateCategoryResponse
+  Delete(request: DeleteCategoryRequest): DeleteCategoryResponse
+  Reorder(request: ReorderCategoriesRequest): ReorderCategoriesResponse
+  GetCategorizedGroups(request: GetGroupsForCategoryRequest): GetGroupsForCategoryResponse
+  GetUncategorizedGroups(request: GetUncategorizedGroupsRequest): GetUncategorizedGroupsResponse
+}
+
+export interface Groups {
+  Get(request: GetGroupRequest): GetGroupResponse
+  Create(request: CreateGroupRequest): CreateGroupResponse
+  Update(request: UpdateGroupRequest): UpdateGroupResponse
+  Delete(request: DeleteGroupRequest): DeleteGroupResponse
+  Reorder(request: ReorderGroupsRequest): ReorderGroupsResponse
+  GetSound(request: GetGroupSoundRequest): Promise<GetGroupSoundResponse>
+  AddEffect(request: AddEffectToGroupRequest): AddEffectToGroupResponse
+}
+
+export interface Boards {
+  Get(request: GetBoardRequest): GetBoardResponse
+  Create(request: CreateBoardRequest): CreateBoardResponse
+  Update(request: UpdateBoardRequest): UpdateBoardResponse
+  Delete(request: DeleteBoardRequest): DeleteBoardResponse
+  GetAll(request: GetAllBoardsRequest): GetAllBoardsResponse
+}
+
+export interface Sounds {
+  Preview(request: PreviewSoundRequest): Promise<PreviewSoundResponse>
 }

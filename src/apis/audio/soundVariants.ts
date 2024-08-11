@@ -1,7 +1,7 @@
-export const SoundVariant = {
-  Looping: 'Looping',
-  Default: 'Default',
-  Rapid: 'Rapid-Fire'
+type SoundVariantFields = {
+  Default: unknown
+  Looping: unknown
+  Rapid: unknown
 }
 
-export type SoundVariant = keyof typeof SoundVariant
+export type SoundVariants = keyof SoundVariantFields
