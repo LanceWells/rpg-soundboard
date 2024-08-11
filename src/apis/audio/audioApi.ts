@@ -429,7 +429,7 @@ export const audioApi: IAudioApi = {
     }
   },
   ReorderGroups: function (request) {
-    const nocategoryid: 'nocategory' = 'nocategory'
+    const nocategoryid = 'nocategory' as const
     const board = boardMap.get(request.boardID)
 
     if (!board) {
@@ -583,7 +583,7 @@ export const audioApi: IAudioApi = {
     }
 
     const newConfig = produce(config.Config, (draft) => {
-      const matchingBoard = draft.boards.find((b) => b.id)
+      const matchingBoard = draft.boards.find((b) => b.id === request.boardID)
       if (!matchingBoard?.categories) {
         return
       }

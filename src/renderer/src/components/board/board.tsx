@@ -1,17 +1,10 @@
-import { ChangeEvent, ChangeEventHandler, act, useCallback, useMemo, useState } from 'react'
-import { GroupID, SoundBoard } from 'src/apis/audio/interface'
+import { ChangeEvent, ChangeEventHandler, useCallback, useMemo, useState } from 'react'
+import { SoundBoard } from 'src/apis/audio/interface'
 import { EditingMode, useAudioStore } from '@renderer/stores/audioStore'
 import { NewEffectModalId } from '../modals/newEffectModal/newEffectModal'
 import AddIcon from '@renderer/assets/icons/add'
 import PencilIcon from '@renderer/assets/icons/pencil'
-import {
-  DndContext,
-  DragEndEvent,
-  PointerSensor,
-  TouchSensor,
-  useSensor,
-  useSensors
-} from '@dnd-kit/core'
+import { DndContext, DragEndEvent } from '@dnd-kit/core'
 import TextField from '../modals/newEffectModal/textField'
 import debounce from 'debounce'
 import DeleteButton from '../generic/deleteButton'
@@ -21,8 +14,6 @@ import Category from '../category/categorized'
 import { IdIsCategory, IdIsGroup } from '@renderer/utils/id'
 import Uncategorized from '../category/uncategorized'
 import { SortableContext } from '@dnd-kit/sortable'
-
-const UncategorizedGroupId = 'uncategorized-groups'
 
 export type BoardProps = {
   board: SoundBoard
@@ -56,111 +47,6 @@ export default function Board(props: BoardProps) {
 
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false)
 
-  const sensors = useSensors(useSensor(PointerSensor), useSensor(TouchSensor))
-
-  // const groups = useMemo(
-  //   () => board.groups.map((g) => <Group boardID={board.id} group={g} key={g.id} />),
-  //   [board, board.groups, board.groups.length, editingMode]
-  // )
-
-  // type GroupSorting = {
-  //   uncategorized: JSX.Element[]
-  //   categorized: {
-  //     [key: CategoryID]: {
-  //       category: SoundCategory
-  //       elements: JSX.Element[]
-  //     }
-  //   }
-  // }
-
-  // const { categorized: categorizedGroups, uncategorized: uncategorizedGroups } = useMemo(() => {
-  //   const categories = new Map((board.categories ?? []).map((c) => [c.id, c]))
-  //   const sortedGroups = board.groups.reduce<GroupSorting>(
-  //     (acc, g) => {
-  //       const groupElement = <Group boardID={board.id} group={g} key={g.id} />
-
-  //       if (!g.category || !categories.has(g.category)) {
-  //         acc.uncategorized.push(groupElement)
-  //         return acc
-  //       }
-
-  //       const category = categories.get(g.category)
-
-  //       if (!acc[g.category]) {
-  //         acc[g.category] = {
-  //           category,
-  //           elements: []
-  //         }
-  //       }
-
-  //       acc[g.category].elements.push(groupElement)
-  //       return acc
-  //     },
-  //     {
-  //       categorized: {},
-  //       uncategorized: []
-  //     } as GroupSorting
-  //   )
-
-  //   return sortedGroups
-  // }, [board, board.categories, board.groups, board.groups.length, editingMode])
-
-  // const categories = useMemo(() => {
-  //   const board.categories?.map((c) => {
-  //     const matchingCategoryGroups = categorizedGroups[c.id]
-  //     if (matchingCategoryGroups) {
-  //       return (<Category  />)
-  //     }
-  //   }) ?? []
-  // }, [])
-
-  // const groupsAndCategories = useMemo(
-  //   () => board.groups.map((g) => <Group boardID={board.id} group={g} key={g.id} />),
-  //   [board, board.groups, board.groups.length, editingMode]
-  // )
-
-  // const { ids: groupCategoryIDs, elements: groupCategoryElements } = useMemo(() => {
-  //   // const groups = board.groups.filter((g) => g.category === undefined)
-  //   const categories = board.categories ?? []
-  //   // const uncategorizedGroups = board.groups.filter((g) => g.category === undefined)
-
-  //   // const groupIDs = groups.map((g) => g.id)
-  //   const categoryIDs = categories.map((c) => c.id)
-  //   // const groupIDs = uncategorizedGroups.map((g) => g.id)
-
-  //   // const groupElements = groups.map((g) => <Group boardID={board.id} group={g} key={g.id} />)
-  //   const categoryElements =
-  //     categories.map((c) => <Category boardID={board.id} category={c} key={c.id} />) ?? []
-
-  //   // const groupElements = uncategorizedGroups.map((g) => (
-  //   //   <Group boardID={board.id} group={g} key={g.id} />
-  //   // ))
-
-  //   // const uncategorizedContainer = (
-  //   //   <UncategorizedGroups boardID={board.id} key={UncategorizedGroupId} />
-  //   // )
-
-  //   return {
-  //     ids: [...categoryIDs],
-  //     elements: [...categoryElements]
-  //   }
-
-  //   // return {
-  //   //   ids: [...categoryIDs, ...groupIDs],
-  //   //   elements: [...categoryElements, ...groupElements]
-  //   // }
-
-  //   // return {
-  //   // ids: [...groupIDs, ...categoryIDs],
-  //   // elements: [...groupElements, ...categoryElements]
-  //   // }
-
-  //   // return {
-  //   //   ids: [...groupIDs, ...categoryIDs],
-  //   //   elements: [...groupElements, ...categoryElements]
-  //   // }
-  // }, [board.groups, board, board.categories, editingMode])
-
   const { elements: categoryElements, ids: categoryIDs } = useMemo(() => {
     const categories = board.categories ?? []
     const ids = categories.map((c) => c.id)
@@ -171,8 +57,6 @@ export default function Board(props: BoardProps) {
       elements
     }
   }, [board.categories, board.groups, board.id])
-
-  // const groupIDs = useMemo(() => board.groups.map((g) => g.id), [board.groups])
 
   const onNewGroup = useCallback(() => {
     setEditingBoardID(board.id)
@@ -289,64 +173,6 @@ export default function Board(props: BoardProps) {
 
       setEditingMode('Editing')
       return
-
-      // if (IdIsCategory(activeID)) {
-      //   if (IdIsGroup(overID)) {
-      //     // Do nothing. If a category is dropped over a group, that's not a valid action.
-      //     setEditingMode('Editing')
-      //     return
-      //   }
-      //   if (IdIsCategory(overID)) {
-      //     // Reorder categories. This means that the user reorganized the categories.
-      //     setEditingMode('Editing')
-      //     return
-      //   }
-      //   setEditingMode('Editing')
-      //   return
-      // }
-
-      // if (IdIsGroup(activeID)) {
-      //   if (IdIsGroup(overID)) {
-      //     const groups = getUncategorizedGroups({ boardID: board.id }).groups
-      //     const groupIDs = groups.map((g) => g.id)
-
-      //     const activeIndex = groupIDs.indexOf(activeID)
-      //     const overIndex = groupIDs.indexOf()
-
-      //     // reorderGroups({
-      //     //   boardID,
-      //     //   category: categoryID,
-      //     //   newOrder: newOrder
-      //     // })
-
-      //     // Reorder groups. This means that the user reorganized the uncategorized groups.
-      //     setEditingMode('Editing')
-      //     return
-      //   }
-      //   if (IdIsCategory(overID)) {
-      //     // Set category for group. This means that the user dragged a group over a category.
-      //     updateGroupPartial(activeID, {
-      //       category: overID
-      //     })
-      //     setEditingMode('Editing')
-      //     return
-      //   }
-      // }
-
-      // const { active, over } = event
-      // if (over === null) {
-      //   return
-      // }
-      // const activeIndex = groupIDs.indexOf(active.id as GroupID)
-      // const overIndex = groupIDs.indexOf(over.id as GroupID)
-      // const arrayCopy = [...Array.from(groupIDs).values()]
-      // const [movingItem] = arrayCopy.splice(activeIndex, 1)
-      // arrayCopy.splice(overIndex, 0, movingItem)
-      // reorderGroups({
-      //   boardID: board.id,
-      //   newOrder: arrayCopy
-      // })
-      // setEditingMode('Editing')
     },
     [categoryIDs, board.id, board.groups, groupCategories, board.categories, JSON.stringify(board)]
   )
@@ -394,23 +220,26 @@ export default function Board(props: BoardProps) {
       shadow-sm
       items-center
       grid
-      [grid-template-areas:_"._title_editbutton"_"groups_groups_groups"_"delete_add_."]
-      [grid-template-columns:_1fr_max-content_1fr]
-      [grid-template-rows:_min-content_1fr_min-content]
+      content-between
+      relative
+      [grid-template-areas:_"._title_editbutton"_"categories_categories_categories"_"groups_groups_groups"_"delete_controls_."]
+      [grid-template-columns:_min-content_1fr_min-content]
     `}
     >
-      <div className="justify-center w-full text-center text-xl [grid-area:title]">
+      <div className="w-full absolute top-0 left-0 text-center pointer-events-none">
         <h3
           className={`
-              h-12
-              ${editingMode === 'Off' ? 'visible' : 'hidden'}
+            w-full
+            text-2xl
+            pt-4
+            ${editingMode === 'Off' ? 'visible' : 'hidden'}
           `}
         >
           {board.name}
         </h3>
         <TextField
           className={`
-              h-12
+              prose
               ${editingMode === 'Off' ? 'hidden' : 'visible'}
             `}
           formName="Board Title"
@@ -430,37 +259,23 @@ export default function Board(props: BoardProps) {
       >
         <PencilIcon />
       </button>
-      <div
-        className={`
-          rounded-md
-          p-3
-          flex
-          flex-row
-          justify-self-center
-          flex-wrap
-          gap-8
-          [grid-area:groups]
-      `}
-      >
-        <DndContext onDragStart={onDragStart} onDragEnd={onDragEnd}>
+      <DndContext onDragStart={onDragStart} onDragEnd={onDragEnd}>
+        <div className="flex flex-row flex-wrap gap-6 justify-center [grid-area:categories]">
           <SortableContext items={categoryIDs} disabled={editingMode == 'Off'}>
             {categoryElements}
           </SortableContext>
+        </div>
+        <div className="flex flex-row flex-wrap gap-6 justify-center [grid-area:groups]">
           <Uncategorized boardID={board.id} />
-        </DndContext>
-        {/* <DndContext onDragStart={onDragStart} onDragEnd={onDragEnd} sensors={sensors}>
-          <SortableContext items={groupCategoryIDs}>{groupCategoryElements}</SortableContext>
-        </DndContext> */}
-        {/* <UncategorizedGroups key={UncategorizedGroupId} boardID={board.id} /> */}
-      </div>
-      <div className="[grid-area:_add] flex flex-row gap-x-4">
+        </div>
+      </DndContext>
+      <div className="[grid-area:_controls] absolute w-full justify-center bottom-0 flex flex-row gap-x-4">
         <button
           className={`
           btn-primary
           btn
           w-fit
           justify-self-center
-          [grid-area:_add]
         `}
           onClick={onNewGroup}
         >
@@ -473,7 +288,6 @@ export default function Board(props: BoardProps) {
           btn
           w-fit
           justify-self-center
-          [grid-area:_add]
         `}
           onClick={onNewCategory}
         >

@@ -1,0 +1,2 @@
+Toggle for not repeating the last sound.
+Rapid-fire option

@@ -77,7 +77,7 @@ export default function Group(props: GroupProps) {
   }, [group, boardID])
 
   return (
-    <div ref={dropProps.setNodeRef} className="relative">
+    <div ref={dropProps.setNodeRef} className="relative prose">
       <div
         ref={dragProps.setNodeRef}
         style={style}

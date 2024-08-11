@@ -7,7 +7,9 @@ import {
   SoundGroupEditableFields,
   SoundIcon,
   CategoryID,
-  SoundGroup
+  SoundGroup,
+  SoundCategoryEditableFields,
+  SoundCategory
 } from 'src/apis/audio/interface'
 import { create } from 'zustand'
 import { ColorOptions } from '@renderer/components/modals/newEffectModal/colorPicker'
@@ -55,6 +57,8 @@ export type AudioState = {
    * to said board.
    */
   editingBoardID: BoardID | undefined
+
+  editingCategory: SoundCategory | undefined
 
   /**
    * If true, the view is currently in "editing mode", which implies that button presses should not
@@ -111,6 +115,7 @@ export type AudioStoreEditingModeMethods = {
   removeWorkingFile: (index: number) => void
   updateWorkingFile: (index: number, volume: number) => void
   setEditingBoardID: (id: BoardID) => void
+  prepEditingCategory: (boardID: BoardID, categoryID: CategoryID) => void
   setGroupName: (name: string | undefined) => void
   setGroupRepeating: (shouldRepeat: boolean) => void
   setFadeIn: (fade: boolean) => void
@@ -155,6 +160,7 @@ export const useAudioStore = create<AudioStore>((set) => ({
   playingGroups: [],
   editingBoardID: undefined,
   editingGroupID: undefined,
+  editingCategory: undefined,
   setEditingMode(isEditing) {
     set({
       editingMode: isEditing
@@ -201,6 +207,23 @@ export const useAudioStore = create<AudioStore>((set) => ({
   setEditingBoardID: (id) => {
     set({
       editingBoardID: id
+    })
+  },
+  prepEditingCategory(boardID, categoryID) {
+    const board = window.audio.GetBoard({ boardID }).board
+    if (!board || !board.categories) {
+      return
+    }
+
+    const category = board.categories.find((c) => c.id === categoryID)
+    if (!category) {
+      return
+    }
+
+    const categoryCopy = produce(category, (_draft) => {})
+
+    set({
+      editingCategory: categoryCopy
     })
   },
   async playGroup(groupID) {

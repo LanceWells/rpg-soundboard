@@ -29,6 +29,7 @@
     "@electron-toolkit/preload": "^3.0.1",
     "@electron-toolkit/utils": "^3.0.0",
     "@iconify/tools": "^4.0.4",
+    "@tailwindcss/typography": "^0.5.14",
     "@tanstack/react-virtual": "^3.8.4",
     "@types/howler": "^2.2.11",
     "debounce": "^2.1.0",
