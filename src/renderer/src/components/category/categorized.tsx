@@ -3,11 +3,11 @@ import { BoardID, SoundCategory } from 'src/apis/audio/interface'
 import { useShallow } from 'zustand/react/shallow'
 import GenericCategoryContainer from './genericCategoryContainer'
 import { CSS } from '@dnd-kit/utilities'
-import { useDraggable, useDroppable } from '@dnd-kit/core'
 import { useCallback } from 'react'
 import { EditCategoryModalId } from '../modals/editCategoryModal/editCategoryModal'
 import PencilIcon from '@renderer/assets/icons/pencil'
 import MoveIcon from '@renderer/assets/icons/move'
+import { useSortable } from '@dnd-kit/sortable'
 
 export type CategorizedProps = {
   boardID: BoardID
@@ -29,23 +29,18 @@ export default function Categorized(props: CategorizedProps) {
 
   const groups = getGroupsForCategory(category.id)
 
-  const { setNodeRef: dropNodeRef } = useDroppable({
-    disabled: editingMode === 'Off',
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
     id: category.id
-  })
-
-  const dragProps = useDraggable({
-    id: category.id,
-    disabled: editingMode === 'Off'
   })
 
   const style = {
     transform: CSS.Transform.toString({
-      x: dragProps.transform?.x ?? 0,
-      y: dragProps.transform?.y ?? 0,
       scaleX: 1.0,
-      scaleY: 1.0
-    })
+      scaleY: 1.0,
+      x: transform?.x ?? 0,
+      y: transform?.y ?? 0
+    }),
+    transition
   }
 
   const onClickEdit = useCallback(() => {
@@ -55,9 +50,8 @@ export default function Categorized(props: CategorizedProps) {
   }, [category, boardID])
 
   return (
-    <div style={style} {...dragProps.attributes} {...dragProps.listeners} role="button">
+    <div {...attributes} ref={setNodeRef} style={style} role="button">
       <div
-        ref={dropNodeRef}
         className={`
         relative
         outline-dashed
@@ -72,14 +66,14 @@ export default function Categorized(props: CategorizedProps) {
           {category.name}
         </h3>
         <div
-          ref={dragProps.setNodeRef}
+          {...listeners}
           className={`
-          rounded-full
-          w-12
-          h-12
-          absolute
-          top-0
-          left-0
+            ${editingMode === 'Off' ? 'hidden' : 'visible'}
+            rounded-full
+            absolute
+            -bottom-4
+            -left-5
+            bg-primary
         `}
         >
           <MoveIcon />
@@ -95,7 +89,6 @@ export default function Categorized(props: CategorizedProps) {
           -right-8
           btn
           btn-circle
-          z-10
           btn-accent
           transition-opacity
           ${editingMode === 'Off' ? 'hidden' : 'visible'}
