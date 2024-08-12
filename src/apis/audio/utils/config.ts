@@ -13,20 +13,18 @@ export class AudioConfigStorage extends ConfigStorage<AudioApiConfig> {
 
     this._boardMap = new Map()
     this._groupMap = new Map()
+
+    this.ReloadMaps()
+  }
+
+  get Config() {
+    return super.Config
   }
 
   set Config(newConfig: AudioApiConfig) {
     super.Config = newConfig
 
-    this._boardMap.clear()
-    this._groupMap.clear()
-
-    newConfig.boards.forEach((b) => {
-      this._boardMap.set(b.id, b)
-      b.groups.forEach((g) => {
-        this._groupMap.set(g.id, g)
-      })
-    })
+    this.ReloadMaps()
   }
 
   getBoard(boardID: BoardID): SoundBoard | undefined {
@@ -35,6 +33,18 @@ export class AudioConfigStorage extends ConfigStorage<AudioApiConfig> {
 
   getGroup(groupID: GroupID): SoundGroup | undefined {
     return this._groupMap.get(groupID)
+  }
+
+  private ReloadMaps() {
+    this._boardMap.clear()
+    this._groupMap.clear()
+
+    this.Config.boards.forEach((b) => {
+      this._boardMap.set(b.id, b)
+      b.groups.forEach((g) => {
+        this._groupMap.set(g.id, g)
+      })
+    })
   }
 }
 

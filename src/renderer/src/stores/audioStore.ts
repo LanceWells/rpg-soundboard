@@ -85,8 +85,8 @@ export type AudioState = {
 }
 
 export type AudioStoreGroupMethods = {
-  addGroup: IAudioApi['CreateGroup']
-  updateGroup: IAudioApi['UpdateGroup']
+  addGroup: IAudioApi['Groups']['Create']
+  updateGroup: IAudioApi['Groups']['Update']
   updateGroupPartial: (
     boardID: BoardID,
     groupID: GroupID,
@@ -96,9 +96,9 @@ export type AudioStoreGroupMethods = {
 }
 
 export type AudioStoreBoardMethods = {
-  addBoard: IAudioApi['CreateBoard']
-  reorderGroups: IAudioApi['ReorderGroups']
-  updateBoard: IAudioApi['UpdateBoard']
+  addBoard: IAudioApi['Boards']['Create']
+  reorderGroups: IAudioApi['Groups']['Reorder']
+  updateBoard: IAudioApi['Boards']['Update']
   deleteBoard: (id: BoardID) => void
 }
 
@@ -124,12 +124,12 @@ export type AudioStoreEditingModeMethods = {
 }
 
 export type AudioStoreCategoryMethods = {
-  addCategory: IAudioApi['CreateCategory']
-  deleteCategory: IAudioApi['DeleteCategory']
-  updateCategory: IAudioApi['UpdateCategory']
+  addCategory: IAudioApi['Categories']['Create']
+  deleteCategory: IAudioApi['Categories']['Delete']
+  updateCategory: IAudioApi['Categories']['Update']
   getGroupsForCategory: (categoryID: CategoryID) => SoundGroup[]
-  getUncategorizedGroups: IAudioApi['GetUncategorizedGroups']
-  reorderCategories: IAudioApi['ReorderCategories']
+  getUncategorizedGroups: IAudioApi['Categories']['GetUncategorizedGroups']
+  reorderCategories: IAudioApi['Categories']['Reorder']
 }
 
 export type AudioStore = AudioState &
@@ -157,7 +157,7 @@ const getDefaultGroup = (): SoundGroupEditableFields => ({
 export const useAudioStore = create<AudioStore>((set) => ({
   editingGroup: getDefaultGroup(),
   editingMode: 'Off',
-  boards: window.audio.GetAllBoards({}).boards,
+  boards: window.audio.Boards.GetAll({}).boards,
   playingGroups: [],
   editingBoardID: undefined,
   editingGroupID: undefined,
@@ -211,7 +211,7 @@ export const useAudioStore = create<AudioStore>((set) => ({
     })
   },
   prepEditingCategory(boardID, categoryID) {
-    const board = window.audio.GetBoard({ boardID }).board
+    const board = window.audio.Boards.Get({ boardID }).board
     if (!board || !board.categories) {
       return
     }
@@ -233,7 +233,7 @@ export const useAudioStore = create<AudioStore>((set) => ({
       soundsToAvoid = [RepeatSoundHandles.get(groupID)!]
     }
 
-    const audio = await window.audio.GetGroupSound({
+    const audio = await window.audio.Groups.GetSound({
       groupID: groupID,
       idsToSkip: soundsToAvoid
     })
@@ -323,8 +323,8 @@ export const useAudioStore = create<AudioStore>((set) => ({
     })
   },
   updateGroup(req) {
-    const updatedGroup = window.audio.UpdateGroup(req)
-    const newBoards = window.audio.GetAllBoards({}).boards
+    const updatedGroup = window.audio.Groups.Update(req)
+    const newBoards = window.audio.Boards.GetAll({}).boards
 
     set({
       boards: newBoards,
@@ -334,7 +334,7 @@ export const useAudioStore = create<AudioStore>((set) => ({
     return updatedGroup
   },
   updateGroupPartial(boardID, groupID, updatedFields) {
-    const currentGroup = window.audio.GetGroup({
+    const currentGroup = window.audio.Groups.Get({
       groupID
     }).group
 
@@ -346,13 +346,13 @@ export const useAudioStore = create<AudioStore>((set) => ({
       Object.assign(draft, updatedFields)
     }) as SoundGroup
 
-    window.audio.UpdateGroup({
+    window.audio.Groups.Update({
       boardID,
       groupID,
       ...newGroup
     })
 
-    const newBoards = window.audio.GetAllBoards({}).boards
+    const newBoards = window.audio.Boards.GetAll({}).boards
 
     set({
       boards: newBoards,
@@ -360,29 +360,29 @@ export const useAudioStore = create<AudioStore>((set) => ({
     })
   },
   deleteGroup(id) {
-    window.audio.DeleteGroup({
+    window.audio.Groups.Delete({
       groupID: id
     })
 
-    const newBoards = window.audio.GetAllBoards({}).boards
+    const newBoards = window.audio.Boards.GetAll({}).boards
     set({
       boards: newBoards,
       editingGroup: getDefaultGroup()
     })
   },
   deleteBoard(id) {
-    window.audio.DeleteBoard({
+    window.audio.Boards.Delete({
       boardID: id
     })
 
-    const newBoards = window.audio.GetAllBoards({}).boards
+    const newBoards = window.audio.Boards.GetAll({}).boards
     set({
       boards: newBoards
     })
   },
   addGroup: (req) => {
-    const newGroup = window.audio.CreateGroup(req)
-    const newBoards = window.audio.GetAllBoards({}).boards
+    const newGroup = window.audio.Groups.Create(req)
+    const newBoards = window.audio.Boards.GetAll({}).boards
 
     set({
       boards: newBoards,
@@ -392,8 +392,8 @@ export const useAudioStore = create<AudioStore>((set) => ({
     return newGroup
   },
   addBoard(req) {
-    const newBoard = window.audio.CreateBoard(req)
-    const newBoards = window.audio.GetAllBoards({}).boards
+    const newBoard = window.audio.Boards.Create(req)
+    const newBoards = window.audio.Boards.GetAll({}).boards
 
     set({
       boards: newBoards
@@ -402,8 +402,8 @@ export const useAudioStore = create<AudioStore>((set) => ({
     return newBoard
   },
   updateBoard(request) {
-    const updatedBoard = window.audio.UpdateBoard(request)
-    const newBoards = window.audio.GetAllBoards({}).boards
+    const updatedBoard = window.audio.Boards.Update(request)
+    const newBoards = window.audio.Boards.GetAll({}).boards
 
     set({
       boards: newBoards
@@ -412,8 +412,8 @@ export const useAudioStore = create<AudioStore>((set) => ({
     return updatedBoard
   },
   reorderGroups(request) {
-    window.audio.ReorderGroups(request)
-    const newBoards = window.audio.GetAllBoards({}).boards
+    window.audio.Groups.Reorder(request)
+    const newBoards = window.audio.Boards.GetAll({}).boards
 
     set({
       boards: newBoards
@@ -422,8 +422,8 @@ export const useAudioStore = create<AudioStore>((set) => ({
     return {}
   },
   addCategory(request) {
-    const resp = window.audio.CreateCategory(request)
-    const newBoards = window.audio.GetAllBoards({}).boards
+    const resp = window.audio.Categories.Create(request)
+    const newBoards = window.audio.Boards.GetAll({}).boards
 
     set({
       boards: newBoards
@@ -432,8 +432,8 @@ export const useAudioStore = create<AudioStore>((set) => ({
     return resp
   },
   deleteCategory(request) {
-    const resp = window.audio.DeleteCategory(request)
-    const newBoards = window.audio.GetAllBoards({}).boards
+    const resp = window.audio.Categories.Delete(request)
+    const newBoards = window.audio.Boards.GetAll({}).boards
 
     set({
       boards: newBoards
@@ -442,8 +442,8 @@ export const useAudioStore = create<AudioStore>((set) => ({
     return resp
   },
   updateCategory(request) {
-    const resp = window.audio.UpdateCategory(request)
-    const newBoards = window.audio.GetAllBoards({}).boards
+    const resp = window.audio.Categories.Update(request)
+    const newBoards = window.audio.Boards.GetAll({}).boards
 
     set({
       boards: newBoards
@@ -452,20 +452,20 @@ export const useAudioStore = create<AudioStore>((set) => ({
     return resp
   },
   getGroupsForCategory(categoryID) {
-    const groups = window.audio.GetGroupsForCategory({
+    const groups = window.audio.Categories.GetCategorizedGroups({
       categoryID
     })
 
     return groups.groups
   },
   getUncategorizedGroups(request) {
-    const resp = window.audio.GetUncategorizedGroups(request)
+    const resp = window.audio.Categories.GetUncategorizedGroups(request)
 
     return resp
   },
   reorderCategories(request) {
-    const resp = window.audio.ReorderCategories(request)
-    const newBoards = window.audio.GetAllBoards({}).boards
+    const resp = window.audio.Categories.Reorder(request)
+    const newBoards = window.audio.Boards.GetAll({}).boards
 
     set({
       boards: newBoards
