@@ -240,16 +240,17 @@ export default function Board(props: BoardProps) {
       grid
       content-between
       relative
-      [grid-template-areas:_"._title_editbutton"_"categories_categories_categories"_"groups_groups_groups"_"delete_controls_."]
-      [grid-template-columns:_min-content_1fr_min-content]
+      [grid-template-areas:_"._title_editbutton"_"categories_categories_categories"_"groups_groups_groups"_"delete_._controls"]
+      [grid-template-columns:_max-content_1fr_min-content]
+      [grid-template-rows:_112px_1fr_1fr_80px]
     `}
     >
-      <div className="w-full absolute top-0 left-0 text-center pointer-events-none">
+      <div className="w-full pt-4 absolute top-0 left-0 text-center pointer-events-none h-28 min-h-28">
         <h3
           className={`
-            w-full
             text-2xl
-            pt-4
+            h-28
+            max-h-28
             ${editingMode === 'Off' ? 'visible' : 'hidden'}
           `}
         >
@@ -257,7 +258,8 @@ export default function Board(props: BoardProps) {
         </h3>
         <TextField
           className={`
-              prose
+              h-28
+              max-h-28
               ${editingMode === 'Off' ? 'hidden' : 'visible'}
             `}
           formName="Board Title"
@@ -287,13 +289,11 @@ export default function Board(props: BoardProps) {
           <Uncategorized boardID={board.id} />
         </div>
       </DndContext>
-      <div className="[grid-area:_controls] absolute w-full justify-center bottom-0 flex flex-row gap-x-4">
+      <div className="[grid-area:_controls] absolute right-20 bottom-0 flex flex-row gap-x-4">
         <button
           className={`
           btn-primary
           btn
-          w-fit
-          justify-self-center
         `}
           onClick={onNewGroup}
         >
@@ -304,8 +304,6 @@ export default function Board(props: BoardProps) {
           className={`
           btn-secondary
           btn
-          w-fit
-          justify-self-center
         `}
           onClick={onNewCategory}
         >
@@ -319,6 +317,9 @@ export default function Board(props: BoardProps) {
         isConfirming={isConfirmingDelete}
         onDelete={onDelete}
         className={`
+          absolute
+          bottom-0
+          w-max
           justify-self-start
           [grid-area:delete]
         `}

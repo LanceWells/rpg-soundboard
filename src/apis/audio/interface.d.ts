@@ -331,20 +331,6 @@ export type GetGroupSoundResponse = {
   effectID: EffectID
 
   variant: SoundVariant
-  // /**
-  //  * If true, this audio should repeat.
-  //  */
-  // repeats: boolean
-
-  // /**
-  //  * If true, this audio should fade in when starting.
-  //  */
-  // fadeIn: boolean
-
-  // /**
-  //  * If true, this audio should fade out when stopping.
-  //  */
-  // fadeOut: boolean
 }
 
 /**
@@ -532,118 +518,6 @@ export type CategoryID = `cat-${string}-${string}-${string}-${string}-${string}`
  * An interface used to define the set of methods that comprise the "Audio" side of the application.
  */
 export interface IAudioApi {
-  // /**
-  //  * Gets a specific group from the soundboard storage.
-  //  *
-  //  * @param request See {@link GetGroupRequest}.
-  //  */
-  // GetGroup(request: GetGroupRequest): GetGroupResponse
-
-  // /**
-  //  * Creates a new group for a particular soundboard.
-  //  *
-  //  * @param request See {@link CreateGroupRequest}.
-  //  */
-  // CreateGroup(request: CreateGroupRequest): CreateGroupResponse
-
-  // /**
-  //  * Updates a particular group with a new set of specified values.
-  //  *
-  //  * @param request See {@link UpdateGroupRequest}.
-  //  */
-  // UpdateGroup(request: UpdateGroupRequest): UpdateGroupResponse
-
-  // /**
-  //  * Adds a sound effect to a given sound group.
-  //  *
-  //  * @param request See {@link AddEffectToGroupRequest}.
-  //  */
-  // AddEffectToGroup(request: AddEffectToGroupRequest): AddEffectToGroupResponse
-
-  // /**
-  //  * Gets a sound effect from a given group.
-  //  *
-  //  * Note that if a particular group has multiple sound effects, that one will be chosen from that
-  //  * group at random.
-  //  *
-  //  * To simplify the setup process, there are no weighted values to determine which sound effect is
-  //  * retrieved.
-  //  *
-  //  * @param request See {@link GetGroupSoundRequest}.
-  //  */
-  // GetGroupSound(request: GetGroupSoundRequest): Promise<GetGroupSoundResponse>
-
-  // /**
-  //  * Gets a particular soundboard.
-  //  *
-  //  * @param request See {@link GetBoardRequest}.
-  //  */
-  // GetBoard(request: GetBoardRequest): GetBoardResponse
-
-  // /**
-  //  * Creates a new soundboard.
-  //  *
-  //  * @param request See {@link CreateBoardRequest}.
-  //  */
-  // CreateBoard(request: CreateBoardRequest): CreateBoardResponse
-
-  // /**
-  //  * Updates a particular soundboard.
-  //  *
-  //  * @param request See {@link UpdateBoardRequest}.
-  //  */
-  // UpdateBoard(request: UpdateBoardRequest): UpdateBoardResponse
-
-  // /**
-  //  * Deletes a given soundboard. Note that this will delete not only the board, but it will delete
-  //  * information about all of the groups that it contains as well as the stored sound effects for
-  //  * each group in this board.
-  //  *
-  //  * @param request See {@link DeleteBoardRequest}.
-  //  */
-  // DeleteBoard(request: DeleteBoardRequest): DeleteBoardResponse
-
-  // /**
-  //  * Gets all soundboards that are currently stored by the system.
-  //  *
-  //  * @param request See {@link GetAllBoardsRequest}.
-  //  */
-  // GetAllBoards(request: GetAllBoardsRequest): GetAllBoardsResponse
-
-  // /**
-  //  * Reorders groups in a particular soundboard.
-  //  *
-  //  * @param request See {@link ReorderGroupsRequest}.
-  //  */
-  // ReorderGroups(request: ReorderGroupsRequest): ReorderGroupsResponse
-
-  // /**
-  //  * Deletes a particular group. Note that this will also delete all related sound effect files.
-  //  *
-  //  * @param request See {@link DeleteGroupRequest}.
-  //  */
-  // DeleteGroup(request: DeleteGroupRequest): DeleteGroupResponse
-
-  // /**
-  //  * Used to preview a particular sound effect. Useful when we don't quite want to store a sound
-  //  * effect before we try to listen to it.
-  //  *
-  //  * @param request See {@link PreviewSoundRequest}.
-  //  */
-  // PreviewSound(request: PreviewSoundRequest): Promise<PreviewSoundResponse>
-
-  // CreateCategory(request: CreateCategoryRequest): CreateCategoryResponse
-
-  // DeleteCategory(request: DeleteCategoryRequest): DeleteBoardResponse
-
-  // UpdateCategory(request: UpdateCategoryRequest): UpdateCategoryResponse
-
-  // GetGroupsForCategory(request: GetGroupsForCategoryRequest): GetGroupsForCategoryResponse
-
-  // GetUncategorizedGroups(request: GetUncategorizedGroupsRequest): GetUncategorizedGroupsResponse
-
-  // ReorderCategories(request: ReorderCategoriesRequest): ReorderCategoriesResponse
-
   Boards: Boards
   Groups: Groups
   Categories: Categories

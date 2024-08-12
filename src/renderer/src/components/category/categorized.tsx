@@ -7,6 +7,7 @@ import { useDraggable, useDroppable } from '@dnd-kit/core'
 import { useCallback } from 'react'
 import { EditCategoryModalId } from '../modals/editCategoryModal/editCategoryModal'
 import PencilIcon from '@renderer/assets/icons/pencil'
+import MoveIcon from '@renderer/assets/icons/move'
 
 export type CategorizedProps = {
   boardID: BoardID
@@ -54,13 +55,7 @@ export default function Categorized(props: CategorizedProps) {
   }, [category, boardID])
 
   return (
-    <div
-      style={style}
-      {...dragProps.attributes}
-      {...dragProps.listeners}
-      ref={dragProps.setNodeRef}
-      role="button"
-    >
+    <div style={style} {...dragProps.attributes} {...dragProps.listeners} role="button">
       <div
         ref={dropNodeRef}
         className={`
@@ -76,6 +71,19 @@ export default function Categorized(props: CategorizedProps) {
         <h3 className="prose text-xl absolute top-0 left-0 w-full max-w-full text-center">
           {category.name}
         </h3>
+        <div
+          ref={dragProps.setNodeRef}
+          className={`
+          rounded-full
+          w-12
+          h-12
+          absolute
+          top-0
+          left-0
+        `}
+        >
+          <MoveIcon />
+        </div>
         <div className="flex flex-row flex-wrap gap-6">
           <GenericCategoryContainer boardID={boardID} groups={groups} />
         </div>

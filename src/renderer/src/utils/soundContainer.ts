@@ -1,7 +1,7 @@
 import { Howl } from 'howler'
 import { GroupID } from 'src/apis/audio/interface'
-import { SoundVariant } from 'src/apis/audio/soundVariants'
 import { getRandomArbitrary } from './random'
+import type { SoundVariants } from 'src/apis/audio/soundVariants'
 
 type StopHandler<T extends GroupID | undefined> = {
   id: T
@@ -13,7 +13,7 @@ export type SoundContainerSetup<T extends GroupID | undefined> = {
   volume: number
   format: string
   stopHandler?: StopHandler<T>
-  variant: SoundVariant
+  variant: SoundVariants
 }
 
 export class SoundContainer<T extends GroupID | undefined = GroupID> {
@@ -21,7 +21,7 @@ export class SoundContainer<T extends GroupID | undefined = GroupID> {
   private _stopHandler: StopHandler<T> | undefined
 
   private _targetVolume: number
-  private _variant: SoundVariant
+  private _variant: SoundVariants
   private _fadeOutRef: NodeJS.Timeout | undefined
 
   static FadeTime = 200

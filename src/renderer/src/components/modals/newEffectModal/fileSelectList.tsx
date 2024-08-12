@@ -125,7 +125,7 @@ function FileEntry(props: FileEntryProps) {
 
   const onClickTest = useCallback(async () => {
     if (!isPlaying) {
-      const soundData = await window.audio.PreviewSound({
+      const soundData = await window.audio.Sounds.Preview({
         effect: {
           path: file.path,
           volume: file.volume
@@ -137,15 +137,15 @@ function FileEntry(props: FileEntryProps) {
         stopHandler.current = undefined
       }
 
-      const sound = new SoundContainer({
+      const sound = new SoundContainer<undefined>({
         format: soundData.format,
         src: soundData.soundB64,
         volume: file.volume,
-        repeats: false,
         stopHandler: {
           id: undefined,
           handler: handleStop
-        }
+        },
+        variant: 'Default'
       })
 
       setIsPlaying(true)

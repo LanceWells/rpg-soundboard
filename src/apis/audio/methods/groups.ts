@@ -222,6 +222,9 @@ export const GroupsAudioAPI: Groups = {
       return {}
     }
 
+    // When we're re-organizing groups, the goal is that we should have the groups in this
+    // category happening sequentially. One way to guarantee that flow is to reorder all of the
+    // groups, placing ones in the same category adjacent to one-another.
     const getUncategorizedGroupsInOrder = () => {
       const uncategorizedGroups = groupsByCategory.get('nocategory') ?? []
       if (request.category !== undefined) {
@@ -236,6 +239,8 @@ export const GroupsAudioAPI: Groups = {
       return newOrder
     }
 
+    // Most importantly, the groups in this category should be in the new order that we've specified
+    // in the request.
     const groupsInNewOrder = [
       ...(board.categories?.flatMap((c) => {
         const theseGroups = groupsByCategory.get(c.id) ?? []
