@@ -15,7 +15,7 @@ import { create } from 'zustand'
 import { ColorOptions } from '@renderer/components/modals/newEffectModal/colorPicker'
 import { SoundContainer } from '@renderer/utils/soundContainer'
 import { produce } from 'immer'
-import { SoundVariant } from '@renderer/utils/soundVariants'
+import type { SoundVariants as SoundVariant } from 'src/apis/audio/soundVariants'
 
 /**
  * A set of editing modes that the view might exist in.

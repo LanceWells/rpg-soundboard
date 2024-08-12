@@ -8,6 +8,7 @@ import {
 } from '../interface'
 import { AudioConfig } from '../utils/config'
 import crypto from 'node:crypto'
+import { deleteBoardFolder } from './fs'
 
 export const BoardsAudioAPI: Boards = {
   Get: function (request) {
@@ -36,12 +37,45 @@ export const BoardsAudioAPI: Boards = {
     }
   },
   Update: function (request) {
-    throw new Error('Function not implemented.')
+    const matchingBoard = this.Get({ boardID: request.boardID })
+    if (!matchingBoard.board) {
+      throw new Error(`Could not find matching board with ID ${request.boardID}.`)
+    }
+
+    const newConfig = produce(AudioConfig.Config, (draft) => {
+      const matchingBoard = draft.boards.find((b) => b.id === request.boardID)
+      if (matchingBoard) {
+        matchingBoard.name = request.fields.name
+      }
+    })
+
+    AudioConfig.Config = newConfig
+
+    const updatedBoard = this.Get({ boardID: request.boardID })
+
+    return {
+      board: updatedBoard.board!
+    }
   },
   Delete: function (request) {
-    throw new Error('Function not implemented.')
+    const matchingBoard = this.Get({ boardID: request.boardID })
+    if (matchingBoard.board === undefined) {
+      throw new Error(`Could not find matching board with ID ${request.boardID}.`)
+    }
+
+    const newConfig = produce(AudioConfig.Config, (draft) => {
+      draft.boards = draft.boards.filter((b) => b.id !== matchingBoard.board?.id)
+    })
+
+    AudioConfig.Config = newConfig
+
+    deleteBoardFolder(request.boardID)
+
+    return {}
   },
-  GetAll: function (request) {
-    throw new Error('Function not implemented.')
+  GetAll: function () {
+    return {
+      boards: AudioConfig.Config.boards
+    }
   }
 }
