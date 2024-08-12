@@ -1,14 +1,11 @@
-import { ChangeEventHandler, useCallback, useMemo, useRef, useState } from 'react'
+import { ChangeEventHandler, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useAudioStore } from '@renderer/stores/audioStore'
 import SoundIcon from '@renderer/assets/icons/sound'
 import CloseIcon from '@renderer/assets/icons/close'
 import { SoundContainer } from '@renderer/utils/soundContainer'
 import { SoundEffectEditableFields } from 'src/apis/audio/interface'
 import StopIcon from '@renderer/assets/icons/stop'
-
-export type FileSelectListProps = {
-  className?: string
-}
+import { useShallow } from 'zustand/react/shallow'
 
 export type FileSelectInputProps = {
   className?: string
@@ -18,7 +15,9 @@ export type FileSelectInputProps = {
 export function FileSelectInput(props: FileSelectInputProps) {
   const { className, error } = props
 
-  const addWorkingFiles = useAudioStore((state) => state.addWorkingFiles)
+  const { addWorkingFiles } = useAudioStore((state) => ({
+    addWorkingFiles: state.addWorkingFiles
+  }))
 
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -61,9 +60,18 @@ export function FileSelectInput(props: FileSelectInputProps) {
   )
 }
 
+export type FileSelectListProps = {
+  className?: string
+}
+
 export default function FileSelectList(props: FileSelectListProps) {
   const { className } = props
-  const { editingGroup, removeWorkingFile } = useAudioStore()
+  const { editingGroup, removeWorkingFile } = useAudioStore(
+    useShallow((state) => ({
+      editingGroup: state.editingGroup,
+      removeWorkingFile: state.removeWorkingFile
+    }))
+  )
 
   const onRemoveFile = useCallback((i: number) => {
     removeWorkingFile(i)
@@ -112,7 +120,9 @@ function FileEntry(props: FileEntryProps) {
   const stopHandler = useRef<() => void>()
   const volumeHandler = useRef<(volume: number) => void>()
 
-  const { updateWorkingFile } = useAudioStore()
+  const { updateWorkingFile } = useAudioStore((state) => ({
+    updateWorkingFile: state.updateWorkingFile
+  }))
 
   const fileName = useMemo(() => {
     const pathSegments = new Array(...file.path.split(/[/\\]/))
@@ -177,6 +187,14 @@ function FileEntry(props: FileEntryProps) {
     },
     [file.volume, index, updateWorkingFile, volumeHandler, isPlaying]
   )
+
+  useEffect(() => {
+    return () => {
+      if (stopHandler.current) {
+        stopHandler.current()
+      }
+    }
+  }, [])
 
   return (
     <div

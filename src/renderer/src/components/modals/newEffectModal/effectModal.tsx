@@ -17,6 +17,7 @@ import { CreateGroupRequest } from 'src/apis/audio/interface'
 import CloseIcon from '@renderer/assets/icons/close'
 import { useShallow } from 'zustand/react/shallow'
 import { SoundVariant } from '@renderer/utils/soundVariants'
+import { SoundVariants } from 'src/apis/audio/soundVariants'
 
 export type EffectModalProps = {
   id: string
@@ -121,7 +122,7 @@ export default function EffectModal(props: PropsWithChildren<EffectModalProps>) 
 
   const onChangeVariant = useCallback<ChangeEventHandler<HTMLSelectElement>>(
     (e) => {
-      setGroupVariant(e.target.value as SoundVariant)
+      setGroupVariant(e.target.value as SoundVariants)
     },
     [setGroupVariant]
   )
@@ -186,26 +187,6 @@ export default function EffectModal(props: PropsWithChildren<EffectModalProps>) 
               {selectOptions}
             </select>
           </label>
-          {/* <div className="flex [grid-area:toggles]">
-            <CheckboxField
-              formName="Repeat?"
-              className="[grid-area:repeat]"
-              checked={editingGroup.repeats}
-              onChange={handleRepeatsCheck}
-            />
-            <CheckboxField
-              formName="Fade In?"
-              className="[grid-area:repeat]"
-              checked={editingGroup.fadeIn}
-              onChange={handleFadeInCheck}
-            />
-            <CheckboxField
-              formName="Fade-Out?"
-              className="[grid-area:repeat]"
-              checked={editingGroup.fadeOut}
-              onChange={handleFadeOutCheck}
-            />
-          </div> */}
         </div>
         <div className="modal-action">
           <form method="dialog" className="w-full">

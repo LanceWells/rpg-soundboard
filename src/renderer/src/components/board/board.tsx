@@ -31,7 +31,7 @@ export default function Board(props: BoardProps) {
     updateGroupPartial,
     getGroupsForCategory,
     getUncategorizedGroups,
-    reodreCategories
+    reorderCategories
   } = useAudioStore(
     useShallow((state) => ({
       editingMode: state.editingMode,
@@ -43,7 +43,7 @@ export default function Board(props: BoardProps) {
       updateGroupPartial: state.updateGroupPartial,
       getGroupsForCategory: state.getGroupsForCategory,
       getUncategorizedGroups: state.getUncategorizedGroups,
-      reodreCategories: state.reorderCategories
+      reorderCategories: state.reorderCategories
     }))
   )
 
@@ -168,7 +168,7 @@ export default function Board(props: BoardProps) {
         newOrder.splice(overIndex, 0, movingItem)
 
         setEditingMode('Editing')
-        reodreCategories({
+        reorderCategories({
           boardID: board.id,
           newOrder: newOrder
         })

@@ -40,16 +40,13 @@ export default function EditEffectModal() {
   // If the modal closes, ensure that we revert back to "editing" mode. This will handle events
   // where the user begins to delete an effect, but closes the window instead.
   const handleClose = useCallback(() => {
-    setEditingMode('Editing')
     setIsConfirmingDelete(false)
-  }, [editingMode, setEditingMode])
+  }, [setIsConfirmingDelete])
 
   const onDelete = useCallback(() => {
     if (editingGroupID) {
       deleteGroup(editingGroupID)
     }
-
-    setEditingMode('Editing')
   }, [editingGroupID, deleteGroup, setEditingMode])
 
   const onAskConfirm = useCallback(() => {
