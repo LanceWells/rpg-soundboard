@@ -1,7 +1,10 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, protocol, net } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
+import { AudProtocolPrefix } from '../apis/audProtocol/aud'
+import url from 'url'
+import { GetAppDataPath } from '../utils/paths'
 
 function createWindow(): void {
   // Create the browser window.
@@ -35,6 +38,10 @@ function createWindow(): void {
   }
 }
 
+protocol.registerSchemesAsPrivileged([
+  { scheme: 'aud', privileges: { stream: true, supportFetchAPI: true, bypassCSP: true } }
+])
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
@@ -47,6 +54,16 @@ app.whenReady().then(() => {
   // see https://github.com/alex8088/electron-toolkit/tree/master/packages/utils
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)
+  })
+
+  // Add a protocol to access local files on the host machine.
+  protocol.handle('aud', (request) => {
+    const filePath = request.url.slice(`${AudProtocolPrefix}://`.length)
+    const configFilePath = GetAppDataPath()
+    const pathWithDir = join(configFilePath, filePath)
+    const pathToFileUrl = url.pathToFileURL(pathWithDir)
+
+    return net.fetch(pathToFileUrl.toString())
   })
 
   // IPC test

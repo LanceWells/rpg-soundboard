@@ -1,7 +1,7 @@
 import path from 'node:path'
 import { GetAppDataPath } from '../../../utils/paths'
 import fs from 'node:fs'
-import { BoardID, GroupID } from '../interface'
+import { BoardID, EffectID, GroupID } from '../interface'
 import { SupportedFileTypes } from '../supportedFileTypes'
 
 export const getBoardPath = (boardID: BoardID): string => {
@@ -39,19 +39,30 @@ export const saveSoundEffect = (
     throw new Error(`Unsupported file type ${srcFileData.ext}`)
   }
 
-  const dstFileDir = getGroupEffectsPath(boardID, groupID)
+  const dstFileDir = getGroupPath(boardID, groupID)
   if (!fs.existsSync(dstFileDir)) {
     fs.mkdirSync(dstFileDir, { recursive: true })
   }
 
   const dstFilePath = path.format({
     dir: dstFileDir,
-    base: srcFileData.base
+    base: `${srcFileData.base}${srcFileData.ext}`
   })
+
+  const auxDirPath = path.join('board-data', boardID, groupID)
+  const auxFilePath = path.format({
+    dir: auxDirPath,
+    base: `${srcFileData.base}${srcFileData.ext}`
+  })
+
+  // Windows paths don't seem to work with the net methods. That also means that we need to prepend
+  // our protocol late, and not using node:path.
+  const auxDirPathPosix = auxFilePath.replaceAll(path.sep, path.posix.sep).replaceAll(' ', '_')
+  const auxPathWithProtocol = `aud://${auxDirPathPosix}`
 
   fs.copyFileSync(srcFilePath, dstFilePath)
 
-  return { path: dstFilePath, format: srcFileData.ext as SupportedFileTypes }
+  return { path: auxPathWithProtocol, format: srcFileData.ext as SupportedFileTypes }
 }
 
 export const deleteFile = (pathToDelete: string) => {

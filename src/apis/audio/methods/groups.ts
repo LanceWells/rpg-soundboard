@@ -22,7 +22,6 @@ import {
   UpdateGroupResponse
 } from '../interface'
 import { AudioConfig } from '../utils/config'
-import fs from 'node:fs'
 import path from 'node:path'
 import { deleteFile, deleteGroupFolder, saveSoundEffect } from './fs'
 import { BoardsAudioAPI } from './boards'
@@ -284,21 +283,23 @@ export const GroupsAudioAPI: Groups = {
       effect = group.effects[effectIndex]
     } while (idsToSkip.includes(effect.id))
 
-    const reader = new FileReader()
-    const file = fs.readFileSync(effect.path)
-    const blob = new Blob([file.buffer])
+    // const reader = new FileReader()
+    // const file = fs.readFileSync(effect.path)
+    // const blob = new Blob([file.buffer])
 
-    reader.readAsDataURL(blob)
-    await new Promise<void>((resolve) => {
-      reader.addEventListener('load', () => {
-        resolve()
-      })
-    })
+    // reader.readAsDataURL(blob)
 
-    const r = reader.result
+    // await new Promise<void>((resolve) => {
+    //   reader.addEventListener('load', () => {
+    //     resolve()
+    //   })
+    // })
+
+    // const r = reader.result
 
     return {
-      soundB64: r?.toString() ?? '',
+      // soundB64: r?.toString() ?? '',
+      soundB64: effect.path,
       format: effect.format as SupportedFileTypes,
       volume: effect.volume,
       effectID: effect.id,
