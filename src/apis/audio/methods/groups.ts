@@ -23,10 +23,13 @@ import {
 } from '../interface'
 import { AudioConfig } from '../utils/config'
 import path from 'node:path'
-import { deleteFile, deleteGroupFolder, saveSoundEffect } from './fs'
+import { deleteFile, deleteGroupFolder, getFileSize, saveSoundEffect } from './fs'
 import { BoardsAudioAPI } from './boards'
 import crypto from 'node:crypto'
 import { SupportedFileTypes } from '../supportedFileTypes'
+import { GetAppDataPath } from '../../../utils/paths'
+
+const html5ThresholdSizeMb = 2
 
 export const GroupsAudioAPI: Groups = {
   Get: function (request: GetGroupRequest): GetGroupResponse {
@@ -273,7 +276,7 @@ export const GroupsAudioAPI: Groups = {
     }
 
     let idsToSkip: EffectID[] = []
-    if (request.idsToSkip && request.idsToSkip.length < group.effects.length) {
+    if (request.idsToSkip && request.idsToSkip.length > group.effects.length) {
       idsToSkip = request.idsToSkip
     }
 
@@ -283,19 +286,11 @@ export const GroupsAudioAPI: Groups = {
       effect = group.effects[effectIndex]
     } while (idsToSkip.includes(effect.id))
 
-    // const reader = new FileReader()
-    // const file = fs.readFileSync(effect.path)
-    // const blob = new Blob([file.buffer])
+    const appDataPath = GetAppDataPath() + '/'
+    const actualSystemPath = effect.path.replace('aud://', appDataPath)
 
-    // reader.readAsDataURL(blob)
-
-    // await new Promise<void>((resolve) => {
-    //   reader.addEventListener('load', () => {
-    //     resolve()
-    //   })
-    // })
-
-    // const r = reader.result
+    const srcFileSizeInMb = await getFileSize(actualSystemPath)
+    const useHtml5 = srcFileSizeInMb > html5ThresholdSizeMb
 
     return {
       // soundB64: r?.toString() ?? '',
@@ -303,7 +298,8 @@ export const GroupsAudioAPI: Groups = {
       format: effect.format as SupportedFileTypes,
       volume: effect.volume,
       effectID: effect.id,
-      variant: group.variant
+      variant: group.variant,
+      useHtml5
     }
   },
   AddEffect: function (request: AddEffectToGroupRequest): AddEffectToGroupResponse {

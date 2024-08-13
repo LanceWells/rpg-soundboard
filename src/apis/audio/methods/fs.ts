@@ -1,7 +1,7 @@
 import path from 'node:path'
 import { GetAppDataPath } from '../../../utils/paths'
 import fs from 'node:fs'
-import { BoardID, EffectID, GroupID } from '../interface'
+import { BoardID, GroupID } from '../interface'
 import { SupportedFileTypes } from '../supportedFileTypes'
 
 export const getBoardPath = (boardID: BoardID): string => {
@@ -105,4 +105,12 @@ export const deleteBoardFolder = (boardID: BoardID) => {
     recursive: true,
     force: true
   })
+}
+
+export async function getFileSize(path: string): Promise<number> {
+  const srcFileStats = await fs.promises.stat(path)
+  const srcFileSizeInBytes = srcFileStats.size
+  const srcFileSizeInMb = srcFileSizeInBytes / (1024 * 1024)
+
+  return srcFileSizeInMb
 }

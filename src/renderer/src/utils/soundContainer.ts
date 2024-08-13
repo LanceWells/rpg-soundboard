@@ -12,6 +12,7 @@ export type SoundContainerSetup<T extends GroupID | undefined> = {
   src: string
   volume: number
   format: string
+  useHtml5: boolean
   stopHandler?: StopHandler<T>
   variant: SoundVariants
 }
@@ -29,33 +30,16 @@ export class SoundContainer<T extends GroupID | undefined = GroupID> {
   static html5FallbackLength = 30
 
   constructor(setup: SoundContainerSetup<T>) {
-    const { src, format, volume, stopHandler, variant } = setup
+    const { src, format, volume, stopHandler, variant, useHtml5 } = setup
 
     this._targetVolume = volume / 100
     this._variant = variant
     this._src = src
 
-    // const randomRate = getRandomArbitrary(0.85, 1.15)
-    // const audio = new Audio(src)
-    // audio.preservesPitch = false
-    // audio.playbackRate = randomRate
-    // audio.play()
-
-    // const audLength = new Audio(src).duration
-    // const a = new Audio(src)
-    // await new Promise<void>((resolve) => {
-    //   a.onload = () => {
-    //     resolve()
-    //   }
-    // })
-
-    const useHtml5 = false
-
     if (src.startsWith('aud://')) {
       this._howl = new Howl({
         src,
         volume: this._variant === 'Looping' ? 0 : this._targetVolume,
-        // volume: 0,
         loop: this._variant === 'Looping',
         html5: useHtml5
       })
@@ -92,13 +76,6 @@ export class SoundContainer<T extends GroupID | undefined = GroupID> {
 
   async Play() {
     const timeToFade = this._howl.duration() - SoundContainer.FadeTime
-
-    const a = new Audio(this._src)
-    await new Promise<void>((resolve) => {
-      a.onload = () => {
-        resolve()
-      }
-    })
 
     if (this._variant === 'Looping' && timeToFade > 0) {
       this._fadeOutRef = setTimeout(() => {

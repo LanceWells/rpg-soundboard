@@ -155,6 +155,7 @@ function FileEntry(props: FileEntryProps) {
           id: undefined,
           handler: handleStop
         },
+        useHtml5: soundData.useHtml5,
         variant: 'Default'
       })
 

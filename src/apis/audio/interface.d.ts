@@ -331,6 +331,8 @@ export type GetGroupSoundResponse = {
   effectID: EffectID
 
   variant: SoundVariant
+
+  useHtml5: boolean
 }
 
 /**
@@ -363,6 +365,8 @@ export type PreviewSoundResponse = {
    * The volume to play for the sound effect. Will range from 0 to 100.
    */
   volume: number
+
+  useHtml5: boolean
 }
 
 /**

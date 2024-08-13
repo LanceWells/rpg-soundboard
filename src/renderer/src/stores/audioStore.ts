@@ -267,7 +267,8 @@ export const useAudioStore = create<AudioStore>((set) => ({
       },
       src: audio.soundB64,
       volume: audio.volume,
-      variant: audio.variant
+      variant: audio.variant,
+      useHtml5: audio.useHtml5
     })
 
     if (!GroupStopHandles.has(groupID)) {
