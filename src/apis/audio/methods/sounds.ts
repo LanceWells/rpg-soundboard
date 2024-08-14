@@ -1,8 +1,6 @@
-import fs from 'node:fs'
 import path from 'node:path'
 import { Sounds } from '../interface'
 import { SupportedFileTypes } from '../supportedFileTypes'
-import { getFileSize } from './fs'
 import { AudProtocolPrefix } from '../../audProtocol/aud'
 import { GetAppDataPath } from '../../../utils/paths'
 import ffmpeg from 'fluent-ffmpeg'
@@ -10,8 +8,6 @@ import { Stream } from 'node:stream'
 
 const ffmpegPath = require('ffmpeg-static').replace('app.asar', 'app.asar.unpacked')
 ffmpeg.setFfmpegPath(ffmpegPath)
-
-const html5ThresholdSizeMb = 2
 
 export const SoundsAudioAPI: Sounds = {
   Preview: async function (request) {
@@ -24,39 +20,24 @@ export const SoundsAudioAPI: Sounds = {
     const formattedPath = path.format(srcFilePath).replaceAll('/', '\\')
     const s = new Stream.PassThrough()
 
-    const w = new Stream.Writable()
-
     ffmpeg(formattedPath)
+      .audioCodec('libvorbis')
+      .format('ogg')
       .duration(15)
-      // .output('./test.ogg')
-      .output(w, { end: true })
+      .output(s, { end: true })
       .on('error', (err) => {
         console.error(err)
       })
-      // .on('finish', () => {
-      //   console.log('finish')
-      // })
-      // .on('close', () => {
-      //   console.log('finish')
-      // })
-      // .on('drain', () => {
-      //   console.log('finish')
-      // })
-      // .on('pipe', () => {
-      //   console.log('finish')
-      // })
-      // .on('unpipe', () => {
-      //   console.log('finish')
-      // })
       .run()
 
-    const buffers: unknown[] = []
+    const buffers: number[] = []
 
-    s.on('data', function (buf: unknown) {
-      if (Array.isArray(buf as unknown)) {
-        buffers.push(...(buf as unknown[]))
+    s.on('data', function (buf: number | number[]) {
+      // is array didn't seem to be working.
+      if ((buf as unknown[])[0] !== undefined) {
+        buffers.push(...(buf as number[]))
       }
-      buffers.push(buf)
+      buffers.push(buf as number)
     })
 
     await new Promise<void>((resolve) => {
@@ -65,27 +46,13 @@ export const SoundsAudioAPI: Sounds = {
       })
     })
 
-    // const reader = new FileReader()
-
-    // const file = fs.readFileSync(actualPath)
-    // const blob = new Blob([file.buffer])
-
-    // reader.readAsDataURL(blob)
-    // await new Promise<void>((resolve) => {
-    //   reader.addEventListener('load', () => {
-    //     resolve()
-    //   })
-    // })
-
-    // const r = reader.result
-
-    const srcFileSizeInMb = await getFileSize(actualPath)
-    const useHtml5 = srcFileSizeInMb > html5ThresholdSizeMb
+    const data = `data:audio/ogg;base64,${Buffer.from(buffers).toString('base64')}`
+    const useHtml5 = true
 
     return {
       format: srcFilePath.ext as SupportedFileTypes,
       // soundB64: r?.toString() ?? '',
-      soundB64: '',
+      soundB64: data,
       volume: request.effect.volume,
       useHtml5
     }

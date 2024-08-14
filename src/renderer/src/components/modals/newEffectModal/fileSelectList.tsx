@@ -116,7 +116,7 @@ type FileEntryProps = {
 function FileEntry(props: FileEntryProps) {
   const { file, index, onClick } = props
 
-  const [playState, setPlayState] = useState<'Loading' | 'Playing' | 'Stoppped'>('Loading')
+  const [playState, setPlayState] = useState<'Loading' | 'Playing' | 'Stopped'>('Loading')
 
   const { updateWorkingFile } = useAudioStore((state) => ({
     updateWorkingFile: state.updateWorkingFile
@@ -136,11 +136,11 @@ function FileEntry(props: FileEntryProps) {
       })
 
       const handleStop = () => {
-        setPlayState('Stoppped')
+        setPlayState('Stopped')
       }
 
       const handleLoaded = () => {
-        setPlayState('Stoppped')
+        setPlayState('Stopped')
       }
 
       const sound = new SoundContainer<undefined>({
@@ -164,8 +164,10 @@ function FileEntry(props: FileEntryProps) {
       playHandler.current = sound.GetPlayHandle()
     }
 
-    loadSound()
-  }, [file.path, file.volume])
+    if (file.path) {
+      loadSound()
+    }
+  }, [file.path, file.volume, setPlayState])
 
   const fileName = useMemo(() => {
     const pathSegments = new Array(...file.path.split(/[/\\]/))
@@ -187,10 +189,10 @@ function FileEntry(props: FileEntryProps) {
           stopHandler.current()
         }
 
-        setPlayState('Stoppped')
+        setPlayState('Stopped')
         break
       }
-      case 'Stoppped': {
+      case 'Stopped': {
         if (playHandler.current) {
           playHandler.current()
         }
@@ -294,7 +296,7 @@ function FileEntry(props: FileEntryProps) {
         [grid-area:_preview]
       `}
       >
-        <SoundIcon className={playState === 'Stoppped' ? 'visible' : 'hidden'} />
+        <SoundIcon className={playState === 'Stopped' ? 'visible' : 'hidden'} />
         <StopIcon className={playState === 'Playing' ? 'visible' : 'hidden'} />
         <span className={playState === 'Loading' ? 'visible loading' : 'hidden'} />
       </button>
