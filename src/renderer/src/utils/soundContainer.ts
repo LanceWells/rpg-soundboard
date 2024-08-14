@@ -8,33 +8,37 @@ type StopHandler<T extends GroupID | undefined> = {
   handler: (groupID: T) => void
 }
 
+type LoadedHandler = {
+  handler: () => void
+}
+
 export type SoundContainerSetup<T extends GroupID | undefined> = {
   src: string
   volume: number
   format: string
   useHtml5: boolean
   stopHandler?: StopHandler<T>
+  loadedHandler?: LoadedHandler
   variant: SoundVariants
 }
 
 export class SoundContainer<T extends GroupID | undefined = GroupID> {
   private _howl: Howl
   private _stopHandler: StopHandler<T> | undefined
+  private _loadedHandler: LoadedHandler | undefined
 
   private _targetVolume: number
   private _variant: SoundVariants
   private _fadeOutRef: NodeJS.Timeout | undefined
-  private _src: string
 
   static FadeTime = 200
   static html5FallbackLength = 30
 
   constructor(setup: SoundContainerSetup<T>) {
-    const { src, format, volume, stopHandler, variant, useHtml5 } = setup
+    const { src, format, volume, stopHandler, loadedHandler, variant, useHtml5 } = setup
 
     this._targetVolume = volume / 100
     this._variant = variant
-    this._src = src
 
     if (src.startsWith('aud://')) {
       this._howl = new Howl({
@@ -47,12 +51,13 @@ export class SoundContainer<T extends GroupID | undefined = GroupID> {
       this._howl = new Howl({
         src,
         volume: this._variant === 'Looping' ? 0 : this._targetVolume,
-        format: format,
+        format: format.replace('.', ''),
         loop: this._variant === 'Looping',
-        html5: false
+        html5: useHtml5
       })
     }
 
+    this._loadedHandler = loadedHandler
     this._stopHandler = stopHandler
 
     // If an effect repeats, then this 'end' event will fire every time that the loop restarts.
@@ -71,6 +76,9 @@ export class SoundContainer<T extends GroupID | undefined = GroupID> {
       .once('playerror', (id, err) => {
         console.error(`Failed to play sound ${id}: ${err}`)
         this.HandleHowlStop()
+      })
+      .on('load', () => {
+        this.HandleHowlLoaded()
       })
   }
 
@@ -98,16 +106,17 @@ export class SoundContainer<T extends GroupID | undefined = GroupID> {
   }
 
   GetStopHandle() {
-    return () => this.StopSound()
+    return () => this.Stop()
   }
 
   GetVolumeHandle() {
     return (volume: number) => {
-      if (this._howl.playing()) {
-        const newVolume = volume / 100
-        this._howl.volume(newVolume)
-      }
+      this.ChangeVolume(volume)
     }
+  }
+
+  GetPlayHandle() {
+    return () => this.Play()
   }
 
   private HandleHowlStop() {
@@ -118,7 +127,13 @@ export class SoundContainer<T extends GroupID | undefined = GroupID> {
     }
   }
 
-  private StopSound() {
+  private HandleHowlLoaded() {
+    if (this._loadedHandler) {
+      this._loadedHandler.handler()
+    }
+  }
+
+  Stop() {
     if (this._variant === 'Looping' && this._variant === 'Looping') {
       this._howl.fade(this._targetVolume, 0, SoundContainer.FadeTime)
       setTimeout(() => {
@@ -131,5 +146,12 @@ export class SoundContainer<T extends GroupID | undefined = GroupID> {
 
     this._howl.stop()
     this.HandleHowlStop()
+  }
+
+  ChangeVolume(volume: number) {
+    if (this._howl.playing()) {
+      const newVolume = volume / 100
+      this._howl.volume(newVolume)
+    }
   }
 }

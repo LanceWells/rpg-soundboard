@@ -116,13 +116,56 @@ type FileEntryProps = {
 function FileEntry(props: FileEntryProps) {
   const { file, index, onClick } = props
 
-  const [isPlaying, setIsPlaying] = useState(false)
-  const stopHandler = useRef<() => void>()
-  const volumeHandler = useRef<(volume: number) => void>()
+  const [playState, setPlayState] = useState<'Loading' | 'Playing' | 'Stoppped'>('Loading')
 
   const { updateWorkingFile } = useAudioStore((state) => ({
     updateWorkingFile: state.updateWorkingFile
   }))
+
+  const stopHandler = useRef<() => void>()
+  const volumeHandler = useRef<(volume: number) => void>()
+  const playHandler = useRef<() => void>()
+
+  useEffect(() => {
+    async function loadSound() {
+      const soundData = await window.audio.Sounds.Preview({
+        effect: {
+          path: file.path,
+          volume: file.volume
+        }
+      })
+
+      const handleStop = () => {
+        setPlayState('Stoppped')
+      }
+
+      const handleLoaded = () => {
+        setPlayState('Stoppped')
+      }
+
+      const sound = new SoundContainer<undefined>({
+        format: soundData.format,
+        src: soundData.soundB64,
+        volume: file.volume,
+        stopHandler: {
+          id: undefined,
+          handler: handleStop
+        },
+        loadedHandler: {
+          handler: handleLoaded
+        },
+        // Preview sounds are data URLs, so don't use html5.
+        useHtml5: false,
+        variant: 'Default'
+      })
+
+      stopHandler.current = sound.GetStopHandle()
+      volumeHandler.current = sound.GetVolumeHandle()
+      playHandler.current = sound.GetPlayHandle()
+    }
+
+    loadSound()
+  }, [file.path, file.volume])
 
   const fileName = useMemo(() => {
     const pathSegments = new Array(...file.path.split(/[/\\]/))
@@ -134,46 +177,41 @@ function FileEntry(props: FileEntryProps) {
   }, [index, onclick])
 
   const onClickTest = useCallback(async () => {
-    if (!isPlaying) {
-      const soundData = await window.audio.Sounds.Preview({
-        effect: {
-          path: file.path,
-          volume: file.volume
-        }
-      })
-
-      const handleStop = () => {
-        setIsPlaying(false)
-        stopHandler.current = undefined
-      }
-
-      const sound = new SoundContainer<undefined>({
-        format: soundData.format,
-        src: soundData.soundB64,
-        volume: file.volume,
-        stopHandler: {
-          id: undefined,
-          handler: handleStop
-        },
-        useHtml5: soundData.useHtml5,
-        variant: 'Default'
-      })
-
-      setIsPlaying(true)
-
-      stopHandler.current = sound.GetStopHandle()
-      volumeHandler.current = sound.GetVolumeHandle()
-
-      sound.Play()
-    } else {
-      if (stopHandler.current) {
-        stopHandler.current()
-      }
-
-      stopHandler.current = undefined
-      setIsPlaying(false)
+    if (!playHandler.current) {
+      return
     }
-  }, [file, file.volume, isPlaying, stopHandler])
+
+    switch (playState) {
+      case 'Playing': {
+        if (stopHandler.current) {
+          stopHandler.current()
+        }
+
+        setPlayState('Stoppped')
+        break
+      }
+      case 'Stoppped': {
+        if (playHandler.current) {
+          playHandler.current()
+        }
+        setPlayState('Playing')
+        break
+      }
+      default: {
+        break
+      }
+    }
+
+    // if (!isPlaying) {
+    //   playHandler.current()
+    //   setIsPlaying(true)
+    // } else {
+    //   if (stopHandler.current) {
+    //     stopHandler.current()
+    //   }
+    //   setIsPlaying(false)
+    // }
+  }, [playHandler, stopHandler, playState, setPlayState])
 
   const onChangeVolume = useCallback<ChangeEventHandler<HTMLInputElement>>(
     (e) => {
@@ -182,11 +220,17 @@ function FileEntry(props: FileEntryProps) {
 
       updateWorkingFile(index, volToSet)
 
-      if (isPlaying && volumeHandler.current) {
+      if (playState === 'Playing' && volumeHandler.current) {
         volumeHandler.current(volToSet)
       }
+
+      // if (isPlaying) {
+      //   if (volumeHandler.current) {
+      //     volumeHandler.current(volToSet)
+      //   }
+      // }
     },
-    [file.volume, index, updateWorkingFile, volumeHandler, isPlaying]
+    [file.volume, index, updateWorkingFile, volumeHandler, playState]
   )
 
   useEffect(() => {
@@ -195,7 +239,7 @@ function FileEntry(props: FileEntryProps) {
         stopHandler.current()
       }
     }
-  }, [])
+  }, [stopHandler])
 
   return (
     <div
@@ -250,8 +294,9 @@ function FileEntry(props: FileEntryProps) {
         [grid-area:_preview]
       `}
       >
-        <SoundIcon className={isPlaying ? 'hidden' : 'visible'} />
-        <StopIcon className={isPlaying ? 'visible' : 'hidden'} />
+        <SoundIcon className={playState === 'Stoppped' ? 'visible' : 'hidden'} />
+        <StopIcon className={playState === 'Playing' ? 'visible' : 'hidden'} />
+        <span className={playState === 'Loading' ? 'visible loading' : 'hidden'} />
       </button>
     </div>
   )
