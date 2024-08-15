@@ -23,7 +23,7 @@ export const SoundsAudioAPI: Sounds = {
     ffmpeg(formattedPath)
       .audioCodec('libvorbis')
       .format('ogg')
-      .duration(15)
+      .duration(30)
       .output(s, { end: true })
       .on('error', (err) => {
         console.error(err)
@@ -51,7 +51,6 @@ export const SoundsAudioAPI: Sounds = {
 
     return {
       format: srcFilePath.ext as SupportedFileTypes,
-      // soundB64: r?.toString() ?? '',
       soundB64: data,
       volume: request.effect.volume,
       useHtml5

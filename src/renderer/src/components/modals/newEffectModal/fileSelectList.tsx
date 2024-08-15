@@ -203,16 +203,6 @@ function FileEntry(props: FileEntryProps) {
         break
       }
     }
-
-    // if (!isPlaying) {
-    //   playHandler.current()
-    //   setIsPlaying(true)
-    // } else {
-    //   if (stopHandler.current) {
-    //     stopHandler.current()
-    //   }
-    //   setIsPlaying(false)
-    // }
   }, [playHandler, stopHandler, playState, setPlayState])
 
   const onChangeVolume = useCallback<ChangeEventHandler<HTMLInputElement>>(
@@ -225,12 +215,6 @@ function FileEntry(props: FileEntryProps) {
       if (playState === 'Playing' && volumeHandler.current) {
         volumeHandler.current(volToSet)
       }
-
-      // if (isPlaying) {
-      //   if (volumeHandler.current) {
-      //     volumeHandler.current(volToSet)
-      //   }
-      // }
     },
     [file.volume, index, updateWorkingFile, volumeHandler, playState]
   )
@@ -290,10 +274,10 @@ function FileEntry(props: FileEntryProps) {
       <button
         onClick={onClickTest}
         className={`
-        btn
+          btn
         btn-square
-        btn-secondary
         [grid-area:_preview]
+        ${playState === 'Loading' ? 'disabled btn-disabled' : 'btn btn-secondary'}
       `}
       >
         <SoundIcon className={playState === 'Stopped' ? 'visible' : 'hidden'} />

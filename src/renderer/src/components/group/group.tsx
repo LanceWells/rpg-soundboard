@@ -128,9 +128,16 @@ export default function Group(props: GroupProps) {
   }, [group.variant])
 
   return (
-    <div ref={dropProps.setNodeRef} className="relative prose">
+    <div
+      onTouchStart={(e) => console.log('carousel touch' + JSON.stringify(e))}
+      onTouchMove={(e) => console.log('carousel touch' + JSON.stringify(e))}
+      ref={dropProps.setNodeRef}
+      className="relative prose"
+    >
       <div
         ref={dragProps.setNodeRef}
+        onTouchStart={(e) => console.log('carousel touch' + JSON.stringify(e))}
+        onTouchMove={(e) => console.log('carousel touch' + JSON.stringify(e))}
         style={style}
         {...dragProps.attributes}
         {...dragProps.listeners}
@@ -142,6 +149,7 @@ export default function Group(props: GroupProps) {
         hover:drop-shadow-lg
         hover
         z-0
+        touch-none
       `}
       >
         <div
