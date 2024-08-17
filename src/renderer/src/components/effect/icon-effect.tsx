@@ -1,6 +1,6 @@
 import { soundboardIcons } from '@renderer/utils/fetchIcons'
 import { Parser } from 'html-to-react'
-import { SoundIcon } from 'src/apis/audio/interface'
+import { SoundIcon } from 'src/apis/audio/types/items'
 
 export type IconEffectProps = {
   icon: SoundIcon

@@ -1,5 +1,4 @@
 import { ChangeEvent, ChangeEventHandler, useCallback, useMemo, useState } from 'react'
-import { SoundBoard } from 'src/apis/audio/interface'
 import { EditingMode, useAudioStore } from '@renderer/stores/audioStore'
 import { NewEffectModalId } from '../modals/newEffectModal/newEffectModal'
 import AddIcon from '@renderer/assets/icons/add'
@@ -14,6 +13,7 @@ import Category from '../category/categorized'
 import { IdIsCategory, IdIsGroup } from '@renderer/utils/id'
 import Uncategorized from '../category/uncategorized'
 import { SortableContext } from '@dnd-kit/sortable'
+import { SoundBoard } from 'src/apis/audio/types/items'
 
 export type BoardProps = {
   board: SoundBoard

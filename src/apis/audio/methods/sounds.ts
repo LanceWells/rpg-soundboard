@@ -1,15 +1,18 @@
 import path from 'node:path'
-import { Sounds } from '../interface'
 import { SupportedFileTypes } from '../supportedFileTypes'
 import { AudProtocolPrefix } from '../../audProtocol/aud'
 import { GetAppDataPath } from '../../../utils/paths'
 import ffmpeg from 'fluent-ffmpeg'
 import { Stream } from 'node:stream'
+import { ISounds } from '../types/sounds'
 
 const ffmpegPath = require('ffmpeg-static').replace('app.asar', 'app.asar.unpacked')
 ffmpeg.setFfmpegPath(ffmpegPath)
 
-export const SoundsAudioAPI: Sounds = {
+export const SoundsAudioAPI: ISounds = {
+  /**
+   * @inheritdoc
+   */
   Preview: async function (request) {
     const appDataDir = GetAppDataPath()
     const actualPath = request.effect.path.startsWith(AudProtocolPrefix)
@@ -47,7 +50,7 @@ export const SoundsAudioAPI: Sounds = {
     })
 
     const data = `data:audio/ogg;base64,${Buffer.from(buffers).toString('base64')}`
-    const useHtml5 = true
+    const useHtml5 = false
 
     return {
       format: srcFilePath.ext as SupportedFileTypes,

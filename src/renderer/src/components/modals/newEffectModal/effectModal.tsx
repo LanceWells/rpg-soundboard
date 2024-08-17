@@ -13,15 +13,15 @@ import { IconEffect } from '../../effect/icon-effect'
 import ColorPicker from './colorPicker'
 import TextField from './textField'
 import FileSelectList, { FileSelectInput } from './fileSelectList'
-import { CreateGroupRequest } from 'src/apis/audio/interface'
 import CloseIcon from '@renderer/assets/icons/close'
 import { useShallow } from 'zustand/react/shallow'
 import { SoundVariant } from '@renderer/utils/soundVariants'
-import { SoundVariants } from 'src/apis/audio/soundVariants'
+import { CreateRequest } from 'src/apis/audio/types/groups'
+import { SoundVariants } from 'src/apis/audio/types/soundVariants'
 
 export type EffectModalProps = {
   id: string
-  handleSubmit: (req: CreateGroupRequest) => void
+  handleSubmit: (req: CreateRequest) => void
   handleClose?: () => void
   actionName: string
   modalTitle: string

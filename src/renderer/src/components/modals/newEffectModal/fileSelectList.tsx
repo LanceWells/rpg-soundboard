@@ -3,9 +3,9 @@ import { useAudioStore } from '@renderer/stores/audioStore'
 import SoundIcon from '@renderer/assets/icons/sound'
 import CloseIcon from '@renderer/assets/icons/close'
 import { SoundContainer } from '@renderer/utils/soundContainer'
-import { SoundEffectEditableFields } from 'src/apis/audio/interface'
 import StopIcon from '@renderer/assets/icons/stop'
 import { useShallow } from 'zustand/react/shallow'
+import { SoundEffectEditableFields } from 'src/apis/audio/types/items'
 
 export type FileSelectInputProps = {
   className?: string

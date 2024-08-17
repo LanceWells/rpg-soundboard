@@ -1,23 +1,27 @@
 import { produce } from 'immer'
-import {
-  BoardID,
-  Boards,
-  CreateBoardResponse,
-  SoundBoard,
-  SoundBoardEditableFields
-} from '../interface'
 import { AudioConfig } from '../utils/config'
 import crypto from 'node:crypto'
 import { deleteBoardFolder } from './fs'
+import { IBoards, CreateResponse, BoardID } from '../types/boards'
+import { SoundBoardEditableFields, SoundBoard } from '../types/items'
 
-export const BoardsAudioAPI: Boards = {
+/**
+ * A standard implementation of the {@link IBoards} interface.
+ */
+export const BoardsAudioAPI: IBoards = {
+  /**
+   * @inheritdoc
+   */
   Get: function (request) {
     const board = AudioConfig.getBoard(request.boardID)
     return {
       board
     }
   },
-  Create: function (request: SoundBoardEditableFields): CreateBoardResponse {
+  /**
+   * @inheritdoc
+   */
+  Create: function (request: SoundBoardEditableFields): CreateResponse {
     const uuid = crypto.randomUUID()
     const newBoardID: BoardID = `brd-${uuid}`
     const newBoard: SoundBoard = {
@@ -36,6 +40,9 @@ export const BoardsAudioAPI: Boards = {
       board: newBoard
     }
   },
+  /**
+   * @inheritdoc
+   */
   Update: function (request) {
     const matchingBoard = this.Get({ boardID: request.boardID })
     if (!matchingBoard.board) {
@@ -57,6 +64,9 @@ export const BoardsAudioAPI: Boards = {
       board: updatedBoard.board!
     }
   },
+  /**
+   * @inheritdoc
+   */
   Delete: function (request) {
     const matchingBoard = this.Get({ boardID: request.boardID })
     if (matchingBoard.board === undefined) {
@@ -73,6 +83,9 @@ export const BoardsAudioAPI: Boards = {
 
     return {}
   },
+  /**
+   * @inheritdoc
+   */
   GetAll: function () {
     return {
       boards: AudioConfig.Config.boards

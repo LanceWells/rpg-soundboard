@@ -1,7 +1,7 @@
 import { Howl } from 'howler'
-import { GroupID } from 'src/apis/audio/interface'
 import { getRandomArbitrary } from './random'
-import type { SoundVariants } from 'src/apis/audio/soundVariants'
+import type { GroupID } from 'src/apis/audio/types/groups'
+import { SoundVariants } from 'src/apis/audio/types/soundVariants'
 
 type StopHandler<T extends GroupID | undefined> = {
   id: T
@@ -101,7 +101,7 @@ export class SoundContainer<T extends GroupID | undefined = GroupID> {
     }
 
     if (this._variant === 'Looping') {
-      this._howl.fade(0, 1, SoundContainer.FadeTime)
+      this._howl.fade(0, this._targetVolume, SoundContainer.FadeTime)
     }
   }
 

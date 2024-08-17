@@ -1,7 +1,7 @@
 import { useAudioStore } from '@renderer/stores/audioStore'
-import { BoardID } from 'src/apis/audio/interface'
 import { useShallow } from 'zustand/react/shallow'
 import GenericCategoryContainer from './genericCategoryContainer'
+import { BoardID } from 'src/apis/audio/types/boards'
 
 export type UncategorizedProps = {
   boardID: BoardID

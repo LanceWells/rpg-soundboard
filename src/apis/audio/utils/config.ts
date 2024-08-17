@@ -1,5 +1,8 @@
 import { ConfigStorage } from '../../../utils/configStorage'
-import { AudioApiConfig, BoardID, GroupID, SoundBoard, SoundGroup } from '../interface'
+import { AudioApiConfig } from '../interface'
+import { BoardID } from '../types/boards'
+import { GroupID } from '../types/groups'
+import { SoundBoard, SoundGroup } from '../types/items'
 
 /**
  * An instantiation of the config for information related to this audio API.

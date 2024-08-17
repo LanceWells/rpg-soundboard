@@ -1,8 +1,9 @@
 import path from 'node:path'
 import { GetAppDataPath } from '../../../utils/paths'
 import fs from 'node:fs'
-import { BoardID, GroupID } from '../interface'
 import { SupportedFileTypes } from '../supportedFileTypes'
+import { BoardID } from '../types/boards'
+import { GroupID } from '../types/groups'
 
 export const getBoardPath = (boardID: BoardID): string => {
   const appDataPath = GetAppDataPath()

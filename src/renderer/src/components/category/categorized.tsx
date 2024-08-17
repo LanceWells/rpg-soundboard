@@ -1,5 +1,4 @@
 import { useAudioStore } from '@renderer/stores/audioStore'
-import { BoardID, SoundCategory } from 'src/apis/audio/interface'
 import { useShallow } from 'zustand/react/shallow'
 import GenericCategoryContainer from './genericCategoryContainer'
 import { CSS } from '@dnd-kit/utilities'
@@ -8,6 +7,8 @@ import { EditCategoryModalId } from '../modals/editCategoryModal/editCategoryMod
 import PencilIcon from '@renderer/assets/icons/pencil'
 import MoveIcon from '@renderer/assets/icons/move'
 import { useSortable } from '@dnd-kit/sortable'
+import { BoardID } from 'src/apis/audio/types/boards'
+import { SoundCategory } from 'src/apis/audio/types/items'
 
 export type CategorizedProps = {
   boardID: BoardID

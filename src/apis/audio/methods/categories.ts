@@ -1,26 +1,29 @@
 import { produce } from 'immer'
-import {
-  Categories,
-  CategoryID,
-  CreateCategoryRequest,
-  CreateCategoryResponse,
-  DeleteCategoryRequest,
-  DeleteCategoryResponse,
-  GetGroupsForCategoryRequest,
-  GetGroupsForCategoryResponse,
-  GetUncategorizedGroupsRequest,
-  GetUncategorizedGroupsResponse,
-  ReorderCategoriesRequest,
-  ReorderCategoriesResponse,
-  SoundCategory,
-  UpdateCategoryRequest,
-  UpdateCategoryResponse
-} from '../interface'
 import { AudioConfig } from '../utils/config'
 import { BoardsAudioAPI } from './boards'
+import {
+  ICategories,
+  CategoryID,
+  CreateRequest,
+  CreateResponse,
+  DeleteRequest,
+  DeleteResponse,
+  GetCategorizedGroupsRequest,
+  GetCategorizedGroupsResponse,
+  GetUncategorizedGroupsRequest,
+  GetUncategorizedGroupsResponse,
+  ReorderRequest,
+  ReorderResponse,
+  UpdateRequest,
+  UpdateResponse
+} from '../types/categories'
+import { SoundCategory } from '../types/items'
 
-export const CategoriesAudioAPI: Categories = {
-  Create: function (request: CreateCategoryRequest): CreateCategoryResponse {
+export const CategoriesAudioAPI: ICategories = {
+  /**
+   * @inheritdoc
+   */
+  Create: function (request: CreateRequest): CreateResponse {
     const { boardID, ...categoryFields } = request
 
     const board = AudioConfig.getBoard(request.boardID)
@@ -54,7 +57,10 @@ export const CategoriesAudioAPI: Categories = {
       category: newCategory
     }
   },
-  Update: function (request: UpdateCategoryRequest): UpdateCategoryResponse {
+  /**
+   * @inheritdoc
+   */
+  Update: function (request: UpdateRequest): UpdateResponse {
     const { boardID, categoryID, ...categoryFields } = request
 
     const matchingBoard = AudioConfig.getBoard(boardID)
@@ -90,7 +96,10 @@ export const CategoriesAudioAPI: Categories = {
       category: updatedCategory
     }
   },
-  Delete: function (request: DeleteCategoryRequest): DeleteCategoryResponse {
+  /**
+   * @inheritdoc
+   */
+  Delete: function (request: DeleteRequest): DeleteResponse {
     const matchingBoard = AudioConfig.getBoard(request.boardID)
     if (matchingBoard === undefined) {
       throw new Error(`Could not find matching board with ID ${request.boardID}.`)
@@ -114,7 +123,10 @@ export const CategoriesAudioAPI: Categories = {
 
     return {}
   },
-  Reorder: function (request: ReorderCategoriesRequest): ReorderCategoriesResponse {
+  /**
+   * @inheritdoc
+   */
+  Reorder: function (request: ReorderRequest): ReorderResponse {
     const board = AudioConfig.getBoard(request.boardID)
 
     if (!board) {
@@ -147,9 +159,12 @@ export const CategoriesAudioAPI: Categories = {
 
     return {}
   },
+  /**
+   * @inheritdoc
+   */
   GetCategorizedGroups: function (
-    request: GetGroupsForCategoryRequest
-  ): GetGroupsForCategoryResponse {
+    request: GetCategorizedGroupsRequest
+  ): GetCategorizedGroupsResponse {
     const { categoryID } = request
 
     const matchingBoard = BoardsAudioAPI.GetAll({}).boards.find((b) =>
@@ -168,6 +183,9 @@ export const CategoriesAudioAPI: Categories = {
       groups: categoryGroups
     }
   },
+  /**
+   * @inheritdoc
+   */
   GetUncategorizedGroups: function (
     request: GetUncategorizedGroupsRequest
   ): GetUncategorizedGroupsResponse {

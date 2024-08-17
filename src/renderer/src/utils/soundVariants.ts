@@ -1,4 +1,4 @@
-import type { SoundVariants } from 'src/apis/audio/soundVariants'
+import { SoundVariants } from 'src/apis/audio/types/soundVariants'
 
 export const SoundVariant: {
   [T in SoundVariants]: string

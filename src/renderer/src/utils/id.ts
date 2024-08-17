@@ -1,4 +1,5 @@
-import { CategoryID, GroupID } from 'src/apis/audio/interface'
+import type { GroupID } from 'src/apis/audio/types/groups'
+import type { CategoryID } from 'src/apis/audio/types/categories'
 
 export function IdIsGroup(id: string): id is GroupID {
   if (id.startsWith('grp-')) {

@@ -1,8 +1,10 @@
 import { SortableContext } from '@dnd-kit/sortable'
 import { useMemo } from 'react'
-import { BoardID, CategoryID, SoundGroup } from 'src/apis/audio/interface'
 import Group from '../group/group'
 import { useAudioStore } from '@renderer/stores/audioStore'
+import { BoardID } from 'src/apis/audio/types/boards'
+import { SoundGroup } from 'src/apis/audio/types/items'
+import { CategoryID } from 'src/apis/audio/types/categories'
 
 export type GenericCategoryContainerProps = {
   groups: SoundGroup[]

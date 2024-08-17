@@ -1,4 +1,3 @@
-import { BoardID, SoundGroup } from 'src/apis/audio/interface'
 import { IconEffect } from '../effect/icon-effect'
 import { useCallback, useMemo } from 'react'
 import { useAudioStore } from '@renderer/stores/audioStore'
@@ -9,6 +8,8 @@ import RepeatIcon from '@renderer/assets/icons/repeat'
 import { useDraggable, useDroppable } from '@dnd-kit/core'
 import PistolIcon from '@renderer/assets/icons/pistol'
 import { useShallow } from 'zustand/react/shallow'
+import { BoardID } from 'src/apis/audio/types/boards'
+import { SoundGroup } from 'src/apis/audio/types/items'
 
 export type GroupProps = {
   group: SoundGroup

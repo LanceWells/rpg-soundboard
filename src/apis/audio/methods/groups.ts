@@ -1,26 +1,4 @@
 import { produce } from 'immer'
-import {
-  AddEffectToGroupRequest,
-  AddEffectToGroupResponse,
-  CategoryID,
-  CreateGroupRequest,
-  CreateGroupResponse,
-  DeleteGroupRequest,
-  DeleteGroupResponse,
-  EffectID,
-  GetGroupRequest,
-  GetGroupResponse,
-  GetGroupSoundRequest,
-  GetGroupSoundResponse,
-  GroupID,
-  Groups,
-  ReorderGroupsRequest,
-  ReorderGroupsResponse,
-  SoundEffect,
-  SoundGroup,
-  UpdateGroupRequest,
-  UpdateGroupResponse
-} from '../interface'
 import { AudioConfig } from '../utils/config'
 import path from 'node:path'
 import { deleteFile, deleteGroupFolder, getFileSize, saveSoundEffect } from './fs'
@@ -28,17 +6,44 @@ import { BoardsAudioAPI } from './boards'
 import crypto from 'node:crypto'
 import { SupportedFileTypes } from '../supportedFileTypes'
 import { GetAppDataPath } from '../../../utils/paths'
+import { SoundEffect, SoundGroup } from '../types/items'
+import { CategoryID } from '../types/categories'
+import { EffectID } from '../types/effects'
+import {
+  IGroups,
+  GetRequest,
+  GetResponse,
+  CreateRequest,
+  CreateResponse,
+  GroupID,
+  UpdateRequest,
+  UpdateResponse,
+  DeleteRequest,
+  DeleteResponse,
+  ReorderRequest,
+  ReorderResponse,
+  GetSoundRequest,
+  GetSoundResponse,
+  AddEffectRequest,
+  AddEffectResponse
+} from '../types/groups'
 
 const html5ThresholdSizeMb = 2
 
-export const GroupsAudioAPI: Groups = {
-  Get: function (request: GetGroupRequest): GetGroupResponse {
+export const GroupsAudioAPI: IGroups = {
+  /**
+   * @inheritdoc
+   */
+  Get: function (request: GetRequest): GetResponse {
     const matchingGroup = AudioConfig.getGroup(request.groupID)
     return {
       group: matchingGroup
     }
   },
-  Create: function (request: CreateGroupRequest): CreateGroupResponse {
+  /**
+   * @inheritdoc
+   */
+  Create: function (request: CreateRequest): CreateResponse {
     const matchingBoard = AudioConfig.getBoard(request.boardID)
     if (!matchingBoard) {
       throw new Error(`Could not find matching board with ID ${request.boardID}.`)
@@ -78,7 +83,10 @@ export const GroupsAudioAPI: Groups = {
       group: newGroup
     }
   },
-  Update: function (request: UpdateGroupRequest): UpdateGroupResponse {
+  /**
+   * @inheritdoc
+   */
+  Update: function (request: UpdateRequest): UpdateResponse {
     const matchingGroup = AudioConfig.getGroup(request.groupID)
     if (!matchingGroup) {
       throw new Error(`Could not find matching grup with ID ${request.groupID}.`)
@@ -150,7 +158,10 @@ export const GroupsAudioAPI: Groups = {
       group: updatedGroup
     }
   },
-  Delete: function (request: DeleteGroupRequest): DeleteGroupResponse {
+  /**
+   * @inheritdoc
+   */
+  Delete: function (request: DeleteRequest): DeleteResponse {
     // Get the board for this group in the map.
     // Remove the group from that board.
     const boardFromMap = [...BoardsAudioAPI.GetAll({}).boards].find((b) =>
@@ -178,7 +189,10 @@ export const GroupsAudioAPI: Groups = {
 
     return {}
   },
-  Reorder: function (request: ReorderGroupsRequest): ReorderGroupsResponse {
+  /**
+   * @inheritdoc
+   */
+  Reorder: function (request: ReorderRequest): ReorderResponse {
     const nocategoryid = 'nocategory' as const
     const board = AudioConfig.getBoard(request.boardID)
 
@@ -269,14 +283,17 @@ export const GroupsAudioAPI: Groups = {
 
     return {}
   },
-  GetSound: async function (request: GetGroupSoundRequest): Promise<GetGroupSoundResponse> {
+  /**
+   * @inheritdoc
+   */
+  GetSound: async function (request: GetSoundRequest): Promise<GetSoundResponse> {
     const group = AudioConfig.getGroup(request.groupID)
     if (!group || group.effects.length === 0) {
       throw new Error(`Could not find group with effects with id ${request.groupID}.`)
     }
 
     let idsToSkip: EffectID[] = []
-    if (request.idsToSkip && request.idsToSkip.length > group.effects.length) {
+    if (request.idsToSkip && request.idsToSkip.length < group.effects.length) {
       idsToSkip = request.idsToSkip
     }
 
@@ -293,7 +310,6 @@ export const GroupsAudioAPI: Groups = {
     const useHtml5 = srcFileSizeInMb > html5ThresholdSizeMb
 
     return {
-      // soundB64: r?.toString() ?? '',
       soundB64: effect.path,
       format: effect.format as SupportedFileTypes,
       volume: effect.volume,
@@ -302,7 +318,10 @@ export const GroupsAudioAPI: Groups = {
       useHtml5
     }
   },
-  AddEffect: function (request: AddEffectToGroupRequest): AddEffectToGroupResponse {
+  /**
+   * @inheritdoc
+   */
+  AddEffect: function (request: AddEffectRequest): AddEffectResponse {
     const matchingGroup = AudioConfig.getGroup(request.groupID)
     if (!matchingGroup) {
       throw new Error(`Could not find matching group with ID ${request.groupID}.`)

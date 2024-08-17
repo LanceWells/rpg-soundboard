@@ -1,21 +1,21 @@
-import {
-  BoardID,
-  GroupID,
-  IAudioApi,
-  SoundEffectEditableFields,
-  SoundBoard,
-  SoundGroupEditableFields,
-  SoundIcon,
-  CategoryID,
-  SoundGroup,
-  SoundCategory,
-  EffectID
-} from 'src/apis/audio/interface'
 import { create } from 'zustand'
 import { ColorOptions } from '@renderer/components/modals/newEffectModal/colorPicker'
 import { SoundContainer } from '@renderer/utils/soundContainer'
 import { produce } from 'immer'
-import type { SoundVariants as SoundVariant } from 'src/apis/audio/soundVariants'
+import type {
+  SoundBoard,
+  SoundCategory,
+  SoundEffectEditableFields,
+  SoundGroup,
+  SoundGroupEditableFields,
+  SoundIcon
+} from 'src/apis/audio/types/items'
+import type { BoardID } from 'src/apis/audio/types/boards'
+import { IAudioApi } from 'src/apis/audio/interface'
+import type { CategoryID } from 'src/apis/audio/types/categories'
+import type { GroupID } from 'src/apis/audio/types/groups'
+import type { EffectID } from 'src/apis/audio/types/effects'
+import { SoundVariants } from 'src/apis/audio/types/soundVariants'
 
 /**
  * A set of editing modes that the view might exist in.
@@ -118,7 +118,7 @@ export type AudioStoreEditingModeMethods = {
   setEditingBoardID: (id: BoardID) => void
   prepEditingCategory: (boardID: BoardID, categoryID: CategoryID) => void
   setGroupName: (name: string | undefined) => void
-  setGroupVariant: (variant: SoundVariant) => void
+  setGroupVariant: (variant: SoundVariants) => void
   setGroupCategory: (categoryID: CategoryID | undefined) => void
   setSelectedIcon: (icon: SoundIcon) => void
 }
