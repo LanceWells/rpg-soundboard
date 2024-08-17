@@ -11,7 +11,7 @@ import IconLookup from '../../effect/iconLookup'
 import { ColorResult } from 'react-color'
 import { IconEffect } from '../../effect/icon-effect'
 import ColorPicker from './colorPicker'
-import TextField from './textField'
+import TextField from '../../generic/textField'
 import FileSelectList, { FileSelectInput } from './fileSelectList'
 import CloseIcon from '@renderer/assets/icons/close'
 import { useShallow } from 'zustand/react/shallow'
@@ -154,7 +154,7 @@ export default function EffectModal(props: PropsWithChildren<EffectModalProps>) 
           <TextField
             required
             className="w-fit [grid-area:_form]"
-            formName="Name"
+            fieldName="Name"
             value={editingGroup.name}
             error={effectNameErr}
             placeholder="My Sound Effect"

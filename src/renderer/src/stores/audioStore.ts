@@ -59,6 +59,9 @@ export type AudioState = {
    */
   editingBoardID: BoardID | undefined
 
+  /**
+   * A set of values used to populate an editing section for a given category.
+   */
   editingCategory: SoundCategory | undefined
 
   /**

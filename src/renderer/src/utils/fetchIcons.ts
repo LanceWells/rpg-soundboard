@@ -1,18 +1,39 @@
 import { icons } from '../../../../node_modules/@iconify-json/game-icons/'
 import { iconToSVG, parseIconSet, validateIconSet } from '@iconify/utils'
 
+/**
+ * Represents an individual "icon". This confers the icon's name as well as its SVG element.
+ */
 export type IconBody = {
+  /**
+   * The name of the icon to render.
+   */
   name: string
+
+  /**
+   * The svg body of the icon to render. This is in plain html format, and will require some
+   * additional handling to render as an individual icon.
+   */
   body: string
 }
 
+/**
+ * A helper class for use with the searching and looking up svg icons provided by
+ * https://game-icons.net/.
+ *
+ * Generally used in a singleton pattern.
+ */
 class SoundboardIcons {
   private _iconLookup: Map<string, string[]>
   private _iconRef: Map<string, string>
 
+  /**
+   * Creates a new instance of a {@link SoundboardIcons}.
+   */
   constructor() {
     const iconRef = new Map<string, string>()
 
+    // The goal is to first evaluate the total icon set in order to create iterable objects.
     // https://iconify.design/docs/libraries/utils/parse-icon-set.html
     validateIconSet(icons)
     parseIconSet(icons, (iconName, iconData) => {
@@ -47,9 +68,11 @@ class SoundboardIcons {
       iconRef.set(iconName, svg)
     })
 
+    // Then create a lookup map based on the icon's title. This is largely used when searching for
+    // relevant icons.
     const iconLookup = new Map<string, string[]>()
-
     const iconEntries = [...iconRef.keys()]
+
     iconEntries.forEach((k) => {
       // The names for each icon are hyphen delimited, and will often include numeric indices. For
       // example, "abstract-01" or "assassin-pouch". The goal is to be able to search off of the
@@ -70,6 +93,15 @@ class SoundboardIcons {
     this._iconLookup = iconLookup
   }
 
+  /**
+   * Finds icons that generally match the provided search string.
+   *
+   * At time of writing, the algorithm compares {@link search} against the start of each word in any
+   * icon's title. For example, "tra" will matching "Tire Tracks", "Trampoline", "Trap Mask", etc.
+   *
+   * @param search The search pharse that should be used to discover icons.
+   * @returns A set of icons that match the provided criteria.
+   */
   SearchIcons(search: string): IconBody[] {
     if (search === '') {
       return []
@@ -96,6 +128,11 @@ class SoundboardIcons {
     return iconBodies
   }
 
+  /**
+   * Gets a particular icon by its specific identifier.
+   * @param iconName The icon name that should be used to look up a particular icon's information.
+   * @returns The icon, if one was found; otherwise undefined.
+   */
   GetIcon(iconName: string): IconBody | undefined {
     const icon = this._iconRef.get(iconName)
     if (!icon) {

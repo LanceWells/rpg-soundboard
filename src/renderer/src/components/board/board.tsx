@@ -4,7 +4,7 @@ import { NewEffectModalId } from '../modals/newEffectModal/newEffectModal'
 import AddIcon from '@renderer/assets/icons/add'
 import PencilIcon from '@renderer/assets/icons/pencil'
 import { DndContext, DragEndEvent } from '@dnd-kit/core'
-import TextField from '../modals/newEffectModal/textField'
+import TextField from '../generic/textField'
 import debounce from 'debounce'
 import DeleteButton from '../generic/deleteButton'
 import { useShallow } from 'zustand/react/shallow'
@@ -15,10 +15,22 @@ import Uncategorized from '../category/uncategorized'
 import { SortableContext } from '@dnd-kit/sortable'
 import { SoundBoard } from 'src/apis/audio/types/items'
 
+/**
+ * Props for {@link Board}.
+ */
 export type BoardProps = {
+  /**
+   * The soundboard to be represented by this component.
+   */
   board: SoundBoard
 }
 
+/**
+ * A container for a {@link SoundBoard} object. This is the base container that includes all
+ * selectable sound effect buttons, as well as the categories that might contain them.
+ *
+ * @param props See {@link BoardProps}.
+ */
 export default function Board(props: BoardProps) {
   const { board } = props
   const {
@@ -262,7 +274,7 @@ export default function Board(props: BoardProps) {
               max-h-28
               ${editingMode === 'Off' ? 'hidden' : 'visible'}
             `}
-          formName="Board Title"
+          fieldName="Board Title"
           onChange={onUpdateTitle}
           defaultValue={board.name}
         />

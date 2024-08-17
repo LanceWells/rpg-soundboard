@@ -2,7 +2,7 @@
  * The types of sounds that a single button (group) might represent. These define the overall
  * behavior of a particular button.
  */
-type SoundVariantFields = {
+export type SoundVariantFields = {
   /**
    * A standard approach to sound effects. After a sound for this group is chosen at random, it will
    * play once. If pressed again, the sound effect will stop playing.

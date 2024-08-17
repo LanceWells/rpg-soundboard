@@ -1,5 +1,5 @@
 import { useAudioStore } from '@renderer/stores/audioStore'
-import TextField from '../newEffectModal/textField'
+import TextField from '../../generic/textField'
 import { ChangeEventHandler, MouseEventHandler, useCallback, useState } from 'react'
 import CloseIcon from '@renderer/assets/icons/close'
 
@@ -54,7 +54,7 @@ export default function NewCategoryModal() {
             <TextField
               required
               placeholder="My Category"
-              formName="Name"
+              fieldName="Name"
               onChange={onChangeName}
               error={nameErr}
               value={name}

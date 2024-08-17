@@ -3,38 +3,130 @@ import { getRandomArbitrary } from './random'
 import type { GroupID } from 'src/apis/audio/types/groups'
 import { SoundVariants } from 'src/apis/audio/types/soundVariants'
 
-type StopHandler<T extends GroupID | undefined> = {
-  id: T
-  handler: (groupID: T) => void
+/**
+ * Defines the callback handler that will be invoked when the sound stops playing.
+ *
+ * @template TID Defines the type of ID that this particular sound container refers to, and will
+ * return when calling provided event callbacks.
+ *
+ * If undefined, this implies that there should be no item ID provided in the callback. This is
+ * useful for situations in which this container is considered to be a disposiable one-use object.
+ */
+export type StopHandler<TID extends GroupID | undefined> = {
+  /**
+   * The ID that is associated with the given effect stopping. This will be undefined if TID is
+   * undefined.
+   */
+  id: TID
+
+  /**
+   * The handler to invoke once the sound has stopped playing.
+   *
+   * @param groupID The group ID that will be provided to the callback method.
+   */
+  handler: (groupID: TID) => void
 }
 
-type LoadedHandler = {
+/**
+ * Defines the callback handler that will be invoked when the sound is loaded.
+ */
+export type LoadedHandler = {
+  /**
+   * The handler to invoke once the sound has loaded.
+   */
   handler: () => void
 }
 
+/**
+ * A setup container used to define variables for use with an instance of a sound container.
+ *
+ * @template TID Defines the type of ID that this particular sound container refers to, and will
+ * return when calling provided event callbacks.
+ *
+ * If undefined, this implies that there should be no item ID provided in the callback. This is
+ * useful for situations in which this container is considered to be a disposiable one-use object.
+ */
 export type SoundContainerSetup<T extends GroupID | undefined> = {
+  /**
+   * The source for the sound that should be played. May either use the `aud://` protocol, or be a
+   * direct file path reference.
+   */
   src: string
+
+  /**
+   * The volume that the sound should be played at.
+   *
+   * This value ranges from 0 - 400; 100 implying "full volume".
+   */
   volume: number
-  format: string
+
+  /**
+   * The file format used with the given sound effect.
+   *
+   * This is only necessary for base64 data URLs. This value may either include the `.` for a file
+   * prefix, or omit it. For example, either `.mp3` or `mp3` are valid.
+   */
+  format?: string
+
+  /**
+   * If true, use HTML5 audio for streaming, as opposed to web audio API. This should typically be
+   * true only for large files.
+   */
   useHtml5: boolean
+
+  /**
+   * A callback handler that will be invoked when the sound has stopped playing.
+   */
   stopHandler?: StopHandler<T>
+
+  /**
+   * A callback handler that will be invoked when the sound has loaded.
+   */
   loadedHandler?: LoadedHandler
+
+  /**
+   * The variant for the sound effect. Will determine some behavior for the effect. Please see
+   * {@link SoundVariants} for more information on each variant.
+   */
   variant: SoundVariants
 }
 
-export class SoundContainer<T extends GroupID | undefined = GroupID> {
+/**
+ * A container used to handle sound effects. The intent is to abstract-away some of the overhead
+ * hanlding. This overhead handling includes items such as:
+ *  - Variant-specific behavior.
+ *  - Error logging.
+ *  - Dynamic loading.
+ *
+ * @template TID Defines the type of ID that this particular sound container refers to, and will
+ * return when calling provided event callbacks.
+ *
+ * If undefined, this implies that there should be no item ID provided in the callback. This is
+ * useful for situations in which this container is considered to be a disposiable one-use object.
+ */
+export class SoundContainer<TID extends GroupID | undefined = GroupID> {
   private _howl: Howl
-  private _stopHandler: StopHandler<T> | undefined
+  private _stopHandler: StopHandler<TID> | undefined
   private _loadedHandler: LoadedHandler | undefined
 
   private _targetVolume: number
   private _variant: SoundVariants
   private _fadeOutRef: NodeJS.Timeout | undefined
 
+  /**
+   * This is the amount of time, in ms, that fading effects should take to fully reach the target
+   * volume.
+   *
+   * This applies to both fade in as well as fade out.
+   */
   static FadeTime = 200
-  static html5FallbackLength = 30
 
-  constructor(setup: SoundContainerSetup<T>) {
+  /**
+   * Creates a new instance of a {@link SoundContainer}.
+   *
+   * @param setup See {@link SoundContainerSetup}.
+   */
+  constructor(setup: SoundContainerSetup<TID>) {
     const { src, format, volume, stopHandler, loadedHandler, variant, useHtml5 } = setup
 
     this._targetVolume = volume / 100
@@ -51,7 +143,7 @@ export class SoundContainer<T extends GroupID | undefined = GroupID> {
       this._howl = new Howl({
         src,
         volume: this._variant === 'Looping' ? 0 : this._targetVolume,
-        format: format.replace('.', ''),
+        format: format?.replace('.', ''),
         loop: this._variant === 'Looping',
         html5: useHtml5
       })

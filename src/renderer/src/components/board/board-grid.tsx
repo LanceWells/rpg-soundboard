@@ -4,8 +4,11 @@ import Board from './board'
 import { NewBoardModalId } from '../modals/newBoardModal/newBoardModal'
 import { useShallow } from 'zustand/react/shallow'
 
+/**
+ * A root-level component that is used to render every various soundboard, along with a means to
+ * switch between boards.
+ */
 export default function BoardGrid() {
-  // const boards = useAudioStore((state) => state.boards)
   const { boards, editingMode } = useAudioStore(
     useShallow((state) => ({
       boards: state.boards,

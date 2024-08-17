@@ -20,8 +20,23 @@ export type AudioApiConfig = {
  * An interface used to define the set of methods that comprise the "Audio" side of the application.
  */
 export interface IAudioApi {
+  /**
+   * An accessor object for the audio APIs related to SoundBoard objects.
+   */
   Boards: IBoards
+
+  /**
+   * An accessor object for the audio APIs related to SoundCategory objects.
+   */
   Groups: IGroups
+
+  /**
+   * An accessor object for the audio APIs related to SoundGroup objects.
+   */
   Categories: ICategories
+
+  /**
+   * An accessor object for the audio APIs related to non-object specific methods.
+   */
   Sounds: ISounds
 }

@@ -10,11 +10,25 @@ import { useSortable } from '@dnd-kit/sortable'
 import { BoardID } from 'src/apis/audio/types/boards'
 import { SoundCategory } from 'src/apis/audio/types/items'
 
+/**
+ * Props for {@link Categorized}.
+ */
 export type CategorizedProps = {
+  /**
+   * The ID for the board that this category is rendered within.
+   */
   boardID: BoardID
+
+  /**
+   * The category that should be rendered.
+   */
   category: SoundCategory
 }
 
+/**
+ * A container for a category, that itself should incldue a variety of sound groups.
+ * @param props See {@link CategorizedProps}.
+ */
 export default function Categorized(props: CategorizedProps) {
   const { category, boardID } = props
 

@@ -1,5 +1,5 @@
 import { useState, useCallback, ChangeEventHandler, MouseEventHandler, useEffect } from 'react'
-import TextField from '../newEffectModal/textField'
+import TextField from '../../generic/textField'
 import { NewCategoryModalId } from '../newCategoryModal/newCategoryModal'
 import { useAudioStore } from '@renderer/stores/audioStore'
 import CloseIcon from '@renderer/assets/icons/close'
@@ -89,7 +89,7 @@ export default function EditCategoryModal() {
             <TextField
               required
               placeholder="My Category"
-              formName="Name"
+              fieldName="Name"
               onChange={onChangeName}
               error={nameErr}
               value={name}
