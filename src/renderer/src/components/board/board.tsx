@@ -241,17 +241,15 @@ export default function Board(props: BoardProps) {
   return (
     <div
       className={`
-      bg-base-200
-      w-full
-      h-full
-      p-2
-      mx-4
       rounded-lg
       shadow-sm
+      mx-4
       items-center
       grid
       content-between
       relative
+      h-full
+      max-h-full
       [grid-template-areas:_"._title_editbutton"_"categories_categories_categories"_"groups_groups_groups"_"delete_._controls"]
       [grid-template-columns:_max-content_1fr_min-content]
       [grid-template-rows:_112px_1fr_1fr_80px]
@@ -301,7 +299,7 @@ export default function Board(props: BoardProps) {
           <Uncategorized boardID={board.id} />
         </div>
       </DndContext>
-      <div className="[grid-area:_controls] absolute right-20 bottom-0 flex flex-row gap-x-4">
+      <div className="[grid-area:_controls] absolute right-20 bottom-0 flex flex-row gap-x-4 pb-4">
         <button
           className={`
           btn-primary
