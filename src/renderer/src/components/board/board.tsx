@@ -3,7 +3,7 @@ import { EditingMode, useAudioStore } from '@renderer/stores/audioStore'
 import { NewEffectModalId } from '../modals/newEffectModal/newEffectModal'
 import AddIcon from '@renderer/assets/icons/add'
 import PencilIcon from '@renderer/assets/icons/pencil'
-import { DndContext, DragEndEvent } from '@dnd-kit/core'
+import { DndContext, DragEndEvent, DragStartEvent } from '@dnd-kit/core'
 import TextField from '../generic/textField'
 import debounce from 'debounce'
 import DeleteButton from '../generic/deleteButton'
@@ -43,7 +43,9 @@ export default function Board(props: BoardProps) {
     updateGroupPartial,
     getGroupsForCategory,
     getUncategorizedGroups,
-    reorderCategories
+    reorderCategories,
+    draggingID,
+    setDraggingID
   } = useAudioStore(
     useShallow((state) => ({
       editingMode: state.editingMode,
@@ -55,7 +57,9 @@ export default function Board(props: BoardProps) {
       updateGroupPartial: state.updateGroupPartial,
       getGroupsForCategory: state.getGroupsForCategory,
       getUncategorizedGroups: state.getUncategorizedGroups,
-      reorderCategories: state.reorderCategories
+      reorderCategories: state.reorderCategories,
+      draggingID: state.draggingID,
+      setDraggingID: state.setDraggingID
     }))
   )
 
@@ -94,6 +98,8 @@ export default function Board(props: BoardProps) {
       const { active, over } = event
 
       const activeID = active.id as string
+
+      setDraggingID(null)
 
       // If over is null, it means that we dragged an item into a space that does not collide with
       // any droppable area. When that happens, it's most likely that we're dragging a group out of
@@ -207,9 +213,16 @@ export default function Board(props: BoardProps) {
     [categoryIDs, board.id, board.groups, groupCategories, board.categories, JSON.stringify(board)]
   )
 
-  const onDragStart = useCallback(() => {
-    setEditingMode('Dragging')
-  }, [editingMode, setEditingMode])
+  const onDragStart = useCallback(
+    (event: DragStartEvent) => {
+      setEditingMode('Dragging')
+      const activeID = event.active.id as string
+      if (IdIsGroup(activeID) || IdIsCategory(activeID)) {
+        setDraggingID(activeID)
+      }
+    },
+    [editingMode, setEditingMode]
+  )
 
   const onUpdateTitle = useCallback<ChangeEventHandler<HTMLInputElement>>(
     debounce((e: ChangeEvent<HTMLInputElement>) => {
@@ -291,9 +304,7 @@ export default function Board(props: BoardProps) {
       </button>
       <DndContext onDragStart={onDragStart} onDragEnd={onDragEnd}>
         <div className="flex flex-row flex-wrap gap-6 justify-center [grid-area:categories]">
-          <SortableContext items={categoryIDs} disabled={editingMode == 'Off'}>
-            {categoryElements}
-          </SortableContext>
+          {categoryElements}
         </div>
         <div className="flex flex-row flex-wrap gap-6 justify-center [grid-area:groups]">
           <Uncategorized boardID={board.id} />

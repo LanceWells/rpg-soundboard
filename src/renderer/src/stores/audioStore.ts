@@ -85,6 +85,8 @@ export type AudioState = {
    * either being edited, or a new group that is being created.
    */
   editingGroup: SoundGroupEditableFields
+
+  draggingID: GroupID | CategoryID | null
 }
 
 export type AudioStoreGroupMethods = {
@@ -124,6 +126,7 @@ export type AudioStoreEditingModeMethods = {
   setGroupVariant: (variant: SoundVariants) => void
   setGroupCategory: (categoryID: CategoryID | undefined) => void
   setSelectedIcon: (icon: SoundIcon) => void
+  setDraggingID: (id: GroupID | CategoryID | null) => void
 }
 
 export type AudioStoreCategoryMethods = {
@@ -165,6 +168,7 @@ export const useAudioStore = create<AudioStore>((set) => ({
   editingBoardID: undefined,
   editingGroupID: undefined,
   editingCategory: undefined,
+  draggingID: null,
   setEditingMode(isEditing) {
     set({
       editingMode: isEditing
@@ -476,5 +480,10 @@ export const useAudioStore = create<AudioStore>((set) => ({
     })
 
     return resp
+  },
+  setDraggingID(id) {
+    set({
+      draggingID: id
+    })
   }
 }))
