@@ -3,7 +3,15 @@ import { EditingMode, useAudioStore } from '@renderer/stores/audioStore'
 import { NewEffectModalId } from '../modals/newEffectModal/newEffectModal'
 import AddIcon from '@renderer/assets/icons/add'
 import PencilIcon from '@renderer/assets/icons/pencil'
-import { DndContext, DragEndEvent } from '@dnd-kit/core'
+import {
+  closestCenter,
+  CollisionDetection,
+  DndContext,
+  DragEndEvent,
+  DragOverlay,
+  DragStartEvent,
+  pointerWithin
+} from '@dnd-kit/core'
 import TextField from '../generic/textField'
 import debounce from 'debounce'
 import DeleteButton from '../generic/deleteButton'
@@ -14,6 +22,10 @@ import { IdIsCategory, IdIsGroup } from '@renderer/utils/id'
 import Uncategorized from '../category/uncategorized'
 import { SortableContext } from '@dnd-kit/sortable'
 import { SoundBoard } from 'src/apis/audio/types/items'
+import { createPortal } from 'react-dom'
+import { BoardID } from 'src/apis/audio/types/boards'
+import Group from '../group/group'
+import { CategoryID } from 'src/apis/audio/types/categories'
 
 /**
  * Props for {@link Board}.
@@ -43,7 +55,9 @@ export default function Board(props: BoardProps) {
     updateGroupPartial,
     getGroupsForCategory,
     getUncategorizedGroups,
-    reorderCategories
+    reorderCategories,
+    draggingID,
+    setDraggingID
   } = useAudioStore(
     useShallow((state) => ({
       editingMode: state.editingMode,
@@ -55,19 +69,27 @@ export default function Board(props: BoardProps) {
       updateGroupPartial: state.updateGroupPartial,
       getGroupsForCategory: state.getGroupsForCategory,
       getUncategorizedGroups: state.getUncategorizedGroups,
-      reorderCategories: state.reorderCategories
+      reorderCategories: state.reorderCategories,
+      draggingID: state.draggingID,
+      setDraggingID: state.setDraggingID
     }))
   )
 
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false)
 
-  const { elements: categoryElements, ids: categoryIDs } = useMemo(() => {
+  const {
+    elements: categoryElements,
+    categoryIDs,
+    groupIDs
+  } = useMemo(() => {
     const categories = board.categories ?? []
-    const ids = categories.map((c) => c.id)
+    const categoryIDs = categories.map((c) => c.id)
+    const groupIDs = board.groups.map((g) => g.id)
     const elements = categories.map((c) => <Category boardID={board.id} category={c} key={c.id} />)
 
     return {
-      ids,
+      categoryIDs,
+      groupIDs,
       elements
     }
   }, [board.categories, board.groups, board.id])
@@ -89,11 +111,59 @@ export default function Board(props: BoardProps) {
 
   const groupCategories = board.groups.map((g) => g.category)
 
+  const collisionDetectionStrategy: CollisionDetection = useCallback(
+    (args) => {
+      if (IdIsCategory(draggingID)) {
+        return closestCenter({
+          ...args,
+          droppableContainers: args.droppableContainers.filter((c) => IdIsCategory(c.id))
+        })
+      }
+
+      // This should be the only other possible path, but add this check anyway JIC we decide to add
+      // new container types.
+      if (IdIsGroup(draggingID)) {
+        const intersectingCategories = pointerWithin(args).filter((c) => IdIsCategory(c.id))
+
+        // If we're not over any containers, assume that we're dragging this group into the
+        // uncategorized section.
+        if (intersectingCategories.length === 0) {
+          return []
+        }
+
+        const overCategory = intersectingCategories[0]
+        const overCategoryGroups = getGroupsForCategory(overCategory.id as CategoryID)
+        const overCategoryGroupIDs = overCategoryGroups.map((g) => g.id)
+
+        if (!overCategoryGroupIDs.includes(draggingID)) {
+          return [overCategory]
+        }
+
+        const closestGroupInCategory = closestCenter({
+          ...args,
+          droppableContainers: args.droppableContainers.filter((c) =>
+            overCategoryGroupIDs.includes(c.id)
+          )
+        })
+
+        console.log(closestGroupInCategory)
+
+        return closestGroupInCategory
+      }
+
+      return []
+    },
+    [draggingID, categoryIDs, groupIDs]
+  )
+
   const onDragEnd = useCallback(
     (event: DragEndEvent) => {
       const { active, over } = event
 
       const activeID = active.id as string
+
+      setDraggingID(null)
+      setEditingMode('Editing')
 
       // If over is null, it means that we dragged an item into a space that does not collide with
       // any droppable area. When that happens, it's most likely that we're dragging a group out of
@@ -107,7 +177,6 @@ export default function Board(props: BoardProps) {
             })
           }
         }
-        setEditingMode('Editing')
         return
       }
 
@@ -121,7 +190,6 @@ export default function Board(props: BoardProps) {
         const activeGroup = board.groups.find((g) => g.id === activeID)
 
         if (!overGroup || !activeGroup) {
-          setEditingMode('Editing')
           return
         }
 
@@ -129,7 +197,6 @@ export default function Board(props: BoardProps) {
           updateGroupPartial(board.id, activeID, {
             category: overGroup?.category
           })
-          setEditingMode('Editing')
           return
         }
 
@@ -160,7 +227,6 @@ export default function Board(props: BoardProps) {
           newOrder
         })
 
-        setEditingMode('Editing')
         return
       }
 
@@ -179,7 +245,6 @@ export default function Board(props: BoardProps) {
         // process.
         newOrder.splice(overIndex, 0, movingItem)
 
-        setEditingMode('Editing')
         reorderCategories({
           boardID: board.id,
           newOrder: newOrder
@@ -196,20 +261,24 @@ export default function Board(props: BoardProps) {
           updateGroupPartial(board.id, activeID, {
             category: overID
           })
-          setEditingMode('Editing')
           return
         }
       }
 
-      setEditingMode('Editing')
       return
     },
     [categoryIDs, board.id, board.groups, groupCategories, board.categories, JSON.stringify(board)]
   )
 
-  const onDragStart = useCallback(() => {
-    setEditingMode('Dragging')
-  }, [editingMode, setEditingMode])
+  const onDragStart = useCallback(
+    (event: DragStartEvent) => {
+      const activeID = event.active.id
+
+      setEditingMode('Dragging')
+      setDraggingID(activeID as string)
+    },
+    [editingMode, setEditingMode]
+  )
 
   const onUpdateTitle = useCallback<ChangeEventHandler<HTMLInputElement>>(
     debounce((e: ChangeEvent<HTMLInputElement>) => {
@@ -289,7 +358,11 @@ export default function Board(props: BoardProps) {
       >
         <PencilIcon />
       </button>
-      <DndContext onDragStart={onDragStart} onDragEnd={onDragEnd}>
+      <DndContext
+        collisionDetection={collisionDetectionStrategy}
+        onDragStart={onDragStart}
+        onDragEnd={onDragEnd}
+      >
         <div className="flex flex-row flex-wrap gap-6 justify-center [grid-area:categories]">
           <SortableContext items={categoryIDs} disabled={editingMode == 'Off'}>
             {categoryElements}
@@ -298,6 +371,12 @@ export default function Board(props: BoardProps) {
         <div className="flex flex-row flex-wrap gap-6 justify-center [grid-area:groups]">
           <Uncategorized boardID={board.id} />
         </div>
+        {createPortal(
+          <DragOverlay adjustScale={false}>
+            {getOverlaidItem({ boardID: board.id, id: draggingID })}
+          </DragOverlay>,
+          document.body
+        )}
       </DndContext>
       <div className="[grid-area:_controls] absolute right-20 bottom-0 flex flex-row gap-x-4 pb-4">
         <button
@@ -336,4 +415,46 @@ export default function Board(props: BoardProps) {
       />
     </div>
   )
+}
+
+type getOverlaidItemProps = {
+  id: string | null
+  boardID: BoardID
+}
+
+export function getOverlaidItem(props: getOverlaidItemProps) {
+  const { id, boardID } = props
+
+  const { getCategory, getGroup } = useAudioStore(
+    useShallow((state) => ({
+      getCategory: state.getCategory,
+      getGroup: state.getGroup
+    }))
+  )
+
+  if (id === null) {
+    return <></>
+  }
+
+  if (IdIsCategory(id)) {
+    const { category } = getCategory({ categoryID: id })
+
+    if (!category) {
+      return <></>
+    }
+
+    return <Category boardID={boardID} category={category} beingDragged={true} />
+  }
+
+  if (IdIsGroup(id)) {
+    const { group } = getGroup({ groupID: id })
+
+    if (!group) {
+      return <></>
+    }
+
+    return <Group boardID={boardID} group={group} beingDragged={true} />
+  }
+
+  return <></>
 }

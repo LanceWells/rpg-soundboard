@@ -6,7 +6,15 @@ import type { CategoryID } from 'src/apis/audio/types/categories'
  * @param id The ID to check.
  * @returns True if the ID is a group ID.
  */
-export function IdIsGroup(id: string): id is GroupID {
+export function IdIsGroup(id: unknown): id is GroupID {
+  if (!id) {
+    return false
+  }
+
+  if (typeof id !== 'string') {
+    return false
+  }
+
   if (id.startsWith('grp-')) {
     return true
   }
@@ -18,7 +26,15 @@ export function IdIsGroup(id: string): id is GroupID {
  * @param id The ID to check.
  * @returns True if the ID is a category ID.
  */
-export function IdIsCategory(id: string): id is CategoryID {
+export function IdIsCategory(id: unknown): id is CategoryID {
+  if (!id) {
+    return false
+  }
+
+  if (typeof id !== 'string') {
+    return false
+  }
+
   if (id.startsWith('cat')) {
     return true
   }

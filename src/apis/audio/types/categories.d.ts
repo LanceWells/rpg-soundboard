@@ -1,5 +1,13 @@
 import type { BoardID } from './boards'
-import type { SoundCategoryEditableFields, SoundCategory, SoundGroup } from './items'
+import type { SoundCategoryEditableFields, SoundCategory, SoundGroup, SoundCategory } from './items'
+
+export type GetRequest = {
+  categoryID: CategoryID
+}
+
+export type GetResponse = {
+  category: SoundCategory | null
+}
 
 /**
  * The request object for {@link ICategories.Create}.
@@ -103,6 +111,8 @@ export type CategoryID = `cat-${string}-${string}-${string}-${string}-${string}`
  * visual hierarchy for those groups that should be contained together.
  */
 export interface ICategories {
+  Get(request: GetRequest): GetResponse
+
   /**
    * Creates a new category using the set list of parameters.
    * @param request See {@link CreateRequest}.

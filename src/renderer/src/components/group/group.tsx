@@ -5,19 +5,20 @@ import { EditEffectModalId } from '../modals/newEffectModal/editEffectModal'
 import { CSS } from '@dnd-kit/utilities'
 import PencilIcon from '@renderer/assets/icons/pencil'
 import RepeatIcon from '@renderer/assets/icons/repeat'
-import { useDraggable, useDroppable } from '@dnd-kit/core'
 import PistolIcon from '@renderer/assets/icons/pistol'
 import { useShallow } from 'zustand/react/shallow'
 import { BoardID } from 'src/apis/audio/types/boards'
 import { SoundGroup } from 'src/apis/audio/types/items'
+import { useSortable } from '@dnd-kit/sortable'
 
 export type GroupProps = {
   group: SoundGroup
   boardID: BoardID
+  beingDragged?: boolean
 }
 
 export default function Group(props: GroupProps) {
-  const { group, boardID } = props
+  const { group, boardID, beingDragged } = props
 
   const {
     playGroup,
@@ -30,7 +31,8 @@ export default function Group(props: GroupProps) {
     resetWorkingFiles,
     setEditingBoardID,
     setGroupVariant,
-    setGroupCategory
+    setGroupCategory,
+    draggingID
   } = useAudioStore(
     useShallow((state) => ({
       playGroup: state.playGroup,
@@ -43,27 +45,23 @@ export default function Group(props: GroupProps) {
       resetWorkingFiles: state.resetWorkingFiles,
       setEditingBoardID: state.setEditingBoardID,
       setGroupVariant: state.setGroupVariant,
-      setGroupCategory: state.setGroupCategory
+      setGroupCategory: state.setGroupCategory,
+      draggingID: state.draggingID
     }))
   )
 
-  const dropProps = useDroppable({
-    id: group.id,
-    disabled: editingMode === 'Off'
-  })
-
-  const dragProps = useDraggable({
-    id: group.id,
-    disabled: editingMode === 'Off'
+  const { attributes, listeners, over, setNodeRef, transition, transform } = useSortable({
+    id: group.id
   })
 
   const style = {
     transform: CSS.Transform.toString({
-      x: dragProps.transform?.x ?? 0,
-      y: dragProps.transform?.y ?? 0,
+      x: transform?.x ?? 0,
+      y: transform?.y ?? 0,
       scaleX: 1.0,
       scaleY: 1.0
-    })
+    }),
+    transition
   }
 
   const isPlaying = useMemo(() => {
@@ -130,18 +128,13 @@ export default function Group(props: GroupProps) {
 
   return (
     <div
-      onTouchStart={(e) => console.log('carousel touch' + JSON.stringify(e))}
-      onTouchMove={(e) => console.log('carousel touch' + JSON.stringify(e))}
-      ref={dropProps.setNodeRef}
-      className="relative prose"
+      className={`relative ${draggingID === group.id && !beingDragged ? 'opacity-0' : 'opacity-100'}`}
     >
       <div
-        ref={dragProps.setNodeRef}
-        onTouchStart={(e) => console.log('carousel touch' + JSON.stringify(e))}
-        onTouchMove={(e) => console.log('carousel touch' + JSON.stringify(e))}
+        ref={setNodeRef}
         style={style}
-        {...dragProps.attributes}
-        {...dragProps.listeners}
+        {...attributes}
+        {...listeners}
         onClick={onClickPlay}
         role="button"
         className={`

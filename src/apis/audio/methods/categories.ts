@@ -203,5 +203,13 @@ export const CategoriesAudioAPI: ICategories = {
     return {
       groups: uncategorizedGroups
     }
+  },
+  Get(request) {
+    const { categoryID } = request
+
+    const matchingCategory = AudioConfig.getCategory(categoryID)
+    return {
+      category: matchingCategory ?? null
+    }
   }
 }

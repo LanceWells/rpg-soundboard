@@ -1,8 +1,9 @@
 import { ConfigStorage } from '../../../utils/configStorage'
 import { AudioApiConfig } from '../interface'
 import { BoardID } from '../types/boards'
+import { CategoryID } from '../types/categories'
 import { GroupID } from '../types/groups'
-import { SoundBoard, SoundGroup } from '../types/items'
+import { SoundBoard, SoundCategory, SoundGroup } from '../types/items'
 
 /**
  * An instantiation of the config for information related to this audio API.
@@ -10,6 +11,7 @@ import { SoundBoard, SoundGroup } from '../types/items'
 export class AudioConfigStorage extends ConfigStorage<AudioApiConfig> {
   private _boardMap: Map<BoardID, SoundBoard>
   private _groupMap: Map<GroupID, SoundGroup>
+  private _categoryMap: Map<CategoryID, SoundCategory>
 
   /**
    * @inheritdoc
@@ -19,6 +21,7 @@ export class AudioConfigStorage extends ConfigStorage<AudioApiConfig> {
 
     this._boardMap = new Map()
     this._groupMap = new Map()
+    this._categoryMap = new Map()
 
     this._reloadMaps()
   }
@@ -57,14 +60,22 @@ export class AudioConfigStorage extends ConfigStorage<AudioApiConfig> {
     return this._groupMap.get(groupID)
   }
 
+  getCategory(categoryID: CategoryID): SoundCategory | undefined {
+    return this._categoryMap.get(categoryID)
+  }
+
   private _reloadMaps() {
     this._boardMap.clear()
     this._groupMap.clear()
+    this._categoryMap.clear()
 
-    this.Config.boards.forEach((b) => {
+    this.Config.boards.forEach((b: SoundBoard) => {
       this._boardMap.set(b.id, b)
       b.groups.forEach((g) => {
         this._groupMap.set(g.id, g)
+      })
+      b.categories?.forEach((c) => {
+        this._categoryMap.set(c.id, c)
       })
     })
   }

@@ -85,9 +85,12 @@ export type AudioState = {
    * either being edited, or a new group that is being created.
    */
   editingGroup: SoundGroupEditableFields
+
+  draggingID: string | null
 }
 
 export type AudioStoreGroupMethods = {
+  getGroup: IAudioApi['Groups']['Get']
   addGroup: IAudioApi['Groups']['Create']
   updateGroup: IAudioApi['Groups']['Update']
   updateGroupPartial: (
@@ -124,6 +127,7 @@ export type AudioStoreEditingModeMethods = {
   setGroupVariant: (variant: SoundVariants) => void
   setGroupCategory: (categoryID: CategoryID | undefined) => void
   setSelectedIcon: (icon: SoundIcon) => void
+  setDraggingID: (id: string | null) => void
 }
 
 export type AudioStoreCategoryMethods = {
@@ -133,6 +137,7 @@ export type AudioStoreCategoryMethods = {
   getGroupsForCategory: (categoryID: CategoryID) => SoundGroup[]
   getUncategorizedGroups: IAudioApi['Categories']['GetUncategorizedGroups']
   reorderCategories: IAudioApi['Categories']['Reorder']
+  getCategory: IAudioApi['Categories']['Get']
 }
 
 export type AudioStore = AudioState &
@@ -165,6 +170,12 @@ export const useAudioStore = create<AudioStore>((set) => ({
   editingBoardID: undefined,
   editingGroupID: undefined,
   editingCategory: undefined,
+  draggingID: null,
+  setDraggingID(id) {
+    set({
+      draggingID: id
+    })
+  },
   setEditingMode(isEditing) {
     set({
       editingMode: isEditing
@@ -195,6 +206,9 @@ export const useAudioStore = create<AudioStore>((set) => ({
         }
       })
     )
+  },
+  getGroup(request) {
+    return window.audio.Groups.Get(request)
   },
   setEditingGroupID(id) {
     set({
@@ -476,5 +490,8 @@ export const useAudioStore = create<AudioStore>((set) => ({
     })
 
     return resp
+  },
+  getCategory(request) {
+    return window.audio.Categories.Get(request)
   }
 }))
