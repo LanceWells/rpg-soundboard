@@ -5,6 +5,7 @@ import { useAudioStore } from '@renderer/stores/audioStore'
 import { BoardID } from 'src/apis/audio/types/boards'
 import { SoundGroup } from 'src/apis/audio/types/items'
 import { CategoryID } from 'src/apis/audio/types/categories'
+import { useShallow } from 'zustand/react/shallow'
 
 export type GenericCategoryContainerProps = {
   groups: SoundGroup[]
@@ -15,7 +16,12 @@ export type GenericCategoryContainerProps = {
 export default function GenericCategoryContainer(props: GenericCategoryContainerProps) {
   const { groups, boardID } = props
 
-  const editingMode = useAudioStore((state) => state.editingMode)
+  const { editingMode } = useAudioStore(
+    useShallow((state) => ({
+      editingMode: state.editingMode,
+      playingGroups: state.playingGroups
+    }))
+  )
 
   const groupIDs = useMemo(() => {
     return groups.map((g) => g.id)

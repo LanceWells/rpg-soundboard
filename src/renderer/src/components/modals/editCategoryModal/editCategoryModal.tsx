@@ -83,7 +83,7 @@ export default function EditCategoryModal() {
   return (
     <dialog id={EditCategoryModalId} className="modal">
       <div className="modal-box overflow-visible">
-        <h3 className="prose">Edit Category</h3>
+        <h3>Edit Category</h3>
         <div className="flex justify-center w-full">
           <form className="w-fit flex flex-col">
             <TextField

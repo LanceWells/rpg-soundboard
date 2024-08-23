@@ -294,9 +294,12 @@ export const useAudioStore = create<AudioStore>((set) => ({
 
     GroupStopHandles.get(groupID)?.push(sound.GetStopHandle())
 
-    set((state) => ({
-      playingGroups: [...state.playingGroups, groupID]
-    }))
+    set((state) => {
+      console.log(state.playingGroups)
+      return {
+        playingGroups: [...state.playingGroups, groupID]
+      }
+    })
 
     sound.Play()
 

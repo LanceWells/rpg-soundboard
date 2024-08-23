@@ -3,13 +3,13 @@ import { useCallback, useMemo } from 'react'
 import { useAudioStore } from '@renderer/stores/audioStore'
 import { EditEffectModalId } from '../modals/newEffectModal/editEffectModal'
 import { CSS } from '@dnd-kit/utilities'
-import PencilIcon from '@renderer/assets/icons/pencil'
 import RepeatIcon from '@renderer/assets/icons/repeat'
 import PistolIcon from '@renderer/assets/icons/pistol'
 import { useShallow } from 'zustand/react/shallow'
 import { BoardID } from 'src/apis/audio/types/boards'
 import { SoundGroup } from 'src/apis/audio/types/items'
 import { useSortable } from '@dnd-kit/sortable'
+import MoveIcon from '@renderer/assets/icons/move'
 
 export type GroupProps = {
   group: SoundGroup
@@ -50,7 +50,7 @@ export default function Group(props: GroupProps) {
     }))
   )
 
-  const { attributes, listeners, over, setNodeRef, transition, transform } = useSortable({
+  const { attributes, listeners, setNodeRef, transition, transform } = useSortable({
     id: group.id
   })
 
@@ -87,6 +87,13 @@ export default function Group(props: GroupProps) {
     setGroupCategory(group.category)
     ;(document.getElementById(EditEffectModalId) as HTMLDialogElement).showModal()
   }, [group, boardID])
+
+  const onClick = useMemo(() => {
+    if (editingMode === 'Editing') {
+      return onClickEdit
+    }
+    return onClickPlay
+  }, [editingMode, onClickEdit, onClickPlay])
 
   const variantIcon = useMemo(() => {
     switch (group.variant) {
@@ -134,8 +141,7 @@ export default function Group(props: GroupProps) {
         ref={setNodeRef}
         style={style}
         {...attributes}
-        {...listeners}
-        onClick={onClickPlay}
+        onClick={onClick}
         role="button"
         className={`
         cursor-pointer
@@ -181,24 +187,21 @@ export default function Group(props: GroupProps) {
           {variantIcon}
         </div>
         <span className="text-sm flex justify-center">{group.name}</span>
-      </div>
-      <button
-        onClick={editingMode ? onClickEdit : undefined}
-        className={`
-          absolute
-          -top-2
-          -right-2
-          btn
-          btn-circle
-          z-10
-          btn-secondary
-          transition-opacity
+        <div
+          className={`
           ${editingMode === 'Off' ? 'hidden' : 'visible'}
-          ${editingMode === 'Editing' ? 'opacity-100' : 'opacity-0'}
+          absolute
+          top-0
+          right-0
+          rounded-lg
+          p-1
+          bg-black
         `}
-      >
-        <PencilIcon />
-      </button>
+          {...listeners}
+        >
+          <MoveIcon className="stroke-white" />
+        </div>
+      </div>
     </div>
   )
 }

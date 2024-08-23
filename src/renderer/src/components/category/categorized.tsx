@@ -93,7 +93,7 @@ export default function Categorized(props: CategorizedProps) {
         justify-center
     `}
       >
-        <h3 className="prose text-xl absolute top-0 left-0 w-full max-w-full text-center">
+        <h3 className="text-xl absolute top-0 left-0 w-full max-w-full text-center">
           {category.name}
         </h3>
         <div
@@ -102,8 +102,8 @@ export default function Categorized(props: CategorizedProps) {
             ${editingMode === 'Off' ? 'hidden' : 'visible'}
             rounded-full
             absolute
-            -bottom-4
-            -left-5
+            -top-2
+            -left-2
             bg-primary
         `}
         >
