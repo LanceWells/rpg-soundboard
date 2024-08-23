@@ -11,6 +11,7 @@ import { BoardID } from 'src/apis/audio/types/boards'
 import { SoundCategory } from 'src/apis/audio/types/items'
 import { useDndContext } from '@dnd-kit/core'
 import AddIcon from '@renderer/assets/icons/add'
+import { IdIsGroup } from '@renderer/utils/id'
 
 /**
  * Props for {@link Categorized}.
@@ -129,7 +130,7 @@ export default function Categorized(props: CategorizedProps) {
           justify-center
           items-center
           pointer-events-none
-          ${over?.id === category.id ? 'opacity-100' : 'opacity-0'}
+          ${IdIsGroup(draggingID) && over?.id === category.id ? 'opacity-100' : 'opacity-0'}
           `}
         >
           <span

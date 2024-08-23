@@ -371,12 +371,9 @@ export default function Board(props: BoardProps) {
         <div className="flex flex-row flex-wrap gap-6 justify-center [grid-area:groups]">
           <Uncategorized boardID={board.id} />
         </div>
-        {createPortal(
-          <DragOverlay adjustScale={false}>
-            {getOverlaidItem({ boardID: board.id, id: draggingID })}
-          </DragOverlay>,
-          document.body
-        )}
+        <DragOverlay adjustScale={false}>
+          {getOverlaidItem({ boardID: board.id, id: draggingID })}
+        </DragOverlay>
       </DndContext>
       <div className="[grid-area:_controls] absolute right-20 bottom-0 flex flex-row gap-x-4 pb-4">
         <button
