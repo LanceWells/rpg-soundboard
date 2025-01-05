@@ -11,7 +11,7 @@ import { GetAppDataPath } from './paths'
  *
  * @template T Refers to the type of the structure that is stored by this configuration.
  */
-export class ConfigStorage<T> {
+export abstract class ConfigStorage<T> {
   private _config: T
   private _configPath: string
 

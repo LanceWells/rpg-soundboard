@@ -1,5 +1,5 @@
 import { useAudioStore } from '@renderer/stores/audioStore'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo } from 'react'
 import Board from './board'
 import { NewBoardModalId } from '../modals/newBoardModal/newBoardModal'
 import { useShallow } from 'zustand/react/shallow'
@@ -10,17 +10,17 @@ import AddIcon from '@renderer/assets/icons/add'
  * switch between boards.
  */
 export default function BoardGrid() {
-  const { boards } = useAudioStore(
+  const { boards, activeBoardID, setActiveBoardID } = useAudioStore(
     useShallow((state) => ({
-      boards: state.boards
+      boards: state.boards,
+      activeBoardID: state.activeBoard?.id,
+      setActiveBoardID: state.setActiveBoard
     }))
   )
 
   const onNewBoard = useCallback(() => {
     ;(document.getElementById(NewBoardModalId) as HTMLDialogElement).showModal()
   }, [])
-
-  const [activeBoardID, setActiveBoardID] = useState(boards[0]?.id)
 
   const { boardNodes, boardTabs } = useMemo(() => {
     const boardNodes = boards.map((b) => {
@@ -58,7 +58,7 @@ export default function BoardGrid() {
 
     return {
       boardNodes,
-      boardTabs: boardTabs
+      boardTabs
     }
   }, [boards, boards.length, activeBoardID])
 

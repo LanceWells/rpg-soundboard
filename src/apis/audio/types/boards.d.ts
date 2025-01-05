@@ -73,7 +73,7 @@ export type DeleteResponse = {}
 /**
  * The request object for {@link IBoards.Create}.
  */
-export type CreateRequest = SoundBoardEditableFields
+export type CreateRequest = Omit<SoundBoardEditableFields, 'categories'>
 
 /**
  * The response object for {@link IBoards.Create}.

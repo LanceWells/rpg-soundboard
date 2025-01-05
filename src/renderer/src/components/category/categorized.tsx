@@ -77,7 +77,6 @@ export default function Categorized(props: CategorizedProps) {
       {...attributes}
       ref={setNodeRef}
       style={style}
-      role="button"
       className={`
         ${draggingID === category.id && !beingDragged ? 'opacity-0' : 'opacity-100'}
       `}
@@ -85,7 +84,7 @@ export default function Categorized(props: CategorizedProps) {
       <div
         className={`
         relative
-        outline-dashed
+        outline
         rounded-lg
         p-6
         pt-10
@@ -110,8 +109,16 @@ export default function Categorized(props: CategorizedProps) {
           <MoveIcon />
         </div>
         <div
+          // style={{
+          //   gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`
+          // }}
           className={`
-          flex flex-row flex-wrap gap-6 z-0
+            flex
+            flex-wrap
+            flex-row
+            max-w-full
+            gap-6
+            z-0
           `}
         >
           <GenericCategoryContainer boardID={boardID} groups={groups} />

@@ -19,10 +19,8 @@ import { useShallow } from 'zustand/react/shallow'
 import { NewCategoryModalId } from '../modals/newCategoryModal/newCategoryModal'
 import Category from '../category/categorized'
 import { IdIsCategory, IdIsGroup } from '@renderer/utils/id'
-import Uncategorized from '../category/uncategorized'
 import { SortableContext } from '@dnd-kit/sortable'
 import { SoundBoard } from 'src/apis/audio/types/items'
-import { createPortal } from 'react-dom'
 import { BoardID } from 'src/apis/audio/types/boards'
 import Group from '../group/group'
 import { CategoryID } from 'src/apis/audio/types/categories'
@@ -146,8 +144,6 @@ export default function Board(props: BoardProps) {
           )
         })
 
-        console.log(closestGroupInCategory)
-
         return closestGroupInCategory
       }
 
@@ -169,15 +165,16 @@ export default function Board(props: BoardProps) {
       // any droppable area. When that happens, it's most likely that we're dragging a group out of
       // a container.
       if (over === null) {
-        if (IdIsGroup(activeID)) {
-          const activeGroup = board.groups.find((g) => g.id === activeID)
-          if (activeGroup && activeGroup.category !== undefined) {
-            updateGroupPartial(board.id, activeID, {
-              category: undefined
-            })
-          }
-        }
         return
+        // if (IdIsGroup(activeID)) {
+        //   const activeGroup = board.groups.find((g) => g.id === activeID)
+        //   if (activeGroup && activeGroup.category !== undefined) {
+        //     updateGroupPartial(board.id, activeID, {
+        //       category: undefined
+        //     })
+        //   }
+        // }
+        // return
       }
 
       const overID = over.id as string
@@ -321,7 +318,7 @@ export default function Board(props: BoardProps) {
       max-h-full
       [grid-template-areas:_"._title_editbutton"_"categories_categories_categories"_"groups_groups_groups"_"delete_._controls"]
       [grid-template-columns:_max-content_1fr_min-content]
-      [grid-template-rows:_112px_1fr_1fr_80px]
+      [grid-template-rows:_112px_max-content_1fr_80px]
     `}
     >
       <div className="w-full pt-4 absolute top-0 left-0 text-center pointer-events-none h-28 min-h-28">
@@ -363,13 +360,10 @@ export default function Board(props: BoardProps) {
         onDragStart={onDragStart}
         onDragEnd={onDragEnd}
       >
-        <div className="flex flex-row flex-wrap gap-6 justify-center [grid-area:categories]">
+        <div className="flex flex-col flex-wrap gap-6 justify-center [grid-area:categories]">
           <SortableContext items={categoryIDs} disabled={editingMode == 'Off'}>
             {categoryElements}
           </SortableContext>
-        </div>
-        <div className="flex flex-row flex-wrap gap-6 justify-center [grid-area:groups]">
-          <Uncategorized boardID={board.id} />
         </div>
         <DragOverlay adjustScale={false}>
           {getOverlaidItem({ boardID: board.id, id: draggingID })}

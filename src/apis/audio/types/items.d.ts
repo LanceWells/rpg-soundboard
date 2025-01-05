@@ -102,7 +102,7 @@ export type SoundGroup = {
    * required field. If the field is not specified, it implies that the sound group is
    * "uncategorized", and should not be rendered visibly within any category container.
    */
-  category?: CategoryID
+  category: CategoryID
 }
 
 /**
@@ -171,7 +171,7 @@ export type SoundBoard = {
   /**
    * The set of sound categories that should be represented within this particular soundboard.
    */
-  categories?: SoundCategory[]
+  categories: [SoundCategory, ...SoundCategory[]]
 }
 
 /**

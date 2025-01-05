@@ -5,7 +5,7 @@ import { SupportedFileTypes } from '../supportedFileTypes'
 import { BoardID } from '../types/boards'
 import { GroupID } from '../types/groups'
 
-export const getBoardPath = (boardID: BoardID): string => {
+const getBoardPath = (boardID: BoardID): string => {
   const appDataPath = GetAppDataPath()
   const boardDir = path.join(appDataPath, 'board-data', boardID)
 
@@ -13,10 +13,9 @@ export const getBoardPath = (boardID: BoardID): string => {
 }
 
 export const getGroupPath = (boardID: BoardID, groupID: GroupID): string => {
-  const appDataPath = GetAppDataPath()
-  const effDir = path.join(appDataPath, 'board-data', boardID, groupID)
+  const grpDir = path.join(getBoardPath(boardID), groupID)
 
-  return effDir
+  return grpDir
 }
 
 export const getGroupEffectsPath = (boardID: BoardID, groupID: GroupID): string => {

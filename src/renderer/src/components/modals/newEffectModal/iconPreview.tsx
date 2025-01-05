@@ -22,10 +22,10 @@ export function IconPreview(props: IconPreviewProps) {
   const handlePickIcon = useCallback(() => {
     setSelectedIcon({
       name: icon.name,
-      backgroundColor: editingGroup.icon.backgroundColor ?? ColorOptions.black,
-      foregroundColor: editingGroup.icon.foregroundColor ?? ColorOptions.white
+      backgroundColor: editingGroup?.icon.backgroundColor ?? ColorOptions.black,
+      foregroundColor: editingGroup?.icon.foregroundColor ?? ColorOptions.white
     })
-  }, [icon.name, editingGroup.icon, setSelectedIcon])
+  }, [icon.name, editingGroup?.icon, setSelectedIcon])
 
   const readableName = icon.name
     .split('-')
@@ -46,15 +46,15 @@ export function IconPreview(props: IconPreviewProps) {
         w-full
         btn
         h-fit
-        ${editingGroup.icon.name === icon.name ? 'bg-base-100' : ''}
+        ${editingGroup?.icon.name === icon.name ? 'bg-base-100' : ''}
       `}
       onClick={handlePickIcon}
     >
       <IconEffect
         icon={{
           name: icon.name,
-          backgroundColor: editingGroup.icon.backgroundColor,
-          foregroundColor: editingGroup.icon.foregroundColor
+          backgroundColor: editingGroup?.icon.backgroundColor ?? 'grey',
+          foregroundColor: editingGroup?.icon.foregroundColor ?? 'grey'
         }}
       />
       <span>{readableName}</span>

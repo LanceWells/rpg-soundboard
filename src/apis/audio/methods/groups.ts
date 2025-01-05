@@ -69,7 +69,8 @@ export const GroupsAudioAPI: IGroups = {
       id: newGroupID,
       name: request.name,
       icon: request.icon,
-      variant: request.variant
+      variant: request.variant,
+      category: matchingBoard.categories[0].id
     }
 
     const newConfig = produce(AudioConfig.Config, (draft) => {

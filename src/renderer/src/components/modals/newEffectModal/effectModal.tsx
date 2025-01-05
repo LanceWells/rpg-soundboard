@@ -55,24 +55,28 @@ export default function EffectModal(props: PropsWithChildren<EffectModalProps>) 
 
   const handleForegroundSelect = useCallback(
     (c: ColorResult) => {
-      setSelectedIcon({
-        backgroundColor: editingGroup.icon.backgroundColor,
-        foregroundColor: c.hex,
-        name: editingGroup.icon.name
-      })
+      if (editingGroup !== null) {
+        setSelectedIcon({
+          backgroundColor: editingGroup.icon.backgroundColor,
+          foregroundColor: c.hex,
+          name: editingGroup.icon.name
+        })
+      }
     },
     [editingGroup, setSelectedIcon]
   )
 
   const handleBackgroundSelect = useCallback(
     (c: ColorResult) => {
-      setSelectedIcon({
-        backgroundColor: c.hex,
-        foregroundColor: editingGroup.icon.foregroundColor,
-        name: editingGroup.icon.name
-      })
+      if (editingGroup !== null) {
+        setSelectedIcon({
+          backgroundColor: c.hex,
+          foregroundColor: editingGroup.icon.foregroundColor,
+          name: editingGroup.icon.name
+        })
+      }
     },
-    [editingGroup.icon, setSelectedIcon]
+    [editingGroup?.icon, setSelectedIcon]
   )
 
   const onClose = useCallback(() => {
@@ -86,6 +90,10 @@ export default function EffectModal(props: PropsWithChildren<EffectModalProps>) 
   const onSubmit = useCallback<MouseEventHandler>(
     (e) => {
       let failToSubmit = false
+      if (editingGroup === null) {
+        failToSubmit = true
+        return
+      }
 
       if (editingGroup.effects.length === 0) {
         failToSubmit = true
@@ -150,12 +158,12 @@ export default function EffectModal(props: PropsWithChildren<EffectModalProps>) 
             w-full
           `}
         >
-          <IconEffect className="[grid-area:_icon]" icon={editingGroup.icon} />
+          <IconEffect className="[grid-area:_icon]" icon={editingGroup?.icon} />
           <TextField
             required
             className="w-fit [grid-area:_form]"
             fieldName="Name"
-            value={editingGroup.name}
+            value={editingGroup?.name}
             error={effectNameErr}
             placeholder="My Sound Effect"
             onChange={(e) => setGroupName(e.target.value)}
@@ -165,13 +173,13 @@ export default function EffectModal(props: PropsWithChildren<EffectModalProps>) 
           <IconLookup className="[grid-area:_lookup] w-full" />
           <ColorPicker
             title="Foreground"
-            color={editingGroup.icon.foregroundColor}
+            color={editingGroup?.icon.foregroundColor ?? 'gray'}
             onColorChange={handleForegroundSelect}
             className="[grid-area:_foreground]"
           />
           <ColorPicker
             title="Background"
-            color={editingGroup.icon.backgroundColor}
+            color={editingGroup?.icon.backgroundColor ?? 'gray'}
             onColorChange={handleBackgroundSelect}
             className="[grid-area:_background]"
           />
@@ -180,7 +188,7 @@ export default function EffectModal(props: PropsWithChildren<EffectModalProps>) 
               <span className="label-text">Sound Variant</span>
             </div>
             <select
-              value={editingGroup.variant}
+              value={editingGroup?.variant ?? 'Default'}
               onChange={onChangeVariant}
               className="select select-bordered"
             >

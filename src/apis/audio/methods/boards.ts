@@ -4,6 +4,7 @@ import crypto from 'node:crypto'
 import { deleteBoardFolder } from './fs'
 import { IBoards, CreateResponse, BoardID } from '../types/boards'
 import { SoundBoardEditableFields, SoundBoard } from '../types/items'
+import { CategoriesAudioAPI } from './categories'
 
 /**
  * A standard implementation of the {@link IBoards} interface.
@@ -18,16 +19,23 @@ export const BoardsAudioAPI: IBoards = {
       board
     }
   },
+
   /**
    * @inheritdoc
    */
   Create: function (request: SoundBoardEditableFields): CreateResponse {
     const uuid = crypto.randomUUID()
     const newBoardID: BoardID = `brd-${uuid}`
+    const defaultCategory = CategoriesAudioAPI.Create({
+      boardID: newBoardID,
+      name: request.name
+    }).category
+
     const newBoard: SoundBoard = {
       groups: [],
       id: newBoardID,
-      name: request.name
+      name: request.name,
+      categories: [defaultCategory]
     }
 
     const newConfig = produce(AudioConfig.Config, (draft) => {
@@ -40,6 +48,7 @@ export const BoardsAudioAPI: IBoards = {
       board: newBoard
     }
   },
+
   /**
    * @inheritdoc
    */
@@ -64,6 +73,7 @@ export const BoardsAudioAPI: IBoards = {
       board: updatedBoard.board!
     }
   },
+
   /**
    * @inheritdoc
    */
@@ -83,6 +93,7 @@ export const BoardsAudioAPI: IBoards = {
 
     return {}
   },
+
   /**
    * @inheritdoc
    */

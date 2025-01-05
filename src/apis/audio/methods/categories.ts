@@ -45,10 +45,8 @@ export const CategoriesAudioAPI: ICategories = {
       }
 
       if (!matchingBoard.categories) {
-        matchingBoard.categories = []
+        matchingBoard.categories = [newCategory]
       }
-
-      matchingBoard.categories.push(newCategory)
     })
 
     AudioConfig.Config = newConfig
@@ -57,6 +55,7 @@ export const CategoriesAudioAPI: ICategories = {
       category: newCategory
     }
   },
+
   /**
    * @inheritdoc
    */
@@ -85,7 +84,7 @@ export const CategoriesAudioAPI: ICategories = {
         }
 
         return c
-      })
+      }) as [SoundCategory, ...SoundCategory[]]
 
       matchingBoard.categories = newCategories
     })
@@ -96,6 +95,7 @@ export const CategoriesAudioAPI: ICategories = {
       category: updatedCategory
     }
   },
+
   /**
    * @inheritdoc
    */
@@ -107,14 +107,19 @@ export const CategoriesAudioAPI: ICategories = {
 
     const newConfig = produce(AudioConfig.Config, (draft) => {
       const matchingBoard = draft.boards.find((b) => b.id === request.boardID)
-      if (!matchingBoard?.categories) {
+      if (!matchingBoard?.categories || matchingBoard.categories.length <= 1) {
         return
       }
 
-      matchingBoard.categories = matchingBoard.categories.filter((c) => c.id !== request.categoryID)
+      matchingBoard.categories = matchingBoard.categories.filter(
+        (c) => c.id !== request.categoryID
+      ) as [SoundCategory, ...SoundCategory[]]
+
+      const defaultCategory = matchingBoard.categories[0]
+
       matchingBoard.groups.forEach((g) => {
         if (g.category === request.categoryID) {
-          g.category = undefined
+          g.category = defaultCategory.id
         }
       })
     })
@@ -123,6 +128,7 @@ export const CategoriesAudioAPI: ICategories = {
 
     return {}
   },
+
   /**
    * @inheritdoc
    */
@@ -150,7 +156,10 @@ export const CategoriesAudioAPI: ICategories = {
       const matchingBoard = draft.boards.find((b) => b.id === request.boardID)
       const catMap = new Map(board.categories!.map((c) => [c.id, c]))
 
-      const newOrder = request.newOrder.map((c) => catMap.get(c)) as SoundCategory[]
+      const newOrder = request.newOrder.map((c) => catMap.get(c)) as [
+        SoundCategory,
+        ...SoundCategory[]
+      ]
 
       matchingBoard!.categories = newOrder
     })
@@ -159,6 +168,7 @@ export const CategoriesAudioAPI: ICategories = {
 
     return {}
   },
+
   /**
    * @inheritdoc
    */
@@ -183,6 +193,7 @@ export const CategoriesAudioAPI: ICategories = {
       groups: categoryGroups
     }
   },
+
   /**
    * @inheritdoc
    */
@@ -204,6 +215,10 @@ export const CategoriesAudioAPI: ICategories = {
       groups: uncategorizedGroups
     }
   },
+
+  /**
+   * @inheritdoc
+   */
   Get(request) {
     const { categoryID } = request
 

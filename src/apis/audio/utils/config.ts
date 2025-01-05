@@ -1,4 +1,5 @@
-import { ConfigStorage } from '../../../utils/configStorage'
+import { produce } from 'immer'
+import { ConfigMigrations, MigratableConfigStorage } from '../../../utils/migratableConfigStorage'
 import { AudioApiConfig } from '../interface'
 import { BoardID } from '../types/boards'
 import { CategoryID } from '../types/categories'
@@ -8,7 +9,41 @@ import { SoundBoard, SoundCategory, SoundGroup } from '../types/items'
 /**
  * An instantiation of the config for information related to this audio API.
  */
-export class AudioConfigStorage extends ConfigStorage<AudioApiConfig> {
+export class AudioConfigStorage extends MigratableConfigStorage<AudioApiConfig> {
+  getMigrations(): ConfigMigrations {
+    return [
+      {
+        version: 1,
+        fn: (inConfig: unknown) => {
+          console.log(inConfig)
+          const outConfig = produce(inConfig as AudioApiConfig, (draft) => {
+            draft.boards.forEach((b) => {
+              if (!b.categories || b.categories.length === 0) {
+                const newCategoryID: CategoryID = `cat-${crypto.randomUUID()}`
+                const newCategory: SoundCategory = {
+                  id: newCategoryID,
+                  name: b.name
+                }
+
+                b.categories = [newCategory]
+              }
+
+              const defaultCategory = b.categories[0].id
+
+              b.groups.forEach((g) => {
+                if (!g.category) {
+                  g.category = defaultCategory
+                }
+              })
+            })
+          })
+
+          return outConfig
+        }
+      }
+    ]
+  }
+
   private _boardMap: Map<BoardID, SoundBoard>
   private _groupMap: Map<GroupID, SoundGroup>
   private _categoryMap: Map<CategoryID, SoundCategory>
@@ -17,12 +52,13 @@ export class AudioConfigStorage extends ConfigStorage<AudioApiConfig> {
    * @inheritdoc
    */
   constructor() {
-    super('audio', { boards: [] })
+    super('audio', { boards: [], version: 1 })
 
     this._boardMap = new Map()
     this._groupMap = new Map()
     this._categoryMap = new Map()
 
+    this.migrateConfig()
     this._reloadMaps()
   }
 

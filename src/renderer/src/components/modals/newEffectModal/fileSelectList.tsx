@@ -79,9 +79,9 @@ export default function FileSelectList(props: FileSelectListProps) {
 
   const fileEntries = useMemo(
     () =>
-      editingGroup.effects.map((f, i) => (
+      editingGroup?.effects.map((f, i) => (
         <FileEntry onClick={onRemoveFile} index={i} file={f} key={`file-${f.path}`} />
-      )),
+      )) ?? [],
     [editingGroup]
   )
 

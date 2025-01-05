@@ -9,7 +9,7 @@ export type IconEffectProps = {
   /**
    * Information about the icon to be rendered.
    */
-  icon: SoundIcon
+  icon: SoundIcon | undefined
 
   /**
    * Optional class name, will be rendered on the root element after other, required classes.
@@ -27,14 +27,14 @@ export type IconEffectProps = {
 export function IconEffect(props: IconEffectProps) {
   const { icon, className } = props
 
-  const iconBody = soundboardIcons.GetIcon(icon.name)
+  const iconBody = soundboardIcons.GetIcon(icon?.name ?? 'moon')
   const reactNode = Parser().parse(iconBody?.body ?? '')
 
   return (
     <div
       style={{
-        backgroundColor: icon.backgroundColor,
-        color: icon.foregroundColor
+        backgroundColor: icon?.backgroundColor ?? 'white',
+        color: icon?.foregroundColor ?? 'black'
       }}
       className={`rounded-lg w-24 h-24 ${className}`}
     >

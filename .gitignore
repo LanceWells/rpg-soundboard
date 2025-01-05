@@ -1,5 +1,6 @@
 node_modules
 dist
+dist - Copy
 out
 .DS_Store
 *.log*
