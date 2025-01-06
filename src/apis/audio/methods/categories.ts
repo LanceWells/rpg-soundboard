@@ -46,6 +46,8 @@ export const CategoriesAudioAPI: ICategories = {
 
       if (!matchingBoard.categories) {
         matchingBoard.categories = [newCategory]
+      } else {
+        matchingBoard.categories.push(newCategory)
       }
     })
 

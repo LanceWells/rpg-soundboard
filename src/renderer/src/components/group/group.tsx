@@ -27,6 +27,7 @@ export default function Group(props: GroupProps) {
     editingMode,
     setSelectedIcon,
     setGroupName,
+    setEditingGroupID,
     resetWorkingFiles,
     setEditingBoardID,
     setGroupVariant,
@@ -40,6 +41,7 @@ export default function Group(props: GroupProps) {
       editingMode: state.editingMode,
       setSelectedIcon: state.setSelectedIcon,
       setGroupName: state.setGroupName,
+      setEditingGroupID: state.setEditingGroupID,
       resetWorkingFiles: state.resetWorkingFiles,
       setEditingBoardID: state.setEditingBoardID,
       setGroupVariant: state.setGroupVariant,
@@ -76,6 +78,7 @@ export default function Group(props: GroupProps) {
 
   const onClickEdit = useCallback(() => {
     stopGroup(group.id)
+    setEditingGroupID(group.id)
     setSelectedIcon(group.icon)
     setGroupName(group.name)
     resetWorkingFiles(group.effects)
