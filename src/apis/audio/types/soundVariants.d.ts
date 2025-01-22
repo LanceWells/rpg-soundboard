@@ -28,6 +28,8 @@ export type SoundVariantFields = {
    * allows the user to rapidly press the button, getting a unique sound each time.
    */
   Rapid: unknown
+
+  Soundtrack: unknown
 }
 
 /**

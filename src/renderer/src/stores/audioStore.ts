@@ -152,7 +152,7 @@ export type AudioStore = AudioState &
 
 const GroupStopHandles: Map<GroupID, Array<() => void>> = new Map()
 
-const RepeatSoundHandles: Map<GroupID, EffectID> = new Map()
+const RepeatSoundIDs: Map<GroupID, EffectID> = new Map()
 
 const getDefaultGroup = (categoryID: CategoryID): SoundGroupEditableFields => ({
   effects: [],
@@ -263,8 +263,10 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
   },
   async playGroup(groupID) {
     let soundsToAvoid: EffectID[] = []
-    if (RepeatSoundHandles.has(groupID)) {
-      soundsToAvoid = [RepeatSoundHandles.get(groupID)!]
+
+    // If this is a repeat sound effect, then avoid playing the same sound that we last played.
+    if (RepeatSoundIDs.has(groupID)) {
+      soundsToAvoid = [RepeatSoundIDs.get(groupID)!]
     }
 
     const audio = await window.audio.Groups.GetSound({
@@ -272,7 +274,14 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
       idsToSkip: soundsToAvoid
     })
 
-    RepeatSoundHandles.set(groupID, audio.effectID)
+    RepeatSoundIDs.set(groupID, audio.effectID)
+
+    // If this is a soundtrack, and we already have one playing, then fade out the old soundtrack
+    // and fade in the new soundtrack.
+    get()
+      .playingGroups.map((g) => get().getGroup({ groupID: g }))
+      .filter((g) => g.group?.variant === 'Soundtrack')
+      .forEach((g) => get().stopGroup(g.group?.id))
 
     const handleHowlStop = (groupID: GroupID) => {
       if (GroupStopHandles.has(groupID)) {

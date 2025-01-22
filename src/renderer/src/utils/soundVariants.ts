@@ -25,5 +25,10 @@ export const SoundVariant: {
   /**
    * See {@link SoundVariantFields.Rapid}.
    */
-  Rapid: 'Rapid-Fire'
+  Rapid: 'Rapid-Fire',
+
+  /**
+   * See {@link SoundVariantFields.Soundtrack}.
+   */
+  Soundtrack: 'Soundtrack'
 }

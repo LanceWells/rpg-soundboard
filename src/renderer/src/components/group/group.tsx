@@ -10,6 +10,7 @@ import { BoardID } from 'src/apis/audio/types/boards'
 import { SoundGroup } from 'src/apis/audio/types/items'
 import { useSortable } from '@dnd-kit/sortable'
 import MoveIcon from '@renderer/assets/icons/move'
+import MusicNoteIcon from '@renderer/assets/icons/musicnote'
 
 export type GroupProps = {
   group: SoundGroup
@@ -124,6 +125,21 @@ export default function Group(props: GroupProps) {
             `}
           >
             <PistolIcon className="h-4 w-4 m-1" />
+          </span>
+        )
+      }
+      case 'Soundtrack': {
+        return (
+          <span
+            className={`
+            indicator-item
+            rounded-full
+            indicator-bottom
+            indicator-start
+            badge-neutral
+          `}
+          >
+            <MusicNoteIcon className="h-4 w-4 m-1" />
           </span>
         )
       }

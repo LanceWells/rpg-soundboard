@@ -119,7 +119,16 @@ export class SoundContainer<TID extends GroupID | undefined = GroupID> {
    *
    * This applies to both fade in as well as fade out.
    */
-  static FadeTime = 200
+  // static FadeTime = 200
+
+  private get _fadeTime() {
+    switch (this._variant) {
+      case 'Soundtrack':
+        return 2500
+      default:
+        return 200
+    }
+  }
 
   /**
    * Creates a new instance of a {@link SoundContainer}.
@@ -136,7 +145,7 @@ export class SoundContainer<TID extends GroupID | undefined = GroupID> {
       this._howl = new Howl({
         src,
         volume: this._variant === 'Looping' ? 0 : this._targetVolume,
-        loop: this._variant === 'Looping',
+        loop: this._variant === 'Looping' || this._variant === 'Soundtrack',
         html5: useHtml5
       })
     } else {
@@ -144,7 +153,7 @@ export class SoundContainer<TID extends GroupID | undefined = GroupID> {
         src,
         volume: this._variant === 'Looping' ? 0 : this._targetVolume,
         format: format?.replace('.', ''),
-        loop: this._variant === 'Looping',
+        loop: this._variant === 'Looping' || this._variant === 'Soundtrack',
         html5: useHtml5
       })
     }
@@ -154,7 +163,7 @@ export class SoundContainer<TID extends GroupID | undefined = GroupID> {
 
     // If an effect repeats, then this 'end' event will fire every time that the loop restarts.
     // In that case, don't stop the sound effect.
-    if (this._variant !== 'Looping') {
+    if (this._variant !== 'Looping' && this._variant !== 'Soundtrack') {
       this._howl.once('end', () => {
         this.HandleHowlStop()
       })
@@ -172,17 +181,20 @@ export class SoundContainer<TID extends GroupID | undefined = GroupID> {
       .on('load', () => {
         this.HandleHowlLoaded()
       })
+      .on('stop', () => {
+        console.log('test stop')
+      })
   }
 
   async Play() {
-    const timeToFade = this._howl.duration() - SoundContainer.FadeTime
+    const timeToFade = this._howl.duration() - this._fadeTime
 
     if (this._variant === 'Looping' && timeToFade > 0) {
       this._fadeOutRef = setTimeout(() => {
         if (this && this._howl) {
-          this._howl.fade(this._targetVolume, 0, SoundContainer.FadeTime)
+          this._howl.fade(this._targetVolume, 0, this._fadeTime)
         }
-      }, SoundContainer.FadeTime)
+      }, this._fadeTime)
     }
 
     this._howl.play()
@@ -192,8 +204,8 @@ export class SoundContainer<TID extends GroupID | undefined = GroupID> {
       this._howl.rate(randomRate)
     }
 
-    if (this._variant === 'Looping') {
-      this._howl.fade(0, this._targetVolume, SoundContainer.FadeTime)
+    if (this._fadeTime > 0) {
+      this._howl.fade(0, this._targetVolume, this._fadeTime)
     }
   }
 
@@ -226,12 +238,12 @@ export class SoundContainer<TID extends GroupID | undefined = GroupID> {
   }
 
   Stop() {
-    if (this._variant === 'Looping' && this._variant === 'Looping') {
-      this._howl.fade(this._targetVolume, 0, SoundContainer.FadeTime)
+    if (this._variant === 'Looping' || this._variant === 'Soundtrack') {
+      this._howl.fade(this._targetVolume, 0, this._fadeTime)
       setTimeout(() => {
         this._howl.stop()
         this.HandleHowlStop()
-      }, SoundContainer.FadeTime)
+      }, this._fadeTime)
 
       return
     }
