@@ -100,6 +100,7 @@ export type AudioStoreGroupMethods = {
     groupID: GroupID,
     updatedFields: Partial<SoundGroupEditableFields>
   ) => void
+  moveGroup: (groupID: GroupID, newBoardID: BoardID) => void
   deleteGroup: (id: GroupID) => void
 }
 
@@ -426,6 +427,28 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
     set({
       boards: newBoards,
       editingGroup: getDefaultGroup(activeBoard.categories[0].id)
+    })
+  },
+  moveGroup(groupID, newBoardID) {
+    const activeBoard = get().activeBoard
+    const { group } = window.audio.Groups.Get({ groupID })
+
+    if (activeBoard === null) {
+      return
+    }
+
+    if (group === undefined) {
+      return
+    }
+
+    window.audio.Groups.Move({ groupID, boardID: newBoardID })
+
+    const newBoards = window.audio.Boards.GetAll({}).boards
+
+    set({
+      boards: newBoards,
+      editingGroup: getDefaultGroup(activeBoard.categories[0].id),
+      editingGroupID: undefined
     })
   },
   deleteGroup(id) {

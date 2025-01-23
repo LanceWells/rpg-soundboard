@@ -3046,10 +3046,6 @@ input.tab:checked + .tab-content,
   min-height: 18rem;
 }
 
-.min-h-0 {
-  min-height: 0px;
-}
-
 .w-24 {
   width: 6rem;
 }
@@ -3125,16 +3121,8 @@ input.tab:checked + .tab-content,
   touch-action: none;
 }
 
-.grid-flow-row {
-  grid-auto-flow: row;
-}
-
-.grid-flow-col {
-  grid-auto-flow: column;
-}
-
-.grid-flow-col-dense {
-  grid-auto-flow: column dense;
+.grid-cols-4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .grid-cols-\[minmax\(0\2c _1fr\)_min-content\] {
@@ -3336,10 +3324,6 @@ input.tab:checked + .tab-content,
   text-align: center;
 }
 
-.align-middle {
-  vertical-align: middle;
-}
-
 .text-2xl {
   font-size: 1.5rem;
   line-height: 2rem;
@@ -3486,10 +3470,6 @@ input.tab:checked + .tab-content,
   grid-area: editbutton;
 }
 
-.\[grid-area\:groups\] {
-  grid-area: groups;
-}
-
 .\[grid-area\:slider\] {
   grid-area: slider;
 }
@@ -3502,6 +3482,10 @@ input.tab:checked + .tab-content,
   grid-template-areas: ". title editbutton" "categories categories categories" "groups groups groups" "delete . controls";
 }
 
+.\[grid-template-areas\:_\"categories_categories_categories\"_\"groups_groups_groups\"_\"delete_\._controls\"\] {
+  grid-template-areas: "categories categories categories" "groups groups groups" "delete . controls";
+}
+
 .\[grid-template-areas\:_\"icon_form_fileselect\"_\"lookup_lookup_files\"_\"foreground_background_toggles\"\] {
   grid-template-areas: "icon form fileselect" "lookup lookup files" "foreground background toggles";
 }
@@ -3512,10 +3496,6 @@ input.tab:checked + .tab-content,
 
 .\[grid-template-columns\:_min-content_1fr\] {
   grid-template-columns: min-content 1fr;
-}
-
-.\[grid-template-rows\:_112px_1fr_1fr_80px\] {
-  grid-template-rows: 112px 1fr 1fr 80px;
 }
 
 .\[grid-template-rows\:_112px_max-content_1fr_80px\] {
@@ -3647,6 +3627,48 @@ body {
 .hover\:drop-shadow-lg:hover {
   --tw-drop-shadow: drop-shadow(0 10px 8px rgb(0 0 0 / 0.04)) drop-shadow(0 4px 3px rgb(0 0 0 / 0.1));
   filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
+}
+
+@media (min-width: 640px) {
+  .sm\:grid-cols-4 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 768px) {
+  .md\:grid-cols-6 {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .lg\:grid-cols-10 {
+    grid-template-columns: repeat(10, minmax(0, 1fr));
+  }
+
+  .lg\:grid-cols-12 {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
+
+  .lg\:grid-cols-8 {
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1280px) {
+  .xl\:grid-cols-12 {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
+
+  .xl\:grid-cols-10 {
+    grid-template-columns: repeat(10, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1536px) {
+  .\32xl\:grid-cols-12 {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
 }
 
 @media (prefers-color-scheme: dark) {

@@ -86,9 +86,34 @@ export const deleteGroupFolder = (boardID: BoardID, groupID: GroupID) => {
 
   if (!fs.existsSync(groupPath)) {
     console.error(`Attempt to delete a folder that does not exist (${groupPath})`)
+    return
   }
 
   fs.rmSync(groupPath, {
+    recursive: true,
+    force: true
+  })
+}
+
+export const copyGroupFolder = (
+  oldBoardID: BoardID,
+  newBoardID: BoardID,
+  oldGroupID: GroupID,
+  newGroupID: GroupID
+) => {
+  const oldGroupPath = getGroupPath(oldBoardID, oldGroupID)
+  if (!fs.existsSync(oldGroupPath)) {
+    console.error(`Attempt to copy from a folder that does not exist (${oldGroupPath})`)
+    return
+  }
+
+  const newGroupPath = getGroupPath(newBoardID, newGroupID)
+  if (fs.existsSync(newGroupPath)) {
+    console.error(`Attempt to copy to a folder that already exists (${newGroupPath})`)
+    return
+  }
+
+  fs.cpSync(oldGroupPath, newGroupPath, {
     recursive: true,
     force: true
   })

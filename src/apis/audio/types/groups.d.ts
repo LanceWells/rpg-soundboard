@@ -201,6 +201,26 @@ export type DeleteRequest = {
 export type DeleteResponse = {}
 
 /**
+ * The request object for {@link IGroups.Move}.
+ */
+export type MoveRequest = {
+  /**
+   * The ID for the group that should be deleted.
+   */
+  groupID: GroupID
+
+  /**
+   * The board to Copy this group to.
+   */
+  boardID: BoardID
+}
+
+/**
+ * The response object for {@link IGroups.Move}.
+ */
+export type MoveResponse = {}
+
+/**
  * An ID that refers to a particular sound group.
  */
 export type GroupID = `grp-${string}-${string}-${string}-${string}-${string}`
@@ -236,6 +256,12 @@ export interface IGroups {
    * @param request See {@link DeleteRequest}.
    */
   Delete(request: DeleteRequest): DeleteResponse
+
+  /**
+   * Copies a particular group that matches the provided set of parameters.
+   * @param request See {@link DeleteRequest}.
+   */
+  Move(request: MoveRequest): MoveResponse
 
   /**
    * Reorders groups within a particular category, or that are uncategorized.

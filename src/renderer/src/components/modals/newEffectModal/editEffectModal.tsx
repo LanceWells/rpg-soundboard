@@ -4,6 +4,7 @@ import { useCallback, useMemo, useState } from 'react'
 import DeleteButton from '@renderer/components/generic/deleteButton'
 import { useShallow } from 'zustand/react/shallow'
 import { CreateRequest } from 'src/apis/audio/types/groups'
+import ChangeBoardSelect from './changeBoardSelect'
 
 export const EditEffectModalId = 'edit-effect-modal'
 
@@ -68,6 +69,8 @@ export default function EditEffectModal() {
     )
   }, [editingMode, onDelete, isConfirmingDelete])
 
+  const select = useMemo(() => <ChangeBoardSelect groupID={editingGroupID} />, [editingGroupID])
+
   return (
     <EffectModal
       modalTitle="Editing Effect"
@@ -77,6 +80,7 @@ export default function EditEffectModal() {
       handleClose={handleClose}
     >
       {deleteButton}
+      {select}
     </EffectModal>
   )
 }

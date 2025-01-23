@@ -84,17 +84,17 @@ export default function Categorized(props: CategorizedProps) {
       <div
         className={`
         relative
-        outline
         rounded-lg
         p-6
         pt-10
         min-w-36
         justify-center
+        ${editingMode === 'Editing' ? 'outline' : ''}
     `}
       >
-        <h3 className="text-xl absolute top-0 left-0 w-full max-w-full text-center">
+        <h2 className="text-2xl absolute top-0 left-0 w-full max-w-full text-center">
           {category.name}
-        </h3>
+        </h2>
         <div
           {...listeners}
           className={`
@@ -110,15 +110,17 @@ export default function Categorized(props: CategorizedProps) {
         </div>
         <div
           // style={{
-          //   gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`
+          //   gridTemplateColumns: `repeat(${4}, minmax(0, 1fr))`
           // }}
           className={`
-            flex
-            flex-wrap
-            flex-row
-            max-w-full
             gap-6
             z-0
+            grid
+            sm:grid-cols-4
+            md:grid-cols-6
+            lg:grid-cols-8
+            xl:grid-cols-10
+            2xl:grid-cols-12
           `}
         >
           <GenericCategoryContainer boardID={boardID} groups={groups} />

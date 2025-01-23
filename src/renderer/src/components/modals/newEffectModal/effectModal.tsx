@@ -199,7 +199,7 @@ export default function EffectModal(props: PropsWithChildren<EffectModalProps>) 
         <div className="modal-action">
           <form method="dialog" className="w-full">
             <div className="flex justify-between">
-              <div>{children}</div>
+              <div className="flex flex-row gap-2">{children}</div>
               <button type="submit" className="btn btn-primary" onClick={onSubmit}>
                 {actionName}
               </button>

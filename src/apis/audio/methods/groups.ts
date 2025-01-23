@@ -1,7 +1,7 @@
 import { produce } from 'immer'
 import { AudioConfig } from '../utils/config'
 import path from 'node:path'
-import { deleteFile, deleteGroupFolder, getFileSize, saveSoundEffect } from './fs'
+import { copyGroupFolder, deleteFile, deleteGroupFolder, getFileSize, saveSoundEffect } from './fs'
 import { BoardsAudioAPI } from './boards'
 import crypto from 'node:crypto'
 import { SupportedFileTypes } from '../supportedFileTypes'
@@ -25,7 +25,9 @@ import {
   GetSoundRequest,
   GetSoundResponse,
   AddEffectRequest,
-  AddEffectResponse
+  AddEffectResponse,
+  MoveRequest,
+  MoveResponse
 } from '../types/groups'
 
 const html5ThresholdSizeMb = 2
@@ -187,6 +189,73 @@ export const GroupsAudioAPI: IGroups = {
     if (boardID) {
       deleteGroupFolder(boardID, request.groupID)
     }
+
+    return {}
+  },
+  Move: function (request: MoveRequest): MoveResponse {
+    const oldBoardFromMap = [...BoardsAudioAPI.GetAll({}).boards].find((b) =>
+      b.groups.some((g) => g.id === request.groupID)
+    )
+
+    if (!oldBoardFromMap) {
+      return {}
+    }
+
+    const newBoardFromMap = [...BoardsAudioAPI.GetAll({}).boards].find(
+      (b) => b.id === request.boardID
+    )
+
+    if (!newBoardFromMap) {
+      return {}
+    }
+
+    const newGroupID: GroupID = `grp-${crypto.randomUUID()}`
+    const newConfig = produce(AudioConfig.Config, (draft) => {
+      if (!oldBoardFromMap) {
+        return
+      }
+
+      const oldBoardFromConfig = draft.boards.find((b) => b.id === oldBoardFromMap.id)
+      if (!oldBoardFromConfig) {
+        return
+      }
+
+      const newBoardFromConfig = draft.boards.find((b) => b.id === request.boardID)
+      if (!newBoardFromConfig) {
+        return
+      }
+
+      const groupFromConfigIndex = oldBoardFromConfig.groups.findIndex(
+        (g) => g.id === request.groupID
+      )
+      if (groupFromConfigIndex === -1) {
+        return
+      }
+
+      // const groupFromConfig = produce(
+      //   oldBoardFromConfig.groups[groupFromConfigIndex],
+      //   (draft) => draft
+      // )
+
+      const groupFromConfig = oldBoardFromConfig.groups.splice(groupFromConfigIndex, 1)[0]
+
+      groupFromConfig.id = newGroupID
+      groupFromConfig.effects = groupFromConfig.effects.map((e) => ({
+        ...e,
+        path: e.path
+          .replace(oldBoardFromConfig.id, newBoardFromConfig.id)
+          .replace(request.groupID, newGroupID)
+      }))
+
+      const newCategory = newBoardFromConfig.categories[0]
+      groupFromConfig.category = newCategory.id
+      newBoardFromConfig.groups.push(groupFromConfig)
+    })
+
+    copyGroupFolder(oldBoardFromMap.id, newBoardFromMap.id, request.groupID, newGroupID)
+    deleteGroupFolder(oldBoardFromMap.id, request.groupID)
+
+    AudioConfig.Config = newConfig
 
     return {}
   },
