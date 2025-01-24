@@ -277,12 +277,14 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
 
     RepeatSoundIDs.set(groupID, audio.effectID)
 
-    // If this is a soundtrack, and we already have one playing, then fade out the old soundtrack
-    // and fade in the new soundtrack.
-    get()
-      .playingGroups.map((g) => get().getGroup({ groupID: g }))
-      .filter((g) => g.group?.variant === 'Soundtrack')
-      .forEach((g) => get().stopGroup(g.group?.id))
+    if (audio.variant === 'Soundtrack') {
+      // If this is a soundtrack, and we already have one playing, then fade out the old soundtrack
+      // and fade in the new soundtrack.
+      get()
+        .playingGroups.map((g) => get().getGroup({ groupID: g }))
+        .filter((g) => g.group?.variant === 'Soundtrack')
+        .forEach((g) => get().stopGroup(g.group?.id))
+    }
 
     const handleHowlStop = (groupID: GroupID) => {
       if (GroupStopHandles.has(groupID)) {

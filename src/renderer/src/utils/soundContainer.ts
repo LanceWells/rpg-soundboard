@@ -141,19 +141,22 @@ export class SoundContainer<TID extends GroupID | undefined = GroupID> {
     this._targetVolume = volume / 100
     this._variant = variant
 
+    const loop = this._variant === 'Looping' || this._variant === 'Soundtrack'
+    const initVolume = loop ? 0 : this._targetVolume
+
     if (src.startsWith('aud://')) {
       this._howl = new Howl({
         src,
-        volume: this._variant === 'Looping' ? 0 : this._targetVolume,
-        loop: this._variant === 'Looping' || this._variant === 'Soundtrack',
+        volume: initVolume,
+        loop,
         html5: useHtml5
       })
     } else {
       this._howl = new Howl({
         src,
-        volume: this._variant === 'Looping' ? 0 : this._targetVolume,
+        volume: initVolume,
         format: format?.replace('.', ''),
-        loop: this._variant === 'Looping' || this._variant === 'Soundtrack',
+        loop,
         html5: useHtml5
       })
     }
@@ -163,7 +166,7 @@ export class SoundContainer<TID extends GroupID | undefined = GroupID> {
 
     // If an effect repeats, then this 'end' event will fire every time that the loop restarts.
     // In that case, don't stop the sound effect.
-    if (this._variant !== 'Looping' && this._variant !== 'Soundtrack') {
+    if (!loop) {
       this._howl.once('end', () => {
         this.HandleHowlStop()
       })
@@ -200,7 +203,7 @@ export class SoundContainer<TID extends GroupID | undefined = GroupID> {
     this._howl.play()
 
     if (this._variant === 'Rapid') {
-      const randomRate = getRandomArbitrary(0.85, 1.15)
+      const randomRate = getRandomArbitrary(0.8, 1.2)
       this._howl.rate(randomRate)
     }
 

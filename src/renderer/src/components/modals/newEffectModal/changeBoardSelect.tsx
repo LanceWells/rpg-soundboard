@@ -25,7 +25,7 @@ export default function ChangeBoardSelect(props: ChangeBoardSelectProps) {
   const options = useMemo(
     () =>
       boards.map((b) => (
-        <option value={b.id} key={b.id} selected={selectedValue === b.id}>
+        <option value={b.id} key={b.id}>
           {b.name}
         </option>
       )),
