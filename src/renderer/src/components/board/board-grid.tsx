@@ -9,6 +9,8 @@ import CategoryIcon from '@renderer/assets/icons/category'
 import { NewEffectModalId } from '../modals/newEffectModal/newEffectModal'
 import { NewCategoryModalId } from '../modals/newCategoryModal/newCategoryModal'
 import PencilIcon from '@renderer/assets/icons/pencil'
+import { EditBoardModalId } from '../modals/newBoardModal/editBoardModal'
+import { SoundBoard } from 'src/apis/audio/types/items'
 
 /**
  * A root-level component that is used to render every various soundboard, along with a means to
@@ -23,7 +25,8 @@ export default function BoardGrid() {
     setEditingBoardID,
     resetEditingGroup,
     resetEditingBoard,
-    setEditingMode
+    setEditingMode,
+    setBoardName
   } = useAudioStore(
     useShallow((state) => ({
       boards: state.boards,
@@ -33,7 +36,8 @@ export default function BoardGrid() {
       setActiveBoardID: state.setActiveBoard,
       setEditingBoardID: state.setEditingBoardID,
       editingMode: state.editingMode,
-      setEditingMode: state.setEditingMode
+      setEditingMode: state.setEditingMode,
+      setBoardName: state.setBoardName
     }))
   )
 
@@ -62,6 +66,16 @@ export default function BoardGrid() {
     setEditingMode(newEditingMode)
   }, [editingMode])
 
+  const onBoardEdit = useCallback(
+    (board: SoundBoard) => {
+      resetEditingBoard()
+      setEditingBoardID(board.id)
+      setBoardName(board.name)
+      ;(document.getElementById(EditBoardModalId) as HTMLDialogElement).showModal()
+    },
+    [EditBoardModalId]
+  )
+
   const { boardNodes, boardTabs } = useMemo(() => {
     const boardNodes = boards.map((b) => {
       return (
@@ -85,12 +99,35 @@ export default function BoardGrid() {
           key={`selector-${b.id}`}
           onClick={() => setActiveBoardID(b.id)}
           className={`
-          w-full
-          rounded-lg
-          ${b.id === activeBoardID ? 'outline' : ''}
-          `}
+            flex
+            justify-center
+        `}
         >
-          <a>{b.name}</a>
+          <button
+            onClick={() => onBoardEdit(b)}
+            className={`
+              btn
+              btn-circle
+              btn-sm
+              absolute
+              right-0
+              btn-primary
+              ${
+                editingMode !== 'Off' && activeBoardID === b.id
+                  ? 'opacity-100 pointer-events-auto'
+                  : 'opacity-0 pointer-events-none'
+              }
+            `}
+          >
+            <PencilIcon className="w-3 absolute" />
+          </button>
+          <a
+            className={`
+            ${b.id === activeBoardID ? 'outline' : ''}
+            `}
+          >
+            {b.name}
+          </a>
         </li>
       )
     })
@@ -99,7 +136,7 @@ export default function BoardGrid() {
       boardNodes,
       boardTabs
     }
-  }, [boards, activeBoardID])
+  }, [boards, activeBoardID, editingMode])
 
   return (
     <div
@@ -114,7 +151,7 @@ export default function BoardGrid() {
     `}
     >
       <div className="bg-base-200 w-56 grid [grid-template-rows:_1fr_min-content]">
-        <ul className="menu">{boardTabs}</ul>
+        <ul className="menu m-2">{boardTabs}</ul>
         <div
           className={`
             grid

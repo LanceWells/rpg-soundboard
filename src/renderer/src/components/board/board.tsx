@@ -1,6 +1,5 @@
-import { ChangeEvent, ChangeEventHandler, useCallback, useMemo, useState } from 'react'
-import { EditingMode, useAudioStore } from '@renderer/stores/audioStore'
-import PencilIcon from '@renderer/assets/icons/pencil'
+import { useCallback, useMemo, useState } from 'react'
+import { useAudioStore } from '@renderer/stores/audioStore'
 import {
   closestCenter,
   CollisionDetection,
@@ -10,8 +9,6 @@ import {
   DragStartEvent,
   pointerWithin
 } from '@dnd-kit/core'
-import TextField from '../generic/textField'
-import debounce from 'debounce'
 import DeleteButton from '../generic/deleteButton'
 import { useShallow } from 'zustand/react/shallow'
 import Category from '../category/categorized'
@@ -45,7 +42,6 @@ export default function Board(props: BoardProps) {
     editingMode,
     setEditingMode,
     reorderGroups,
-    updateBoard,
     deleteBoard,
     updateGroupPartial,
     getGroupsForCategory,
@@ -58,7 +54,6 @@ export default function Board(props: BoardProps) {
       editingMode: state.editingMode,
       setEditingMode: state.setEditingMode,
       reorderGroups: state.reorderGroups,
-      updateBoard: state.updateBoard,
       deleteBoard: state.deleteBoard,
       updateGroupPartial: state.updateGroupPartial,
       getGroupsForCategory: state.getGroupsForCategory,
@@ -249,20 +244,20 @@ export default function Board(props: BoardProps) {
     [editingMode, setEditingMode]
   )
 
-  const onUpdateTitle = useCallback<ChangeEventHandler<HTMLInputElement>>(
-    debounce((e: ChangeEvent<HTMLInputElement>) => {
-      if (e.target.value) {
-        updateBoard({
-          boardID: board.id,
-          fields: {
-            ...board,
-            name: e.target.value
-          }
-        })
-      }
-    }, 200),
-    [board.name]
-  )
+  // const onUpdateTitle = useCallback<ChangeEventHandler<HTMLInputElement>>(
+  //   debounce((e: ChangeEvent<HTMLInputElement>) => {
+  //     if (e.target.value) {
+  //       updateBoard({
+  //         boardID: board.id,
+  //         fields: {
+  //           ...board,
+  //           name: e.target.value
+  //         }
+  //       })
+  //     }
+  //   }, 200),
+  //   [board.name]
+  // )
 
   const onDelete = useCallback(() => {
     deleteBoard(board.id)
@@ -288,33 +283,11 @@ export default function Board(props: BoardProps) {
       relative
       h-full
       max-h-full
-      [grid-template-areas:_"._title_."_"categories_categories_categories"_"groups_groups_groups"_"delete_._."]
+      [grid-template-areas:_"categories_categories_categories"_"groups_groups_groups"_"delete_._."]
       [grid-template-columns:_max-content_1fr_min-content]
-      [grid-template-rows:_112px_max-content_1fr_80px]
+      [grid-template-rows:_max-content_1fr_80px]
     `}
     >
-      <div className="w-full pt-4 absolute top-0 left-0 text-center pointer-events-none h-28 min-h-28">
-        <h3
-          className={`
-            text-2xl
-            h-28
-            max-h-28
-            ${editingMode === 'Off' ? 'visible' : 'hidden'}
-          `}
-        >
-          {board.name}
-        </h3>
-        <TextField
-          className={`
-              h-28
-              max-h-28
-              ${editingMode === 'Off' ? 'hidden' : 'visible'}
-            `}
-          fieldName="Board Title"
-          onChange={onUpdateTitle}
-          defaultValue={board.name}
-        />
-      </div>
       <DndContext
         collisionDetection={collisionDetectionStrategy}
         onDragStart={onDragStart}

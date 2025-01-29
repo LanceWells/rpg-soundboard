@@ -4,7 +4,6 @@ import crypto from 'node:crypto'
 import { deleteBoardFolder } from './fs'
 import { IBoards, CreateResponse, BoardID } from '../types/boards'
 import { SoundBoardEditableFields, SoundBoard, SoundCategory } from '../types/items'
-import { CategoriesAudioAPI } from './categories'
 import { CategoryID } from '../types/categories'
 
 /**
