@@ -33,7 +33,8 @@ export default function Group(props: GroupProps) {
     setEditingBoardID,
     setGroupVariant,
     setGroupCategory,
-    draggingID
+    draggingID,
+    resetEditingGroup
   } = useAudioStore(
     useShallow((state) => ({
       playGroup: state.playGroup,
@@ -47,7 +48,8 @@ export default function Group(props: GroupProps) {
       setEditingBoardID: state.setEditingBoardID,
       setGroupVariant: state.setGroupVariant,
       setGroupCategory: state.setGroupCategory,
-      draggingID: state.draggingID
+      draggingID: state.draggingID,
+      resetEditingGroup: state.resetEditingGroup
     }))
   )
 
@@ -78,6 +80,7 @@ export default function Group(props: GroupProps) {
   }, [group, isPlaying])
 
   const onClickEdit = useCallback(() => {
+    resetEditingGroup()
     stopGroup(group.id)
     setEditingGroupID(group.id)
     setSelectedIcon(group.icon)
