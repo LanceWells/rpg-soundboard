@@ -185,7 +185,7 @@ export class SoundContainer<TID extends GroupID | undefined = GroupID> {
         this.HandleHowlLoaded()
       })
       .on('stop', () => {
-        console.log('test stop')
+        this.HandleHowlStop()
       })
   }
 
@@ -245,7 +245,6 @@ export class SoundContainer<TID extends GroupID | undefined = GroupID> {
       this._howl.fade(this._targetVolume, 0, this._fadeTime)
       setTimeout(() => {
         this._howl.stop()
-        this.HandleHowlStop()
       }, this._fadeTime)
 
       return
