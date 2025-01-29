@@ -3,8 +3,9 @@ import { AudioConfig } from '../utils/config'
 import crypto from 'node:crypto'
 import { deleteBoardFolder } from './fs'
 import { IBoards, CreateResponse, BoardID } from '../types/boards'
-import { SoundBoardEditableFields, SoundBoard } from '../types/items'
+import { SoundBoardEditableFields, SoundBoard, SoundCategory } from '../types/items'
 import { CategoriesAudioAPI } from './categories'
+import { CategoryID } from '../types/categories'
 
 /**
  * A standard implementation of the {@link IBoards} interface.
@@ -26,10 +27,10 @@ export const BoardsAudioAPI: IBoards = {
   Create: function (request: SoundBoardEditableFields): CreateResponse {
     const uuid = crypto.randomUUID()
     const newBoardID: BoardID = `brd-${uuid}`
-    const defaultCategory = CategoriesAudioAPI.Create({
-      boardID: newBoardID,
+    const defaultCategory: SoundCategory = {
+      id: `brd-${crypto.randomUUID()}` as CategoryID,
       name: request.name
-    }).category
+    }
 
     const newBoard: SoundBoard = {
       references: [],

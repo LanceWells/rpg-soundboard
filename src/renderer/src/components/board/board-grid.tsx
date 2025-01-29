@@ -22,12 +22,14 @@ export default function BoardGrid() {
     setActiveBoardID,
     setEditingBoardID,
     resetEditingGroup,
+    resetEditingBoard,
     setEditingMode
   } = useAudioStore(
     useShallow((state) => ({
       boards: state.boards,
       activeBoardID: state.activeBoard?.id,
       resetEditingGroup: state.resetEditingGroup,
+      resetEditingBoard: state.resetEditingBoard,
       setActiveBoardID: state.setActiveBoard,
       setEditingBoardID: state.setEditingBoardID,
       editingMode: state.editingMode,
@@ -37,6 +39,7 @@ export default function BoardGrid() {
 
   const onNewBoard = useCallback(() => {
     resetEditingGroup()
+    resetEditingBoard()
     ;(document.getElementById(NewBoardModalId) as HTMLDialogElement).showModal()
   }, [])
 

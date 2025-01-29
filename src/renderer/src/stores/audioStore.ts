@@ -4,6 +4,7 @@ import { SoundContainer } from '@renderer/utils/soundContainer'
 import { produce } from 'immer'
 import type {
   SoundBoard,
+  SoundBoardEditableFields,
   SoundCategory,
   SoundEffectEditableFields,
   SoundGroup,
@@ -86,6 +87,8 @@ export type AudioState = {
    */
   editingGroup: SoundGroupEditableFields | null
 
+  editingBoard: Omit<SoundBoardEditableFields, 'categories'> | null
+
   draggingID: string | null
 
   activeBoard: SoundBoard | null
@@ -119,6 +122,7 @@ export type AudioStoreSoundMethods = {
 
 export type AudioStoreEditingModeMethods = {
   resetEditingGroup: () => void
+  resetEditingBoard: () => void
   setEditingMode: (isEditing: EditingMode) => void
   setEditingGroupID: (id: GroupID) => void
   addWorkingFiles: (list: SoundEffectEditableFields | SoundEffectEditableFields[]) => void
@@ -132,6 +136,7 @@ export type AudioStoreEditingModeMethods = {
   setGroupCategory: (categoryID: CategoryID) => void
   setSelectedIcon: (icon: SoundIcon) => void
   setDraggingID: (id: string | null) => void
+  setBoardName: (name: string | undefined) => void
 }
 
 export type AudioStoreCategoryMethods = {
@@ -167,7 +172,12 @@ const getDefaultGroup = (categoryID: CategoryID): SoundGroupEditableFields => ({
   category: categoryID
 })
 
+const getDefaultBoard = (): Omit<SoundBoardEditableFields, 'categories'> => ({
+  name: ''
+})
+
 export const useAudioStore = create<AudioStore>((set, get) => ({
+  editingBoard: null,
   editingGroup: null,
   editingMode: 'Off',
   boards: window.audio.Boards.GetAll({}).boards,
@@ -283,7 +293,7 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
       get()
         .playingGroups.map((g) => get().getGroup({ groupID: g }))
         .filter((g) => g.group?.variant === 'Soundtrack')
-        .forEach((g) => get().stopGroup(g.group?.id))
+        .forEach((g) => get().stopGroup(g.group?.id as GroupID))
     }
 
     const handleHowlStop = (groupID: GroupID) => {
@@ -356,6 +366,15 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
       })
     )
   },
+  setBoardName(name) {
+    set(
+      produce((state: AudioStore) => {
+        if (state.editingBoard) {
+          state.editingBoard.name = name ?? ''
+        }
+      })
+    )
+  },
   setGroupVariant(variant) {
     set(
       produce((state: AudioStore) => {
@@ -383,6 +402,12 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
     set({
       editingGroup: getDefaultGroup(activeBoard.categories[0].id)
     })
+  },
+  resetEditingBoard() {
+    set({
+      editingBoard: getDefaultBoard()
+    })
+    return
   },
   updateGroup(req) {
     const activeBoard = get().activeBoard

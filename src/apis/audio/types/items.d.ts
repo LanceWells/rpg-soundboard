@@ -185,4 +185,4 @@ export type SoundBoard = {
 /**
  * A set of editable fields as a subset of a {@link SoundBoard}.
  */
-export type SoundBoardEditableFields = Omit<SoundBoard, 'id' | 'groups'>
+export type SoundBoardEditableFields = Omit<SoundBoard, 'id' | 'groups' | 'references'>
