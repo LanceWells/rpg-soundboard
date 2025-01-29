@@ -40,6 +40,21 @@ export class AudioConfigStorage extends MigratableConfigStorage<AudioApiConfig> 
 
           return outConfig
         }
+      },
+      {
+        version: 2,
+        fn: (inConfig: unknown) => {
+          console.log(inConfig)
+          const outConfig = produce(inConfig as AudioApiConfig, (draft) => {
+            draft.boards.forEach((b) => {
+              if (b.references === undefined) {
+                b.references = []
+              }
+            })
+          })
+
+          return outConfig
+        }
       }
     ]
   }
@@ -52,7 +67,7 @@ export class AudioConfigStorage extends MigratableConfigStorage<AudioApiConfig> 
    * @inheritdoc
    */
   constructor() {
-    super('audio', { boards: [], version: 1 })
+    super('audio', { boards: [], version: 2 })
 
     this._boardMap = new Map()
     this._groupMap = new Map()

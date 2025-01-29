@@ -232,11 +232,6 @@ export const GroupsAudioAPI: IGroups = {
         return
       }
 
-      // const groupFromConfig = produce(
-      //   oldBoardFromConfig.groups[groupFromConfigIndex],
-      //   (draft) => draft
-      // )
-
       const groupFromConfig = oldBoardFromConfig.groups.splice(groupFromConfigIndex, 1)[0]
 
       groupFromConfig.id = newGroupID

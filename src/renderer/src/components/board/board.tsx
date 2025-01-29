@@ -1,7 +1,5 @@
 import { ChangeEvent, ChangeEventHandler, useCallback, useMemo, useState } from 'react'
 import { EditingMode, useAudioStore } from '@renderer/stores/audioStore'
-import { NewEffectModalId } from '../modals/newEffectModal/newEffectModal'
-import AddIcon from '@renderer/assets/icons/add'
 import PencilIcon from '@renderer/assets/icons/pencil'
 import {
   closestCenter,
@@ -16,7 +14,6 @@ import TextField from '../generic/textField'
 import debounce from 'debounce'
 import DeleteButton from '../generic/deleteButton'
 import { useShallow } from 'zustand/react/shallow'
-import { NewCategoryModalId } from '../modals/newCategoryModal/newCategoryModal'
 import Category from '../category/categorized'
 import { IdIsCategory, IdIsGroup } from '@renderer/utils/id'
 import { SortableContext } from '@dnd-kit/sortable'
@@ -24,6 +21,7 @@ import { SoundBoard } from 'src/apis/audio/types/items'
 import { BoardID } from 'src/apis/audio/types/boards'
 import Group from '../group/group'
 import { CategoryID } from 'src/apis/audio/types/categories'
+import { GroupID } from 'src/apis/audio/types/groups'
 
 /**
  * Props for {@link Board}.
@@ -45,7 +43,6 @@ export default function Board(props: BoardProps) {
   const { board } = props
   const {
     editingMode,
-    setEditingBoardID,
     setEditingMode,
     reorderGroups,
     updateBoard,
@@ -59,7 +56,6 @@ export default function Board(props: BoardProps) {
   } = useAudioStore(
     useShallow((state) => ({
       editingMode: state.editingMode,
-      setEditingBoardID: state.setEditingBoardID,
       setEditingMode: state.setEditingMode,
       reorderGroups: state.reorderGroups,
       updateBoard: state.updateBoard,
@@ -91,21 +87,6 @@ export default function Board(props: BoardProps) {
       elements
     }
   }, [board.categories, board.groups, board.id])
-
-  const onNewGroup = useCallback(() => {
-    setEditingBoardID(board.id)
-    ;(document.getElementById(NewEffectModalId) as HTMLDialogElement).showModal()
-  }, [board.id])
-
-  const onNewCategory = useCallback(() => {
-    setEditingBoardID(board.id)
-    ;(document.getElementById(NewCategoryModalId) as HTMLDialogElement).showModal()
-  }, [board.id])
-
-  const onClickEdit = useCallback(() => {
-    const newEditingMode: EditingMode = editingMode === 'Off' ? 'Editing' : 'Off'
-    setEditingMode(newEditingMode)
-  }, [editingMode, setEditingMode])
 
   const groupCategories = board.groups.map((g) => g.category)
 
@@ -140,7 +121,7 @@ export default function Board(props: BoardProps) {
         const closestGroupInCategory = closestCenter({
           ...args,
           droppableContainers: args.droppableContainers.filter((c) =>
-            overCategoryGroupIDs.includes(c.id)
+            overCategoryGroupIDs.includes(c.id as GroupID)
           )
         })
 
@@ -166,15 +147,6 @@ export default function Board(props: BoardProps) {
       // a container.
       if (over === null) {
         return
-        // if (IdIsGroup(activeID)) {
-        //   const activeGroup = board.groups.find((g) => g.id === activeID)
-        //   if (activeGroup && activeGroup.category !== undefined) {
-        //     updateGroupPartial(board.id, activeID, {
-        //       category: undefined
-        //     })
-        //   }
-        // }
-        // return
       }
 
       const overID = over.id as string
@@ -316,7 +288,7 @@ export default function Board(props: BoardProps) {
       relative
       h-full
       max-h-full
-      [grid-template-areas:_"._title_editbutton"_"categories_categories_categories"_"groups_groups_groups"_"delete_._controls"]
+      [grid-template-areas:_"._title_."_"categories_categories_categories"_"groups_groups_groups"_"delete_._."]
       [grid-template-columns:_max-content_1fr_min-content]
       [grid-template-rows:_112px_max-content_1fr_80px]
     `}
@@ -343,18 +315,6 @@ export default function Board(props: BoardProps) {
           defaultValue={board.name}
         />
       </div>
-      <button
-        onClick={onClickEdit}
-        className={`
-            btn
-            justify-self-end
-            btn-square
-            [grid-area:editbutton]
-            ${editingMode === 'Off' ? 'btn-outline' : 'btn-secondary'}
-          `}
-      >
-        <PencilIcon />
-      </button>
       <DndContext
         collisionDetection={collisionDetectionStrategy}
         onDragStart={onDragStart}
@@ -369,28 +329,6 @@ export default function Board(props: BoardProps) {
           {getOverlaidItem({ boardID: board.id, id: draggingID })}
         </DragOverlay>
       </DndContext>
-      <div className="[grid-area:_controls] absolute right-20 bottom-0 flex flex-row gap-x-4 pb-4">
-        <button
-          className={`
-          btn-primary
-          btn
-        `}
-          onClick={onNewGroup}
-        >
-          <AddIcon className="h-3 w-3" />
-          Group
-        </button>
-        <button
-          className={`
-          btn-secondary
-          btn
-        `}
-          onClick={onNewCategory}
-        >
-          <AddIcon className="h-3 w-3" />
-          Category
-        </button>
-      </div>
       <DeleteButton
         onAskConfirm={onAskConfirm}
         onCancelDelete={onCancelDelete}

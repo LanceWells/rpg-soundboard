@@ -204,8 +204,28 @@ export default function Group(props: GroupProps) {
         >
           <IconEffect icon={group.icon} />
           {variantIcon}
+          <span
+            className={`
+              select-none
+              absolute
+              z-10
+              w-full
+              h-full
+              text-sm
+              flex
+              justify-center
+              items-center
+              bg-base-300
+              p-1
+              rounded-md
+              opacity-0
+              hover:opacity-90
+              transition-opacity
+            `}
+          >
+            {group.name}
+          </span>
         </div>
-        <span className="text-sm flex justify-center">{group.name}</span>
         <div
           className={`
           ${editingMode === 'Off' ? 'hidden' : 'visible'}

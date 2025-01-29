@@ -32,6 +32,7 @@ export const BoardsAudioAPI: IBoards = {
     }).category
 
     const newBoard: SoundBoard = {
+      references: [],
       groups: [],
       id: newBoardID,
       name: request.name,

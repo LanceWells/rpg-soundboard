@@ -3,6 +3,7 @@ import type { SoundVariants } from './soundVariants'
 import type { EffectID } from './effects'
 import type { BoardID } from './boards'
 import type { CategoryID } from './categories'
+import { GroupID } from './groups'
 
 /**
  * Represents the icon associated with an {@link SoundGroup}.
@@ -105,6 +106,11 @@ export type SoundGroup = {
   category: CategoryID
 }
 
+export type SoundGroupReference = {
+  groupID: GroupID
+  boardID: BoardID
+}
+
 /**
  * An extraction of editable fields for {@link SoundGroup}.
  */
@@ -167,6 +173,8 @@ export type SoundBoard = {
    * individual button on a given soundboard.
    */
   groups: SoundGroup[]
+
+  references: SoundGroupReference[]
 
   /**
    * The set of sound categories that should be represented within this particular soundboard.

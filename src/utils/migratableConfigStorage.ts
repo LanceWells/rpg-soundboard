@@ -1,4 +1,3 @@
-import { produce } from 'immer'
 import { ConfigStorage } from './configStorage'
 
 export interface IMigratableConfig {
