@@ -244,21 +244,6 @@ export default function Board(props: BoardProps) {
     [editingMode, setEditingMode]
   )
 
-  // const onUpdateTitle = useCallback<ChangeEventHandler<HTMLInputElement>>(
-  //   debounce((e: ChangeEvent<HTMLInputElement>) => {
-  //     if (e.target.value) {
-  //       updateBoard({
-  //         boardID: board.id,
-  //         fields: {
-  //           ...board,
-  //           name: e.target.value
-  //         }
-  //       })
-  //     }
-  //   }, 200),
-  //   [board.name]
-  // )
-
   const onDelete = useCallback(() => {
     deleteBoard(board.id)
   }, [deleteBoard, board.id])
@@ -274,18 +259,19 @@ export default function Board(props: BoardProps) {
   return (
     <div
       className={`
-      rounded-lg
-      shadow-sm
-      mx-4
-      items-center
-      grid
-      content-between
-      relative
-      h-full
-      max-h-full
-      [grid-template-areas:_"categories_categories_categories"_"groups_groups_groups"_"delete_._."]
-      [grid-template-columns:_max-content_1fr_min-content]
-      [grid-template-rows:_max-content_1fr_80px]
+        p-4
+        rounded-lg
+        shadow-sm
+        mx-4
+        items-center
+        grid
+        content-between
+        relative
+        h-full
+        max-h-full
+        [grid-template-areas:_"categories_categories_categories"_"groups_groups_groups"_"delete_._."]
+        [grid-template-columns:_max-content_1fr_min-content]
+        [grid-template-rows:_max-content_1fr_80px]
     `}
     >
       <DndContext

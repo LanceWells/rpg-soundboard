@@ -109,9 +109,6 @@ export default function Categorized(props: CategorizedProps) {
           <MoveIcon />
         </div>
         <div
-          // style={{
-          //   gridTemplateColumns: `repeat(${4}, minmax(0, 1fr))`
-          // }}
           className={`
             gap-6
             z-0
@@ -161,8 +158,8 @@ export default function Categorized(props: CategorizedProps) {
           onClick={editingMode ? onClickEdit : undefined}
           className={`
           absolute
-          -top-8
-          -right-8
+          -top-2
+          -right-2
           btn
           btn-circle
           btn-accent
