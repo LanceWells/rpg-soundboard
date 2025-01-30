@@ -6,7 +6,7 @@ import type { CategoryID } from './categories'
 import { GroupID } from './groups'
 
 /**
- * Represents the icon associated with an {@link SoundGroup}.
+ * Represents the icon associated with an {@link SoundGroupSource}.
  */
 export type SoundIcon = {
   /**
@@ -28,7 +28,7 @@ export type SoundIcon = {
 
 /**
  * Represents an independent sound effect, for use with picking a random sound from a
- * {@link SoundGroup}.
+ * {@link SoundGroupSource}.
  */
 export type SoundEffect = {
   /**
@@ -60,12 +60,16 @@ export type SoundEffect = {
  */
 export type SoundEffectEditableFields = Omit<SoundEffect, 'id' | 'format'>
 
+export type SoundGroup = SoundGroupSource | SoundGroupReference
+
 /**
  * Represents a group of independent sound effects. Note that this is represented by a series of
  * buttons on a soundboard. The effects contained by this group are meant to be a randomization of
  * possible sounds that the group might produce.
  */
-export type SoundGroup = {
+export type SoundGroupSource = {
+  type: 'source'
+
   /**
    * The ID for the group.
    */
@@ -107,14 +111,16 @@ export type SoundGroup = {
 }
 
 export type SoundGroupReference = {
-  groupID: GroupID
+  type: 'reference'
+  id: GroupID
   boardID: BoardID
+  category: CategoryID
 }
 
 /**
- * An extraction of editable fields for {@link SoundGroup}.
+ * An extraction of editable fields for {@link SoundGroupSource}.
  */
-export type SoundGroupEditableFields = Omit<SoundGroup, 'id' | 'effects'> & {
+export type SoundGroupEditableFields = Omit<SoundGroupSource, 'id' | 'effects'> & {
   /**
    * An extraction of editable fields for sound effects. Created here to represent the set of
    * editable effects for this group.
@@ -123,7 +129,7 @@ export type SoundGroupEditableFields = Omit<SoundGroup, 'id' | 'effects'> & {
 }
 
 /**
- * A sound category refers to a visual grouping of {@link SoundGroup} objects. These objects should
+ * A sound category refers to a visual grouping of {@link SoundGroupSource} objects. These objects should
  * be rendered in close proximity, and ought to use some form of Gestalt psychology to make the
  * items appear related.
  */
@@ -173,8 +179,6 @@ export type SoundBoard = {
    * individual button on a given soundboard.
    */
   groups: SoundGroup[]
-
-  references: SoundGroupReference[]
 
   /**
    * The set of sound categories that should be represented within this particular soundboard.

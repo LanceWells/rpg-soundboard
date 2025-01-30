@@ -7,13 +7,13 @@ import RepeatIcon from '@renderer/assets/icons/repeat'
 import PistolIcon from '@renderer/assets/icons/pistol'
 import { useShallow } from 'zustand/react/shallow'
 import { BoardID } from 'src/apis/audio/types/boards'
-import { SoundGroup } from 'src/apis/audio/types/items'
+import { SoundGroupSource } from 'src/apis/audio/types/items'
 import { useSortable } from '@dnd-kit/sortable'
 import MoveIcon from '@renderer/assets/icons/move'
 import MusicNoteIcon from '@renderer/assets/icons/musicnote'
 
 export type GroupProps = {
-  group: SoundGroup
+  group: SoundGroupSource
   boardID: BoardID
   beingDragged?: boolean
 }

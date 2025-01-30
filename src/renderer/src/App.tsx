@@ -1,5 +1,6 @@
 import BoardGrid from './components/board/board-grid'
 import EditCategoryModal from './components/modals/editCategoryModal/editCategoryModal'
+import LinkEffectModal from './components/modals/linkEffectModal/linkEffectModal'
 import EditBoardModal from './components/modals/newBoardModal/editBoardModal'
 import NewBoardModal from './components/modals/newBoardModal/newBoardModal'
 import NewCategoryModal from './components/modals/newCategoryModal/newCategoryModal'
@@ -18,6 +19,7 @@ export default function App() {
       <EditBoardModal />
       <NewCategoryModal />
       <EditCategoryModal />
+      <LinkEffectModal />
       <BoardGrid />
     </div>
   )

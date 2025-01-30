@@ -73,7 +73,7 @@ export default function Board(props: BoardProps) {
   } = useMemo(() => {
     const categories = board.categories ?? []
     const categoryIDs = categories.map((c) => c.id)
-    const groupIDs = board.groups.map((g) => g.id)
+    const groupIDs = new Set(board.groups.map((g) => g.id))
     const elements = categories.map((c) => <Category boardID={board.id} category={c} key={c.id} />)
 
     return {
@@ -335,7 +335,7 @@ export function getOverlaidItem(props: getOverlaidItemProps) {
   }
 
   if (IdIsGroup(id)) {
-    const { group } = getGroup({ groupID: id })
+    const group = getGroup(id)
 
     if (!group) {
       return <></>

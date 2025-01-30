@@ -16,7 +16,7 @@ export type AudioApiConfig = {
    */
   boards: SoundBoard[]
 
-  version: 2
+  version: number
 }
 
 /**

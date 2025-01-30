@@ -3118,6 +3118,10 @@ html {
   row-gap: 1rem;
 }
 
+.gap-y-2 {
+  row-gap: 0.5rem;
+}
+
 .justify-self-start {
   justify-self: start;
 }
@@ -3239,8 +3243,17 @@ html {
   padding: 2.5rem;
 }
 
+.px-4 {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
 .pt-10 {
   padding-top: 2.5rem;
+}
+
+.pr-4 {
+  padding-right: 1rem;
 }
 
 .text-center {
@@ -3398,6 +3411,14 @@ html {
 
 .\[grid-template-areas\:_\"board_category_group\"_\"edit_edit_edit\"\] {
   grid-template-areas: "board category group" "edit edit edit";
+}
+
+.\[grid-template-areas\:_\"board_category_link_group\"_\"edit_edit_edit\"\] {
+  grid-template-areas: "board category link group" "edit edit edit";
+}
+
+.\[grid-template-areas\:_\"board_category_link_group\"_\"edit_edit_edit_edit\"\] {
+  grid-template-areas: "board category link group" "edit edit edit edit";
 }
 
 .\[grid-template-areas\:_\"categories_categories_categories\"_\"groups_groups_groups\"_\"delete_\._\.\"\] {

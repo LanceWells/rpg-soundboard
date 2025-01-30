@@ -1,5 +1,10 @@
 import type { BoardID } from './boards'
-import type { SoundCategoryEditableFields, SoundCategory, SoundGroup, SoundCategory } from './items'
+import type {
+  SoundCategoryEditableFields,
+  SoundCategory,
+  SoundGroupSource,
+  SoundCategory
+} from './items'
 
 export type GetRequest = {
   categoryID: CategoryID
@@ -68,7 +73,7 @@ export type GetCategorizedGroupsRequest = {
  * The response object for {@link ICategories.GetCategorizedGroups}.
  */
 export type GetCategorizedGroupsResponse = {
-  groups: SoundGroup[]
+  groups: SoundGroupSource[]
 }
 
 /**
@@ -82,7 +87,7 @@ export type GetUncategorizedGroupsRequest = {
  * The response object for {@link ICategories.GetUncategorizedGroups}.
  */
 export type GetUncategorizedGroupsResponse = {
-  groups: SoundGroup[]
+  groups: SoundGroupSource[]
 }
 
 /**

@@ -3,12 +3,12 @@ import { useMemo } from 'react'
 import Group from '../group/group'
 import { useAudioStore } from '@renderer/stores/audioStore'
 import { BoardID } from 'src/apis/audio/types/boards'
-import { SoundGroup } from 'src/apis/audio/types/items'
+import { SoundGroupSource } from 'src/apis/audio/types/items'
 import { CategoryID } from 'src/apis/audio/types/categories'
 import { useShallow } from 'zustand/react/shallow'
 
 export type GenericCategoryContainerProps = {
-  groups: SoundGroup[]
+  groups: SoundGroupSource[]
   boardID: BoardID
   categoryID?: CategoryID
 }

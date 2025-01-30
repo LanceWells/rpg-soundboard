@@ -11,6 +11,8 @@ import { NewCategoryModalId } from '../modals/newCategoryModal/newCategoryModal'
 import PencilIcon from '@renderer/assets/icons/pencil'
 import { EditBoardModalId } from '../modals/newBoardModal/editBoardModal'
 import { SoundBoard } from 'src/apis/audio/types/items'
+import LinkIcon from '@renderer/assets/icons/link'
+import { LinkEffectModalId } from '../modals/linkEffectModal/linkEffectModal'
 
 /**
  * A root-level component that is used to render every various soundboard, along with a means to
@@ -51,6 +53,13 @@ export default function BoardGrid() {
     if (activeBoardID) {
       setEditingBoardID(activeBoardID)
       ;(document.getElementById(NewEffectModalId) as HTMLDialogElement).showModal()
+    }
+  }, [activeBoardID])
+
+  const onLinkGroup = useCallback(() => {
+    if (activeBoardID) {
+      setEditingBoardID(activeBoardID)
+      ;(document.getElementById(LinkEffectModalId) as HTMLDialogElement).showModal()
     }
   }, [activeBoardID])
 
@@ -155,22 +164,27 @@ export default function BoardGrid() {
         <div
           className={`
             grid
-            [grid-template-areas:_"board_category_group"_"edit_edit_edit"]
-            gap-2
+            [grid-template-areas:_"board_category_link_group"_"edit_edit_edit_edit"]
+            gap-y-2
             m-2`}
         >
           <div className="tooltip" data-tip="New Board">
-            <button className="btn btn-secondary" onClick={onNewBoard}>
+            <button className="btn btn-secondary btn-circle" onClick={onNewBoard}>
               <BoardIcon />
             </button>
           </div>
           <div className="tooltip" data-tip="New Category" onClick={onNewCategory}>
-            <button className="btn btn-accent">
+            <button className="btn btn-accent btn-circle">
               <CategoryIcon />
             </button>
           </div>
+          <div className="tooltip" data-tip="Link Effect" onClick={onLinkGroup}>
+            <button className="btn btn-primary btn-circle">
+              <LinkIcon />
+            </button>
+          </div>
           <div className="tooltip" data-tip="New Effect" onClick={onNewGroup}>
-            <button className="btn btn-primary">
+            <button className="btn btn-primary btn-circle">
               <GroupIcon />
             </button>
           </div>

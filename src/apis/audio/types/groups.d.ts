@@ -1,4 +1,4 @@
-import type { SoundGroupEditableFields, SoundGroup, SoundEffect } from './items'
+import type { SoundGroupEditableFields, SoundGroupSource, SoundEffect } from './items'
 import type { BoardID } from './boards'
 import type { EffectID } from './effects'
 import type { CategoryID } from './categories'
@@ -22,7 +22,7 @@ export type CreateResponse = {
   /**
    * The group that has been created.
    */
-  group: SoundGroup
+  group: SoundGroupSource
 }
 
 /**
@@ -60,6 +60,21 @@ export type AddEffectResponse = {
   effect: SoundEffect
 }
 
+export type LinkRequest = {
+  destinationBoard: BoardID
+  sourceGroup: GroupID
+  sourceBoard: BoardID
+}
+
+export type LinkResponse = {}
+
+export type UnlinkRequest = {
+  board: BoardID
+  group: GroupID
+}
+
+export type UnlinkResponse = {}
+
 /**
  * The request object for {@link IGroups.Update}.
  */
@@ -82,7 +97,7 @@ export type UpdateResponse = {
   /**
    * The sound group that has been updated.
    */
-  group: SoundGroup
+  group: SoundGroupSource
 }
 
 /**
@@ -177,7 +192,7 @@ export type ReorderRequest = {
    * If provided, indicates that the groups being reordered are within the same category. Otherwise,
    * indicates that the gruops are uncategorized.
    */
-  category: CategoryID | undefined
+  category: CategoryID
 }
 
 /**
@@ -280,4 +295,8 @@ export interface IGroups {
    * @param request See {@link AddEffectRequest}.
    */
   AddEffect(request: AddEffectRequest): AddEffectResponse
+
+  LinkGroup(request: LinkRequest): LinkResponse
+
+  UnlinkGroup(request: UnlinkRequest): UnlinkResponse
 }

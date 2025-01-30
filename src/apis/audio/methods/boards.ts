@@ -32,7 +32,7 @@ export const BoardsAudioAPI: IBoards = {
     }
 
     const newBoard: SoundBoard = {
-      references: [],
+      // references: [],
       groups: [],
       id: newBoardID,
       name: request.name,
