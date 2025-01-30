@@ -1,4 +1,5 @@
 import CloseIcon from '@renderer/assets/icons/close'
+import EffectTree from './effectTree'
 
 export const LinkEffectModalId = 'LinkEffectModal'
 
@@ -7,7 +8,9 @@ export default function LinkEffectModal() {
     <dialog id={LinkEffectModalId} className="modal">
       <div className="modal-box overflow-visible">
         <h3 className="font-bold text-lg">Link Effects</h3>
-        <div className="flex justify-center w-full">Tree goes here.</div>
+        <div className="flex justify-center w-full h-full">
+          <EffectTree />
+        </div>
         <div className="modal-action">
           <form method="dialog">
             <button className="btn btn-primary">Update</button>

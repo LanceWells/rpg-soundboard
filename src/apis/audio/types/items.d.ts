@@ -120,7 +120,7 @@ export type SoundGroupReference = {
 /**
  * An extraction of editable fields for {@link SoundGroupSource}.
  */
-export type SoundGroupEditableFields = Omit<SoundGroupSource, 'id' | 'effects'> & {
+export type SoundGroupSourceEditableFields = Omit<SoundGroupSource, 'id' | 'effects'> & {
   /**
    * An extraction of editable fields for sound effects. Created here to represent the set of
    * editable effects for this group.

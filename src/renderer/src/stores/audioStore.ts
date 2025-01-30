@@ -8,7 +8,7 @@ import type {
   SoundCategory,
   SoundEffectEditableFields,
   SoundGroupSource,
-  SoundGroupEditableFields,
+  SoundGroupSourceEditableFields,
   SoundGroupReference,
   SoundIcon
 } from 'src/apis/audio/types/items'
@@ -20,6 +20,8 @@ import type { EffectID } from 'src/apis/audio/types/effects'
 import { SoundVariants } from 'src/apis/audio/types/soundVariants'
 
 export type LinkState = Omit<SoundGroupReference, 'category'>[]
+
+export type SoundBoardFields = Pick<SoundBoard, 'name'> & { referenceGroups: SoundGroupReference[] }
 
 /**
  * A set of editing modes that the view might exist in.
@@ -88,9 +90,9 @@ export type AudioState = {
    * The draft state for the currently-editing group. Should be set to the value of a group that is
    * either being edited, or a new group that is being created.
    */
-  editingGroup: SoundGroupEditableFields | null
+  editingGroup: SoundGroupSourceEditableFields | null
 
-  editingBoard: Omit<SoundBoardEditableFields, 'categories'> | null
+  editingBoard: SoundBoardFields | null
 
   draggingID: string | null
 
@@ -104,11 +106,11 @@ export type AudioStoreGroupMethods = {
   updateGroupPartial: (
     boardID: BoardID,
     groupID: GroupID,
-    updatedFields: Partial<SoundGroupEditableFields>
+    updatedFields: Partial<SoundGroupSourceEditableFields>
   ) => void
   moveGroup: (groupID: GroupID, newBoardID: BoardID) => void
   deleteGroup: (id: GroupID) => void
-  upateLinks: (req: LinkState) => void
+  updateLinks: (req: LinkState) => void
 }
 
 export type AudioStoreBoardMethods = {
@@ -141,6 +143,7 @@ export type AudioStoreEditingModeMethods = {
   setSelectedIcon: (icon: SoundIcon) => void
   setDraggingID: (id: string | null) => void
   setBoardName: (name: string | undefined) => void
+  setReferenceGroups: (groups: SoundGroupReference[]) => void
 }
 
 export type AudioStoreCategoryMethods = {
@@ -164,7 +167,7 @@ const GroupStopHandles: Map<GroupID, Array<() => void>> = new Map()
 
 const RepeatSoundIDs: Map<GroupID, EffectID> = new Map()
 
-const getDefaultGroup = (categoryID: CategoryID): SoundGroupEditableFields => ({
+const getDefaultGroup = (categoryID: CategoryID): SoundGroupSourceEditableFields => ({
   type: 'source',
   effects: [],
   icon: {
@@ -177,8 +180,9 @@ const getDefaultGroup = (categoryID: CategoryID): SoundGroupEditableFields => ({
   category: categoryID
 })
 
-const getDefaultBoard = (): Omit<SoundBoardEditableFields, 'categories'> => ({
-  name: ''
+const getDefaultBoard = (): SoundBoardFields => ({
+  name: '',
+  referenceGroups: []
 })
 
 export const useAudioStore = create<AudioStore>((set, get) => ({
@@ -371,15 +375,7 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
       })
     )
   },
-  setBoardName(name) {
-    set(
-      produce((state: AudioStore) => {
-        if (state.editingBoard) {
-          state.editingBoard.name = name ?? ''
-        }
-      })
-    )
-  },
+
   setGroupVariant(variant) {
     set(
       produce((state: AudioStore) => {
@@ -499,39 +495,61 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
       editingGroup: getDefaultGroup(activeBoard.categories[0].id)
     })
   },
-  upateLinks(req) {
+  setBoardName(name) {
+    set(
+      produce((state: AudioStore) => {
+        if (state.editingBoard) {
+          state.editingBoard.name = name ?? ''
+        }
+      })
+    )
+  },
+  setReferenceGroups(groups) {
+    set(
+      produce((state: AudioStore) => {
+        if (!state.editingBoard) {
+          return
+        }
+
+        state.editingBoard.referenceGroups = groups
+      })
+    )
+  },
+  updateLinks(req) {
     const activeBoard = get().activeBoard
     if (activeBoard === null) {
       return
     }
 
-    // const unlinkRequestMap = activeBoard.references.reduce((acc, curr) => {
-    //   acc.set(curr.groupID, {
-    //     board: curr.boardID,
-    //     group: curr.groupID
-    //   })
+    const unlinkRequestMap = activeBoard.groups
+      .filter((g) => g.type === 'reference')
+      .reduce((acc, curr) => {
+        acc.set(curr.id, {
+          board: curr.boardID,
+          group: curr.id
+        })
 
-    //   return acc
-    // }, new Map<GroupID, UnlinkRequest>())
+        return acc
+      }, new Map<GroupID, UnlinkRequest>())
 
-    // const linkRequests: LinkRequest[] = []
+    const linkRequests: LinkRequest[] = []
 
-    // req.forEach((r) => {
-    //   if (unlinkRequestMap.has(r.groupID)) {
-    //     unlinkRequestMap.delete(r.groupID)
-    //   } else {
-    //     linkRequests.push({
-    //       destinationBoard: activeBoard.id,
-    //       sourceBoard: r.boardID,
-    //       sourceGroup: r.groupID
-    //     })
-    //   }
-    // })
+    req.forEach((r) => {
+      if (unlinkRequestMap.has(r.id)) {
+        unlinkRequestMap.delete(r.id)
+      } else {
+        linkRequests.push({
+          destinationBoard: activeBoard.id,
+          sourceBoard: r.boardID,
+          sourceGroup: r.id
+        })
+      }
+    })
 
-    // const unlinkRequests = [...unlinkRequestMap.values()]
+    const unlinkRequests = [...unlinkRequestMap.values()]
 
-    // linkRequests.forEach((r) => window.audio.Groups.LinkGroup(r))
-    // unlinkRequests.forEach((r) => window.audio.Groups.UnlinkGroup(r))
+    linkRequests.forEach((r) => window.audio.Groups.LinkGroup(r))
+    unlinkRequests.forEach((r) => window.audio.Groups.UnlinkGroup(r))
 
     return {}
   },

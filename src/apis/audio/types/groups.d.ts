@@ -1,4 +1,4 @@
-import type { SoundGroupEditableFields, SoundGroupSource, SoundEffect } from './items'
+import type { SoundGroupSourceEditableFields, SoundGroupSource, SoundEffect } from './items'
 import type { BoardID } from './boards'
 import type { EffectID } from './effects'
 import type { CategoryID } from './categories'
@@ -13,7 +13,7 @@ export type CreateRequest = {
    * The ID for the board that this group should be a part of.
    */
   boardID: BoardID
-} & SoundGroupEditableFields
+} & SoundGroupSourceEditableFields
 
 /**
  * The response object for {@link IGroups.Create}.
@@ -88,7 +88,7 @@ export type UpdateRequest = {
    * The ID for the group that should be updated.
    */
   groupID: GroupID
-} & SoundGroupEditableFields
+} & SoundGroupSourceEditableFields
 
 /**
  * The response object for {@link IGroups.Update}.
