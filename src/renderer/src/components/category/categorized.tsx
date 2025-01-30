@@ -37,18 +37,15 @@ export type CategorizedProps = {
 export default function Categorized(props: CategorizedProps) {
   const { category, boardID, beingDragged } = props
 
-  const { getGroupsForCategory, setEditingBoardID, prepEditingCategory, editingMode, draggingID } =
-    useAudioStore(
-      useShallow((state) => ({
-        getGroupsForCategory: state.getGroupsForCategory,
-        editingMode: state.editingMode,
-        setEditingBoardID: state.setEditingBoardID,
-        prepEditingCategory: state.prepEditingCategory,
-        draggingID: state.draggingID
-      }))
-    )
-
-  const groups = getGroupsForCategory(category.id)
+  const { groups, setEditingBoardID, prepEditingCategory, editingMode, draggingID } = useAudioStore(
+    useShallow((state) => ({
+      groups: state.getGroupsForCategory(category.id),
+      editingMode: state.editingMode,
+      setEditingBoardID: state.setEditingBoardID,
+      prepEditingCategory: state.prepEditingCategory,
+      draggingID: state.draggingID
+    }))
+  )
 
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
     id: category.id

@@ -421,64 +421,79 @@ export const GroupsAudioAPI: IGroups = {
     }
   },
   LinkGroup: function (request: LinkRequest): LinkResponse {
-    // const matchingGroup = AudioConfig.getGroup(request.sourceGroup)
-    // if (!matchingGroup) {
-    //   throw new Error(`Could not find matching group with ID ${request.sourceGroup}.`)
-    // }
+    const matchingGroup = AudioConfig.getGroup(request.sourceGroup)
+    if (!matchingGroup) {
+      throw new Error(`Could not find matching group with ID ${request.sourceGroup}.`)
+    }
 
-    // const matchingSourceBoard = AudioConfig.getBoard(request.sourceBoard)
-    // if (!matchingSourceBoard) {
-    //   throw new Error(`Could not find matching board with ID ${request.sourceBoard}.`)
-    // }
+    const matchingSourceBoard = AudioConfig.getBoard(request.sourceBoard)
+    if (!matchingSourceBoard) {
+      throw new Error(`Could not find matching board with ID ${request.sourceBoard}.`)
+    }
 
-    // const matchingDestinationBoard = AudioConfig.getBoard(request.destinationBoard)
-    // if (!matchingDestinationBoard) {
-    //   throw new Error(`Could not find matching board with ID ${request.destinationBoard}.`)
-    // }
+    const matchingDestinationBoard = AudioConfig.getBoard(request.destinationBoard)
+    if (!matchingDestinationBoard) {
+      throw new Error(`Could not find matching board with ID ${request.destinationBoard}.`)
+    }
 
-    // // Already has this group. Don't copy it again.
-    // if (matchingDestinationBoard.references.some((r) => r.groupID === request.sourceGroup)) {
-    //   return {}
-    // }
+    // Already has this group. Don't copy it again.
+    if (
+      matchingDestinationBoard.groups.some(
+        (g) => g.type === 'reference' && g.id === matchingGroup.id
+      )
+    ) {
+      return {}
+    }
 
-    // const newConfig = produce(AudioConfig.Config, (draft) => {
-    //   const destinationBoard = draft.boards.find((b) => b.id === request.destinationBoard)
+    const newConfig = produce(AudioConfig.Config, (draft) => {
+      const destinationBoard = draft.boards.find((b) => b.id === request.destinationBoard)
+      if (!destinationBoard) {
+        return draft
+      }
 
-    //   destinationBoard?.references.push({
-    //     boardID: request.sourceBoard,
-    //     groupID: request.sourceGroup,
-    //     category: destinationBoard.categories[0].id
-    //   })
+      destinationBoard.groups.push({
+        type: 'reference',
+        boardID: request.sourceBoard,
+        category: destinationBoard.categories[0].id,
+        id: request.sourceGroup
+      })
 
-    //   return draft
-    // })
+      return draft
+    })
 
-    // AudioConfig.Config = newConfig
+    AudioConfig.Config = newConfig
 
     return {}
   },
   UnlinkGroup(request) {
-    // const matchingGroup = AudioConfig.getGroup(request.group)
-    // if (!matchingGroup) {
-    //   throw new Error(`Could not find matching group with ID ${request.group}.`)
-    // }
+    const matchingGroup = AudioConfig.getGroup(request.sourceGroup)
+    if (!matchingGroup) {
+      throw new Error(`Could not find matching group with ID ${request.sourceGroup}.`)
+    }
 
-    // const matchingSourceBoard = AudioConfig.getBoard(request.board)
-    // if (!matchingSourceBoard) {
-    //   throw new Error(`Could not find matching board with ID ${request.board}.`)
-    // }
+    const matchingSourceBoard = AudioConfig.getBoard(request.sourceBoard)
+    if (!matchingSourceBoard) {
+      throw new Error(`Could not find matching board with ID ${request.sourceBoard}.`)
+    }
 
-    // const newConfig = produce(AudioConfig.Config, (draft) => {
-    //   const board = draft.boards.find((b) => b.id === request.board)
-    //   if (!board) {
-    //     return draft
-    //   }
+    const matchingDestinationBoard = AudioConfig.getBoard(request.destinationBoard)
+    if (!matchingDestinationBoard) {
+      throw new Error(`Could not find matching board with ID ${request.destinationBoard}.`)
+    }
 
-    //   board.references = board?.references.filter((r) => r.groupID !== request.group)
-    //   return draft
-    // })
+    const newConfig = produce(AudioConfig.Config, (draft) => {
+      const board = draft.boards.find((b) => b.id === request.sourceBoard)
+      if (!board) {
+        return draft
+      }
 
-    // AudioConfig.Config = newConfig
+      board.groups = board?.groups.filter(
+        (r) => r.type !== 'reference' || r.id !== request.sourceGroup
+      )
+      return draft
+    })
+
+    AudioConfig.Config = newConfig
 
     return {}
   }

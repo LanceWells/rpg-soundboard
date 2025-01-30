@@ -4,7 +4,6 @@ import { SoundContainer } from '@renderer/utils/soundContainer'
 import { produce } from 'immer'
 import type {
   SoundBoard,
-  SoundBoardEditableFields,
   SoundCategory,
   SoundEffectEditableFields,
   SoundGroupSource,
@@ -15,7 +14,7 @@ import type {
 import type { BoardID } from 'src/apis/audio/types/boards'
 import { IAudioApi } from 'src/apis/audio/interface'
 import type { CategoryID } from 'src/apis/audio/types/categories'
-import type { GroupID, LinkRequest, UnlinkRequest } from 'src/apis/audio/types/groups'
+import type { GroupID } from 'src/apis/audio/types/groups'
 import type { EffectID } from 'src/apis/audio/types/effects'
 import { SoundVariants } from 'src/apis/audio/types/soundVariants'
 
@@ -96,7 +95,7 @@ export type AudioState = {
 
   draggingID: string | null
 
-  activeBoard: SoundBoard | null
+  activeBoardID: BoardID | null
 }
 
 export type AudioStoreGroupMethods = {
@@ -110,7 +109,6 @@ export type AudioStoreGroupMethods = {
   ) => void
   moveGroup: (groupID: GroupID, newBoardID: BoardID) => void
   deleteGroup: (id: GroupID) => void
-  updateLinks: (req: LinkState) => void
 }
 
 export type AudioStoreBoardMethods = {
@@ -118,7 +116,7 @@ export type AudioStoreBoardMethods = {
   reorderGroups: IAudioApi['Groups']['Reorder']
   updateBoard: IAudioApi['Boards']['Update']
   deleteBoard: (id: BoardID) => void
-  setActiveBoard: (id: BoardID) => void
+  setActiveBoardID: (id: BoardID) => void
 }
 
 export type AudioStoreSoundMethods = {
@@ -143,7 +141,8 @@ export type AudioStoreEditingModeMethods = {
   setSelectedIcon: (icon: SoundIcon) => void
   setDraggingID: (id: string | null) => void
   setBoardName: (name: string | undefined) => void
-  setReferenceGroups: (groups: SoundGroupReference[]) => void
+  addBoardReference: (sourceBoard: BoardID, sourceGroup: GroupID) => void
+  removeBoardReference: (sourceBoard: BoardID, sourceGroup: GroupID) => void
 }
 
 export type AudioStoreCategoryMethods = {
@@ -195,10 +194,10 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
   editingGroupID: undefined,
   editingCategory: undefined,
   draggingID: null,
-  activeBoard: window.audio.Boards.GetAll({}).boards[0] ?? null,
-  setActiveBoard(id) {
+  activeBoardID: window.audio.Boards.GetAll({}).boards[0].id ?? null,
+  setActiveBoardID(id) {
     set({
-      activeBoard: window.audio.Boards.Get({ boardID: id }).board ?? null
+      activeBoardID: window.audio.Boards.Get({ boardID: id }).board?.id ?? null
     })
   },
   setDraggingID(id) {
@@ -395,8 +394,13 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
     )
   },
   resetEditingGroup() {
-    const activeBoard = get().activeBoard
-    if (activeBoard === null) {
+    const activeBoardID = get().activeBoardID
+    if (activeBoardID === null) {
+      return
+    }
+
+    const activeBoard = get().boards.find((b) => b.id === activeBoardID)
+    if (!activeBoard) {
       return
     }
 
@@ -411,7 +415,8 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
     return
   },
   updateGroup(req) {
-    const activeBoard = get().activeBoard
+    const activeBoardID = get().activeBoardID
+    const activeBoard = get().boards.find((b) => b.id === activeBoardID) ?? null
     const updatedGroup = window.audio.Groups.Update(req)
     const newBoards = window.audio.Boards.GetAll({}).boards
 
@@ -427,7 +432,8 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
     return updatedGroup
   },
   updateGroupPartial(boardID, groupID, updatedFields) {
-    const activeBoard = get().activeBoard
+    const activeBoardID = get().activeBoardID
+    const activeBoard = get().boards.find((b) => b.id === activeBoardID) ?? null
     const currentGroup = window.audio.Groups.Get({
       groupID
     }).group
@@ -458,7 +464,8 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
     })
   },
   moveGroup(groupID, newBoardID) {
-    const activeBoard = get().activeBoard
+    const activeBoardID = get().activeBoardID
+    const activeBoard = get().boards.find((b) => b.id === activeBoardID) ?? null
     const { group } = window.audio.Groups.Get({ groupID })
 
     if (activeBoard === null) {
@@ -480,7 +487,8 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
     })
   },
   deleteGroup(id) {
-    const activeBoard = get().activeBoard
+    const activeBoardID = get().activeBoardID
+    const activeBoard = get().boards.find((b) => b.id === activeBoardID) ?? null
     window.audio.Groups.Delete({
       groupID: id
     })
@@ -504,55 +512,6 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
       })
     )
   },
-  setReferenceGroups(groups) {
-    set(
-      produce((state: AudioStore) => {
-        if (!state.editingBoard) {
-          return
-        }
-
-        state.editingBoard.referenceGroups = groups
-      })
-    )
-  },
-  updateLinks(req) {
-    const activeBoard = get().activeBoard
-    if (activeBoard === null) {
-      return
-    }
-
-    const unlinkRequestMap = activeBoard.groups
-      .filter((g) => g.type === 'reference')
-      .reduce((acc, curr) => {
-        acc.set(curr.id, {
-          board: curr.boardID,
-          group: curr.id
-        })
-
-        return acc
-      }, new Map<GroupID, UnlinkRequest>())
-
-    const linkRequests: LinkRequest[] = []
-
-    req.forEach((r) => {
-      if (unlinkRequestMap.has(r.id)) {
-        unlinkRequestMap.delete(r.id)
-      } else {
-        linkRequests.push({
-          destinationBoard: activeBoard.id,
-          sourceBoard: r.boardID,
-          sourceGroup: r.id
-        })
-      }
-    })
-
-    const unlinkRequests = [...unlinkRequestMap.values()]
-
-    linkRequests.forEach((r) => window.audio.Groups.LinkGroup(r))
-    unlinkRequests.forEach((r) => window.audio.Groups.UnlinkGroup(r))
-
-    return {}
-  },
   deleteBoard(id) {
     window.audio.Boards.Delete({
       boardID: id
@@ -564,7 +523,8 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
     })
   },
   addGroup: (req) => {
-    const activeBoard = get().activeBoard
+    const activeBoardID = get().activeBoardID
+    const activeBoard = get().boards.find((b) => b.id === activeBoardID) ?? null
     const newGroup = window.audio.Groups.Create(req)
     const newBoards = window.audio.Boards.GetAll({}).boards
 
@@ -663,5 +623,43 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
   },
   getCategory(request) {
     return window.audio.Categories.Get(request)
+  },
+  addBoardReference(sourceBoard, sourceGroup) {
+    const activeBoardID = get().activeBoardID
+    const activeBoard = get().boards.find((b) => b.id === activeBoardID) ?? null
+    if (!activeBoard) {
+      return
+    }
+
+    window.audio.Groups.LinkGroup({
+      destinationBoard: activeBoard.id,
+      sourceBoard,
+      sourceGroup
+    })
+
+    const newBoards = window.audio.Boards.GetAll({}).boards
+
+    set({
+      boards: newBoards
+    })
+  },
+  removeBoardReference(sourceBoard, sourceGroup) {
+    const activeBoardID = get().activeBoardID
+    const activeBoard = get().boards.find((b) => b.id === activeBoardID) ?? null
+    if (!activeBoard) {
+      return
+    }
+
+    window.audio.Groups.UnlinkGroup({
+      sourceBoard,
+      sourceGroup,
+      destinationBoard: activeBoard.id
+    })
+
+    const newBoards = window.audio.Boards.GetAll({}).boards
+
+    set({
+      boards: newBoards
+    })
   }
 }))

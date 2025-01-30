@@ -69,8 +69,9 @@ export type LinkRequest = {
 export type LinkResponse = {}
 
 export type UnlinkRequest = {
-  board: BoardID
-  group: GroupID
+  sourceBoard: BoardID
+  sourceGroup: GroupID
+  destinationBoard: BoardID
 }
 
 export type UnlinkResponse = {}

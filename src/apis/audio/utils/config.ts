@@ -16,6 +16,7 @@ export class AudioConfigStorage extends MigratableConfigStorage<AudioApiConfig> 
       {
         version: 1,
         fn: (inConfig: unknown) => {
+          console.log('Version 1 migration')
           console.log(inConfig)
           const outConfig = produce(inConfig as AudioApiConfig, (draft) => {
             draft.boards.forEach((b) => {
@@ -47,6 +48,7 @@ export class AudioConfigStorage extends MigratableConfigStorage<AudioApiConfig> 
       {
         version: 2,
         fn: (inConfig: unknown) => {
+          console.log('Version 2 migration')
           const outConfig = produce(inConfig as AudioApiConfig, (draft) => {
             draft.boards.forEach((b) => {
               b.groups.forEach((g) => {

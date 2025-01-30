@@ -32,10 +32,10 @@ export default function BoardGrid() {
   } = useAudioStore(
     useShallow((state) => ({
       boards: state.boards,
-      activeBoardID: state.activeBoard?.id,
+      activeBoardID: state.activeBoardID,
       resetEditingGroup: state.resetEditingGroup,
       resetEditingBoard: state.resetEditingBoard,
-      setActiveBoardID: state.setActiveBoard,
+      setActiveBoardID: state.setActiveBoardID,
       setEditingBoardID: state.setEditingBoardID,
       editingMode: state.editingMode,
       setEditingMode: state.setEditingMode,

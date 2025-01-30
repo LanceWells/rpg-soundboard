@@ -4,26 +4,17 @@ import { useShallow } from 'zustand/react/shallow'
 import GroupCategory from './effectCategory'
 
 export default function EffectTree() {
-  const { activeBoard, boards, editingBoard } = useAudioStore(
+  const { activeBoardID, boards } = useAudioStore(
     useShallow((state) => ({
       boards: state.boards,
-      activeBoard: state.activeBoard,
+      activeBoardID: state.activeBoardID,
       editingBoard: state.editingBoard
     }))
   )
 
   const groups = useMemo(() => {
-    const f = boards
-      .filter((b) => b.id !== activeBoard?.id)
-      .flatMap((b) =>
-        b.categories.map((c) => ({
-          board: b,
-          category: c
-        }))
-      )
-
     return boards
-      .filter((b) => b.id !== activeBoard?.id)
+      .filter((b) => b.id !== activeBoardID)
       .flatMap((b) =>
         b.categories.map((c) => ({
           board: b,
@@ -39,7 +30,7 @@ export default function EffectTree() {
           />
         )
       })
-  }, [boards, activeBoard])
+  }, [boards, activeBoardID])
 
   return (
     <div

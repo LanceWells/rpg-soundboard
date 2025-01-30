@@ -39,10 +39,9 @@ export abstract class MigratableConfigStorage<
     }
 
     let migratedConfig: T = this.Config
-    while (this._orderedMigrations.length > 0) {
-      const thisMigration = this._orderedMigrations.pop()
-
-      if (thisMigration?.version ?? 0 <= (migratedConfig.version ?? 0)) {
+    for (let i = 0; i < this._orderedMigrations.length; i++) {
+      const thisMigration = this._orderedMigrations[i]
+      if (thisMigration.version > (migratedConfig.version ?? 0)) {
         migratedConfig = thisMigration?.fn(migratedConfig) as T
       }
     }
