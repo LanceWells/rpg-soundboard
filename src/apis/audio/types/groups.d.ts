@@ -118,7 +118,7 @@ export type GetResponse = {
   /**
    * The group that has been fetched, or undefined if the group was not found.
    */
-  group: SoundGroup | undefined
+  group: SoundGroupSource | undefined
 }
 
 /**

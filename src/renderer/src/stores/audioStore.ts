@@ -9,7 +9,8 @@ import type {
   SoundGroupSource,
   SoundGroupSourceEditableFields,
   SoundGroupReference,
-  SoundIcon
+  SoundIcon,
+  SoundGroup
 } from 'src/apis/audio/types/items'
 import type { BoardID } from 'src/apis/audio/types/boards'
 import { IAudioApi } from 'src/apis/audio/interface'
@@ -242,7 +243,12 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
     )
   },
   getGroup(request) {
-    return window.audio.Groups.Get({ groupID: request }).group
+    const group = window.audio.Groups.Get({ groupID: request }).group
+    if (!group) {
+      throw new Error(`Could not find a group with id ${request}`)
+    }
+
+    return group
   },
   setEditingGroupID(id) {
     set({
@@ -604,7 +610,19 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
       categoryID
     })
 
-    return groups.groups
+    const soundGroups = groups.groups as SoundGroup[]
+    const outGroups = soundGroups.map<SoundGroupSource>((g) => {
+      if (g.type === 'source') {
+        return g
+      }
+
+      const source = window.audio.Groups.Get({
+        groupID: g.id
+      })
+      return source.group as SoundGroupSource
+    })
+
+    return outGroups
   },
   getUncategorizedGroups(request) {
     const resp = window.audio.Categories.GetUncategorizedGroups(request)

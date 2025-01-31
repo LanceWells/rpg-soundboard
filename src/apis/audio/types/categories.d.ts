@@ -73,7 +73,7 @@ export type GetCategorizedGroupsRequest = {
  * The response object for {@link ICategories.GetCategorizedGroups}.
  */
 export type GetCategorizedGroupsResponse = {
-  groups: SoundGroupSource[]
+  groups: SoundGroup[]
 }
 
 /**
@@ -87,7 +87,7 @@ export type GetUncategorizedGroupsRequest = {
  * The response object for {@link ICategories.GetUncategorizedGroups}.
  */
 export type GetUncategorizedGroupsResponse = {
-  groups: SoundGroupSource[]
+  groups: SoundGroup[]
 }
 
 /**

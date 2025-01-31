@@ -25,6 +25,7 @@ export default function EditEffectModal() {
     (req: CreateRequest) => {
       if (editingGroupID) {
         updateGroup({
+          type: 'source',
           boardID: req.boardID,
           icon: req.icon,
           name: req.name,

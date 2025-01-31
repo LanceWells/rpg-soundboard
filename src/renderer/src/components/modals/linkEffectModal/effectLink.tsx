@@ -34,7 +34,6 @@ export default function GroupLink(props: GroupLinkProps) {
       } else {
         removeBoardReference(activeBoard.id, group.id)
       }
-      e.preventDefault()
     },
     [activeBoard, group]
   )
