@@ -7,13 +7,13 @@ import RepeatIcon from '@renderer/assets/icons/repeat'
 import PistolIcon from '@renderer/assets/icons/pistol'
 import { useShallow } from 'zustand/react/shallow'
 import { BoardID } from 'src/apis/audio/types/boards'
-import { SoundGroupSource } from 'src/apis/audio/types/items'
+import type { SoundGroup } from 'src/apis/audio/types/items'
 import { useSortable } from '@dnd-kit/sortable'
 import MoveIcon from '@renderer/assets/icons/move'
 import MusicNoteIcon from '@renderer/assets/icons/musicnote'
 
 export type GroupProps = {
-  group: SoundGroupSource
+  group: SoundGroup
   boardID: BoardID
   beingDragged?: boolean
 }
@@ -22,6 +22,7 @@ export default function Group(props: GroupProps) {
   const { group, boardID, beingDragged } = props
 
   const {
+    getGroup,
     playGroup,
     stopGroup,
     playingGroups,
@@ -37,6 +38,7 @@ export default function Group(props: GroupProps) {
     resetEditingGroup
   } = useAudioStore(
     useShallow((state) => ({
+      getGroup: state.getGroup,
       playGroup: state.playGroup,
       stopGroup: state.stopGroup,
       playingGroups: state.playingGroups,
@@ -52,6 +54,11 @@ export default function Group(props: GroupProps) {
       resetEditingGroup: state.resetEditingGroup
     }))
   )
+
+  const sourceGroup = useMemo(() => {
+    const out = group.type === 'source' ? group : getGroup(group.id)
+    return out
+  }, [group])
 
   const { attributes, listeners, setNodeRef, transition, transform } = useSortable({
     id: group.id
@@ -72,7 +79,7 @@ export default function Group(props: GroupProps) {
   }, [playingGroups, group.id])
 
   const onClickPlay = useCallback(() => {
-    if (group.variant !== 'Rapid' && isPlaying) {
+    if (sourceGroup.variant !== 'Rapid' && isPlaying) {
       stopGroup(group.id)
     } else {
       playGroup(group.id)
@@ -83,14 +90,26 @@ export default function Group(props: GroupProps) {
     resetEditingGroup()
     stopGroup(group.id)
     setEditingGroupID(group.id)
-    setSelectedIcon(group.icon)
-    setGroupName(group.name)
-    resetWorkingFiles(group.effects)
-    setEditingBoardID(boardID)
-    setGroupVariant(group.variant)
+    setSelectedIcon(sourceGroup.icon)
+    setGroupName(sourceGroup.name)
+    resetWorkingFiles(sourceGroup.effects)
+    // setEditingBoardID(boardID)
+    setGroupVariant(sourceGroup.variant)
     setGroupCategory(group.category)
+
+    switch (group.type) {
+      case 'reference': {
+        setEditingBoardID(group.boardID)
+        break
+      }
+      case 'source': {
+        setEditingBoardID(boardID)
+        break
+      }
+    }
+
     ;(document.getElementById(EditEffectModalId) as HTMLDialogElement).showModal()
-  }, [group, boardID])
+  }, [group, sourceGroup, boardID])
 
   const onClick = useMemo(() => {
     if (editingMode === 'Editing') {
@@ -100,7 +119,7 @@ export default function Group(props: GroupProps) {
   }, [editingMode, onClickEdit, onClickPlay])
 
   const variantIcon = useMemo(() => {
-    switch (group.variant) {
+    switch (sourceGroup.variant) {
       case 'Looping': {
         return (
           <span
@@ -150,7 +169,7 @@ export default function Group(props: GroupProps) {
         return <></>
       }
     }
-  }, [group.variant])
+  }, [sourceGroup.variant])
 
   return (
     <div
@@ -202,7 +221,7 @@ export default function Group(props: GroupProps) {
           before:bg-[radial-gradient(circle_at_center,lightgreen,_rebeccapurple)]
           `}
         >
-          <IconEffect icon={group.icon} />
+          <IconEffect icon={sourceGroup.icon} />
           {variantIcon}
           <span
             className={`
@@ -223,7 +242,7 @@ export default function Group(props: GroupProps) {
               transition-opacity
             `}
           >
-            {group.name}
+            {sourceGroup.name}
           </span>
         </div>
         <div

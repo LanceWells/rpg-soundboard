@@ -144,13 +144,14 @@ export type AudioStoreEditingModeMethods = {
   setBoardName: (name: string | undefined) => void
   addBoardReference: (sourceBoard: BoardID, sourceGroup: GroupID) => void
   removeBoardReference: (sourceBoard: BoardID, sourceGroup: GroupID) => void
+  updateBoardReference: IAudioApi['Groups']['UpdateLink']
 }
 
 export type AudioStoreCategoryMethods = {
   addCategory: IAudioApi['Categories']['Create']
   deleteCategory: IAudioApi['Categories']['Delete']
   updateCategory: IAudioApi['Categories']['Update']
-  getGroupsForCategory: (categoryID: CategoryID) => SoundGroupSource[]
+  getGroupsForCategory: (categoryID: CategoryID) => SoundGroup[]
   getUncategorizedGroups: IAudioApi['Categories']['GetUncategorizedGroups']
   reorderCategories: IAudioApi['Categories']['Reorder']
   getCategory: IAudioApi['Categories']['Get']
@@ -611,18 +612,8 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
     })
 
     const soundGroups = groups.groups as SoundGroup[]
-    const outGroups = soundGroups.map<SoundGroupSource>((g) => {
-      if (g.type === 'source') {
-        return g
-      }
 
-      const source = window.audio.Groups.Get({
-        groupID: g.id
-      })
-      return source.group as SoundGroupSource
-    })
-
-    return outGroups
+    return soundGroups
   },
   getUncategorizedGroups(request) {
     const resp = window.audio.Categories.GetUncategorizedGroups(request)
@@ -679,5 +670,10 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
     set({
       boards: newBoards
     })
+  },
+  updateBoardReference(request) {
+    window.audio.Groups.UpdateLink(request)
+
+    return {}
   }
 }))

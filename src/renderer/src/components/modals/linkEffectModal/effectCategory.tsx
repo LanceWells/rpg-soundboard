@@ -14,7 +14,7 @@ export default function GroupCategory(props: GroupCategoryProps) {
     return board.groups
       .filter((g) => g.type === 'source' && g.category === category.id)
       .map((g) => {
-        return <GroupLink key={`link-${g.id}`} group={g as SoundGroupSource} />
+        return <GroupLink key={`link-${g.id}`} boardID={board.id} group={g as SoundGroupSource} />
       })
   }, [board.groups, category])
 

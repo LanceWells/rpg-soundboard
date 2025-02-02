@@ -482,7 +482,7 @@ export const GroupsAudioAPI: IGroups = {
     }
 
     const newConfig = produce(AudioConfig.Config, (draft) => {
-      const board = draft.boards.find((b) => b.id === request.sourceBoard)
+      const board = draft.boards.find((b) => b.id === request.destinationBoard)
       if (!board) {
         return draft
       }
@@ -490,6 +490,40 @@ export const GroupsAudioAPI: IGroups = {
       board.groups = board?.groups.filter(
         (r) => r.type !== 'reference' || r.id !== request.sourceGroup
       )
+      return draft
+    })
+
+    AudioConfig.Config = newConfig
+
+    return {}
+  },
+  UpdateLink(request) {
+    const matchingBoard = AudioConfig.getBoard(request.destinationBoardID)
+    if (!matchingBoard) {
+      throw new Error(`Could not find matching board with ID ${request.destinationBoardID}.`)
+    }
+
+    const matchingReference = matchingBoard.groups.find(
+      (g) => g.type === 'reference' && g.id === request.sourceGroupID
+    )
+    if (!matchingReference) {
+      throw new Error(`Could not find matching group with ID ${request.sourceGroupID}.`)
+    }
+
+    const newConfig = produce(AudioConfig.Config, (draft) => {
+      const board = draft.boards.find((b) => b.id === request.destinationBoardID)
+      if (!board) {
+        return draft
+      }
+
+      const group = board.groups.find((g) => g.id === request.sourceGroupID)
+      if (!group) {
+        return draft
+      }
+
+      if (request.updates.category) {
+        group.category = request.updates.category
+      }
       return draft
     })
 

@@ -128,6 +128,8 @@ export type SoundGroupSourceEditableFields = Omit<SoundGroupSource, 'id' | 'effe
   effects: SoundEffectEditableFields[]
 }
 
+export type SoundGroupReferenceEditableFields = Omit<SoundGroupReference, 'id' | 'type' | 'boardID'>
+
 /**
  * A sound category refers to a visual grouping of {@link SoundGroupSource} objects. These objects should
  * be rendered in close proximity, and ought to use some form of Gestalt psychology to make the

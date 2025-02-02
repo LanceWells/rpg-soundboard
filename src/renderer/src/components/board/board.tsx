@@ -44,6 +44,7 @@ export default function Board(props: BoardProps) {
     reorderGroups,
     deleteBoard,
     updateGroupPartial,
+    updateBoardReference,
     getGroupsForCategory,
     getUncategorizedGroups,
     reorderCategories,
@@ -56,6 +57,7 @@ export default function Board(props: BoardProps) {
       reorderGroups: state.reorderGroups,
       deleteBoard: state.deleteBoard,
       updateGroupPartial: state.updateGroupPartial,
+      updateBoardReference: state.updateBoardReference,
       getGroupsForCategory: state.getGroupsForCategory,
       getUncategorizedGroups: state.getUncategorizedGroups,
       reorderCategories: state.reorderCategories,
@@ -83,7 +85,7 @@ export default function Board(props: BoardProps) {
     }
   }, [board.categories, board.groups, board.id])
 
-  const groupCategories = board.groups.map((g) => g.category)
+  // const groupCategories = board.groups.map((g) => g.category)
 
   const collisionDetectionStrategy: CollisionDetection = useCallback(
     (args) => {
@@ -133,6 +135,10 @@ export default function Board(props: BoardProps) {
       const { active, over } = event
 
       const activeID = active.id as string
+      const group = board.groups.find((g) => g.id === activeID)
+      if (!group) {
+        return
+      }
 
       setDraggingID(null)
       setEditingMode('Editing')
@@ -221,17 +227,37 @@ export default function Board(props: BoardProps) {
       if (IdIsGroup(activeID) && IdIsCategory(overID)) {
         const activeGroup = board.groups.find((g) => g.id === activeID)
 
-        if (activeGroup?.category !== overID) {
-          updateGroupPartial(board.id, activeID, {
-            category: overID
-          })
+        if (!activeGroup) {
           return
         }
+
+        if (activeGroup?.category === overID) {
+          return
+        }
+
+        switch (activeGroup.type) {
+          case 'source':
+            updateGroupPartial(board.id, activeID, {
+              category: overID
+            })
+            break
+          case 'reference':
+            updateBoardReference({
+              destinationBoardID: board.id,
+              sourceGroupID: group.id,
+              updates: {
+                category: overID
+              }
+            })
+            break
+        }
+
+        return
       }
 
       return
     },
-    [categoryIDs, board.id, board.groups, groupCategories, board.categories, JSON.stringify(board)]
+    [categoryIDs, board]
   )
 
   const onDragStart = useCallback(

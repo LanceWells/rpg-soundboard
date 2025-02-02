@@ -1,4 +1,9 @@
-import type { SoundGroupSourceEditableFields, SoundGroupSource, SoundEffect } from './items'
+import type {
+  SoundGroupSourceEditableFields,
+  SoundGroupSource,
+  SoundEffect,
+  SoundGroupReferenceEditableFields
+} from './items'
 import type { BoardID } from './boards'
 import type { EffectID } from './effects'
 import type { CategoryID } from './categories'
@@ -75,6 +80,14 @@ export type UnlinkRequest = {
 }
 
 export type UnlinkResponse = {}
+
+export type UpdateLinkRequest = {
+  destinationBoardID: BoardID
+  sourceGroupID: GroupID
+  updates: Partial<SoundGroupReferenceEditableFields>
+}
+
+export type UpdateLinkResponse = {}
 
 /**
  * The request object for {@link IGroups.Update}.
@@ -300,4 +313,6 @@ export interface IGroups {
   LinkGroup(request: LinkRequest): LinkResponse
 
   UnlinkGroup(request: UnlinkRequest): UnlinkResponse
+
+  UpdateLink(request: UpdateLinkRequest): UpdateLinkResponse
 }

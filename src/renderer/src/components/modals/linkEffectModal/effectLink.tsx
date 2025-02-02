@@ -1,14 +1,16 @@
 import { useAudioStore } from '@renderer/stores/audioStore'
 import { ChangeEventHandler, useCallback, useMemo } from 'react'
+import { BoardID } from 'src/apis/audio/types/boards'
 import { SoundGroupSource } from 'src/apis/audio/types/items'
 import { useShallow } from 'zustand/react/shallow'
 
 export type GroupLinkProps = {
   group: SoundGroupSource
+  boardID: BoardID
 }
 
 export default function GroupLink(props: GroupLinkProps) {
-  const { group } = props
+  const { group, boardID } = props
 
   const { activeBoard, addBoardReference, removeBoardReference } = useAudioStore(
     useShallow((state) => ({
@@ -30,12 +32,12 @@ export default function GroupLink(props: GroupLinkProps) {
         return
       }
       if (e.target.checked) {
-        addBoardReference(activeBoard.id, group.id)
+        addBoardReference(boardID, group.id)
       } else {
-        removeBoardReference(activeBoard.id, group.id)
+        removeBoardReference(boardID, group.id)
       }
     },
-    [activeBoard, group]
+    [activeBoard, boardID, group]
   )
 
   return (
