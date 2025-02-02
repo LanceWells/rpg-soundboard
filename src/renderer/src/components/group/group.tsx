@@ -93,7 +93,6 @@ export default function Group(props: GroupProps) {
     setSelectedIcon(sourceGroup.icon)
     setGroupName(sourceGroup.name)
     resetWorkingFiles(sourceGroup.effects)
-    // setEditingBoardID(boardID)
     setGroupVariant(sourceGroup.variant)
     setGroupCategory(group.category)
 

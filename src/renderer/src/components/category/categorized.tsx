@@ -107,6 +107,7 @@ export default function Categorized(props: CategorizedProps) {
         </div>
         <div
           className={`
+            justify-items-center
             gap-6
             z-0
             grid

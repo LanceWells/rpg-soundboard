@@ -135,10 +135,6 @@ export default function Board(props: BoardProps) {
       const { active, over } = event
 
       const activeID = active.id as string
-      const group = board.groups.find((g) => g.id === activeID)
-      if (!group) {
-        return
-      }
 
       setDraggingID(null)
       setEditingMode('Editing')
@@ -244,7 +240,7 @@ export default function Board(props: BoardProps) {
           case 'reference':
             updateBoardReference({
               destinationBoardID: board.id,
-              sourceGroupID: group.id,
+              sourceGroupID: activeGroup.id,
               updates: {
                 category: overID
               }
@@ -257,7 +253,7 @@ export default function Board(props: BoardProps) {
 
       return
     },
-    [categoryIDs, board]
+    [categoryIDs, board, board.groups]
   )
 
   const onDragStart = useCallback(

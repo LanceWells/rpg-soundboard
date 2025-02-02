@@ -674,6 +674,12 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
   updateBoardReference(request) {
     window.audio.Groups.UpdateLink(request)
 
+    const newBoards = window.audio.Boards.GetAll({}).boards
+
+    set({
+      boards: newBoards
+    })
+
     return {}
   }
 }))
