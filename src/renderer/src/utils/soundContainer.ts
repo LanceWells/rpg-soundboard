@@ -130,6 +130,10 @@ export class SoundContainer<TID extends GroupID | undefined = GroupID> {
     }
   }
 
+  get Variant() {
+    return this._variant
+  }
+
   /**
    * Creates a new instance of a {@link SoundContainer}.
    *
@@ -260,4 +264,14 @@ export class SoundContainer<TID extends GroupID | undefined = GroupID> {
       this._howl.volume(newVolume)
     }
   }
+
+  Fade(ratio: number) {
+    if (this._howl.playing()) {
+      const oldVolume = this._targetVolume
+      const newVolume = oldVolume * ratio
+      this._howl.fade(oldVolume, newVolume, 250)
+    }
+  }
 }
+
+// Keep a running track of the last effect that was played that isn't a soundtrack effect. This way, when that effect stops, we can ensure that we fade back in.

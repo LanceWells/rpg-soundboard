@@ -164,7 +164,7 @@ export type AudioStore = AudioState &
   AudioStoreEditingModeMethods &
   AudioStoreCategoryMethods
 
-const GroupStopHandles: Map<GroupID, Array<() => void>> = new Map()
+const GroupHandles: Map<GroupID, Array<SoundContainer>> = new Map()
 
 const RepeatSoundIDs: Map<GroupID, EffectID> = new Map()
 
@@ -300,30 +300,56 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
       idsToSkip: soundsToAvoid
     })
 
+    const playingSoundTracks = get()
+      .playingGroups.map((g) => get().getGroup(g))
+      .filter((g) => g?.variant === 'Soundtrack')
+
     RepeatSoundIDs.set(groupID, audio.effectID)
 
     if (audio.variant === 'Soundtrack') {
       // If this is a soundtrack, and we already have one playing, then fade out the old soundtrack
       // and fade in the new soundtrack.
-      get()
+      playingSoundTracks.forEach((g) => get().stopGroup(g?.id as GroupID))
+    } else {
+      const remainingEffectsCount = get()
         .playingGroups.map((g) => get().getGroup(g))
-        .filter((g) => g?.variant === 'Soundtrack')
-        .forEach((g) => get().stopGroup(g?.id as GroupID))
+        .filter((g) => ['Default', 'Rapid'].includes(g.variant))
+        .flatMap((g) => g).length
+
+      if (remainingEffectsCount === 0) {
+        playingSoundTracks
+          .flatMap((g) => GroupHandles.get(g.id))
+          .filter((g) => !!g)
+          .forEach((s) => s.Fade(0.2))
+      }
     }
 
     const handleHowlStop = (groupID: GroupID) => {
-      if (GroupStopHandles.has(groupID)) {
-        const handles = GroupStopHandles.get(groupID)!
+      if (GroupHandles.has(groupID)) {
+        const handles = GroupHandles.get(groupID)!
 
         if (handles.length > 1) {
           handles.splice(0, 1)
         } else {
-          GroupStopHandles.delete(groupID)
+          GroupHandles.delete(groupID)
+        }
+
+        const remainingEffectsCount = [...GroupHandles.values()]
+          .flatMap((g) => g)
+          .filter((g) => ['Default', 'Rapid'].includes(g.Variant)).length
+
+        if (remainingEffectsCount === 0) {
+          get()
+            .playingGroups.map((g) => get().getGroup(g))
+            .filter((g) => g?.variant === 'Soundtrack')
+            .flatMap((g) => GroupHandles.get(g.id))
+            .filter((g) => !!g)
+            .forEach((s) => s.Fade(1))
         }
       }
 
       set(() => {
-        const newGroups = [...GroupStopHandles.keys()]
+        const newGroups = [...GroupHandles.keys()]
         return {
           playingGroups: newGroups
         }
@@ -342,11 +368,11 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
       useHtml5: audio.useHtml5
     })
 
-    if (!GroupStopHandles.has(groupID)) {
-      GroupStopHandles.set(groupID, [])
+    if (!GroupHandles.has(groupID)) {
+      GroupHandles.set(groupID, [])
     }
 
-    GroupStopHandles.get(groupID)?.push(sound.GetStopHandle())
+    GroupHandles.get(groupID)?.push(sound)
 
     set((state) => {
       return {
@@ -359,8 +385,8 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
     return audio
   },
   async stopGroup(groupID) {
-    if (GroupStopHandles.has(groupID)) {
-      GroupStopHandles.get(groupID)?.forEach((handle) => handle())
+    if (GroupHandles.has(groupID)) {
+      GroupHandles.get(groupID)?.forEach((handle) => handle.Stop())
     }
   },
   resetWorkingFiles(list) {
