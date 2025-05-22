@@ -1,7 +1,6 @@
 import { SoundVariants } from 'src/apis/audio/types/soundVariants'
 import { AbstractSoundContainer } from '../abstract'
 import { GroupID } from 'src/apis/audio/types/groups'
-import { getRandomArbitrary } from '@renderer/utils/random'
 import { SoundContainerSetup } from '../interface'
 
 export class SoundtrackSoundContainer<
@@ -18,8 +17,13 @@ export class SoundtrackSoundContainer<
   }
 
   override Play() {
-    const randomRate = getRandomArbitrary(0.8, 1.2)
     super.Play()
-    this.howl.rate(randomRate)
+  }
+
+  override Stop(): void {
+    this.howl.fade(this.targetVolume, 0, this.fadeTime)
+    setTimeout(() => {
+      this.howl.stop()
+    }, this.fadeTime)
   }
 }
