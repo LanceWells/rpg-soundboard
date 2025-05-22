@@ -18,7 +18,7 @@ import type { GroupID } from 'src/apis/audio/types/groups'
 import type { EffectID } from 'src/apis/audio/types/effects'
 import { SoundVariants } from 'src/apis/audio/types/soundVariants'
 import { NewSoundContainer } from '@renderer/utils/soundContainer/util'
-import { ISoundContainer } from '@renderer/utils/soundContainer/variants/interface'
+import { ISoundContainer } from '@renderer/utils/soundContainer/interface'
 
 export type LinkState = Omit<SoundGroupReference, 'category'>[]
 
@@ -365,7 +365,6 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
       },
       src: audio.soundB64,
       volume: audio.volume,
-      variant: audio.variant,
       useHtml5: audio.useHtml5
     })
 

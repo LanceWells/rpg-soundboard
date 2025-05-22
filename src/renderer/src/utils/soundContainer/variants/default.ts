@@ -1,6 +1,7 @@
 import { SoundVariants } from 'src/apis/audio/types/soundVariants'
-import { AbstractSoundContainer, SoundContainerSetup } from './abstract'
+import { AbstractSoundContainer } from '../abstract'
 import { GroupID } from 'src/apis/audio/types/groups'
+import { SoundContainerSetup } from '../interface'
 
 export class DefaultSoundContainer<
   TID extends GroupID | undefined = GroupID

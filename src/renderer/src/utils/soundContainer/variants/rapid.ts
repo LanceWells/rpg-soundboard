@@ -1,7 +1,8 @@
 import { SoundVariants } from 'src/apis/audio/types/soundVariants'
-import { AbstractSoundContainer, SoundContainerSetup } from './abstract'
+import { AbstractSoundContainer } from '../abstract'
 import { GroupID } from 'src/apis/audio/types/groups'
 import { getRandomArbitrary } from '@renderer/utils/random'
+import { SoundContainerSetup } from '../interface'
 
 export class RapidSoundContainer<
   TID extends GroupID | undefined = GroupID
