@@ -2,10 +2,10 @@ import { ChangeEventHandler, useCallback, useEffect, useMemo, useRef, useState }
 import { useAudioStore } from '@renderer/stores/audioStore'
 import SoundIcon from '@renderer/assets/icons/sound'
 import CloseIcon from '@renderer/assets/icons/close'
-import { SoundContainer } from '@renderer/utils/soundContainer'
 import StopIcon from '@renderer/assets/icons/stop'
 import { useShallow } from 'zustand/react/shallow'
 import { SoundEffectEditableFields } from 'src/apis/audio/types/items'
+import { NewSoundContainer } from '@renderer/utils/soundContainer/util'
 
 export type FileSelectInputProps = {
   className?: string
@@ -143,7 +143,7 @@ function FileEntry(props: FileEntryProps) {
         setPlayState('Stopped')
       }
 
-      const sound = new SoundContainer<undefined>({
+      const sound = NewSoundContainer('Default', {
         format: soundData.format,
         src: soundData.soundB64,
         volume: file.volume,
@@ -158,10 +158,28 @@ function FileEntry(props: FileEntryProps) {
         useHtml5: false,
         variant: 'Default'
       })
+      // const sound = new SoundContainer<undefined>({
+      //   format: soundData.format,
+      //   src: soundData.soundB64,
+      //   volume: file.volume,
+      //   stopHandler: {
+      //     id: undefined,
+      //     handler: handleStop
+      //   },
+      //   loadedHandler: {
+      //     handler: handleLoaded
+      //   },
+      //   // Preview sounds are data URLs, so don't use html5.
+      //   useHtml5: false,
+      //   variant: 'Default'
+      // })
 
-      stopHandler.current = sound.GetStopHandle()
-      volumeHandler.current = sound.GetVolumeHandle()
-      playHandler.current = sound.GetPlayHandle()
+      stopHandler.current = () => sound.Stop()
+      volumeHandler.current = (volume: number) => sound.ChangeVolume(volume)
+      playHandler.current = () => sound.Play()
+      // stopHandler.current = sound.GetStopHandle()
+      // volumeHandler.current = sound.GetVolumeHandle()
+      // playHandler.current = sound.GetPlayHandle()
     }
 
     if (file.path) {

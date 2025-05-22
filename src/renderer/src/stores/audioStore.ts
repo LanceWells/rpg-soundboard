@@ -1,6 +1,5 @@
 import { create } from 'zustand'
 import { ColorOptions } from '@renderer/components/modals/newEffectModal/colorPicker'
-import { SoundContainer } from '@renderer/utils/soundContainer'
 import { produce } from 'immer'
 import type {
   SoundBoard,
@@ -18,6 +17,8 @@ import type { CategoryID } from 'src/apis/audio/types/categories'
 import type { GroupID } from 'src/apis/audio/types/groups'
 import type { EffectID } from 'src/apis/audio/types/effects'
 import { SoundVariants } from 'src/apis/audio/types/soundVariants'
+import { NewSoundContainer } from '@renderer/utils/soundContainer/util'
+import { ISoundContainer } from '@renderer/utils/soundContainer/variants/interface'
 
 export type LinkState = Omit<SoundGroupReference, 'category'>[]
 
@@ -164,7 +165,7 @@ export type AudioStore = AudioState &
   AudioStoreEditingModeMethods &
   AudioStoreCategoryMethods
 
-const GroupHandles: Map<GroupID, Array<SoundContainer>> = new Map()
+const GroupHandles: Map<GroupID, Array<ISoundContainer>> = new Map()
 
 const RepeatSoundIDs: Map<GroupID, EffectID> = new Map()
 
@@ -356,7 +357,7 @@ export const useAudioStore = create<AudioStore>((set, get) => ({
       })
     }
 
-    const sound = new SoundContainer({
+    const sound = NewSoundContainer(audio.variant, {
       format: audio.format,
       stopHandler: {
         id: groupID,

@@ -1,7 +1,7 @@
 import { Howl } from 'howler'
-import { getRandomArbitrary } from './random'
-import type { GroupID } from 'src/apis/audio/types/groups'
+import { GroupID } from 'src/apis/audio/types/groups'
 import { SoundVariants } from 'src/apis/audio/types/soundVariants'
+import { ISoundContainer } from './interface'
 
 /**
  * Defines the callback handler that will be invoked when the sound stops playing.
@@ -83,74 +83,33 @@ export type SoundContainerSetup<T extends GroupID | undefined> = {
    * A callback handler that will be invoked when the sound has loaded.
    */
   loadedHandler?: LoadedHandler
-
-  /**
-   * The variant for the sound effect. Will determine some behavior for the effect. Please see
-   * {@link SoundVariants} for more information on each variant.
-   */
-  variant: SoundVariants
 }
 
-/**
- * A container used to handle sound effects. The intent is to abstract-away some of the overhead
- * hanlding. This overhead handling includes items such as:
- *  - Variant-specific behavior.
- *  - Error logging.
- *  - Dynamic loading.
- *
- * @template TID Defines the type of ID that this particular sound container refers to, and will
- * return when calling provided event callbacks.
- *
- * If undefined, this implies that there should be no item ID provided in the callback. This is
- * useful for situations in which this container is considered to be a disposiable one-use object.
- */
-export class SoundContainer<TID extends GroupID | undefined = GroupID> {
-  private _howl: Howl
+export abstract class AbstractSoundContainer<TID extends GroupID | undefined = GroupID>
+  implements ISoundContainer
+{
   private _stopHandler: StopHandler<TID> | undefined
   private _loadedHandler: LoadedHandler | undefined
 
-  private _targetVolume: number
-  private _variant: SoundVariants
-  private _fadeOutRef: NodeJS.Timeout | undefined
-  private _duration: number | undefined
+  protected duration: number | undefined
+  protected howl: Howl
+  protected targetVolume: number
 
-  /**
-   * This is the amount of time, in ms, that fading effects should take to fully reach the target
-   * volume.
-   *
-   * This applies to both fade in as well as fade out.
-   */
-  // static FadeTime = 200
+  public abstract Variant: SoundVariants
 
-  private get _fadeTime() {
-    switch (this._variant) {
-      case 'Soundtrack':
-        return 2500
-      default:
-        return 200
-    }
+  protected get fadeTime() {
+    return 200
   }
 
-  get Variant() {
-    return this._variant
-  }
+  protected constructor(setup: SoundContainerSetup<TID>, loop: boolean) {
+    const { src, format, volume, stopHandler, loadedHandler, useHtml5 } = setup
 
-  /**
-   * Creates a new instance of a {@link SoundContainer}.
-   *
-   * @param setup See {@link SoundContainerSetup}.
-   */
-  constructor(setup: SoundContainerSetup<TID>) {
-    const { src, format, volume, stopHandler, loadedHandler, variant, useHtml5 } = setup
+    this.targetVolume = volume / 100
 
-    this._targetVolume = volume / 100
-    this._variant = variant
-
-    const loop = this._variant === 'Looping' || this._variant === 'Soundtrack'
-    const initVolume = loop ? 0 : this._targetVolume
+    const initVolume = loop ? 0 : this.targetVolume
 
     if (src.startsWith('aud://')) {
-      this._howl = new Howl({
+      this.howl = new Howl({
         src,
         volume: initVolume,
         loop,
@@ -158,7 +117,7 @@ export class SoundContainer<TID extends GroupID | undefined = GroupID> {
         preload: useHtml5 ? 'metadata' : true
       })
     } else {
-      this._howl = new Howl({
+      this.howl = new Howl({
         src,
         volume: initVolume,
         format: format?.replace('.', ''),
@@ -170,29 +129,17 @@ export class SoundContainer<TID extends GroupID | undefined = GroupID> {
     this._loadedHandler = loadedHandler
     this._stopHandler = stopHandler
 
-    // If an effect repeats, then this 'end' event will fire every time that the loop restarts.
-    // In that case, don't stop the sound effect.
-    // if (!loop) {
-    //   this._howl.once('end', () => {
-    //     this.HandleHowlStop()
-    //   })
-    // } else {
-    //   this._howl.once('stop', () => {
-    //     this.HandleHowlStop()
-    //   })
-    // }
-
     if (loop) {
-      this._howl.once('stop', () => {
+      this.howl.once('stop', () => {
         this.HandleHowlStop()
       })
     } else {
-      this._howl.once('end', () => {
+      this.howl.once('end', () => {
         this.HandleHowlStop()
       })
     }
 
-    this._howl
+    this.howl
       .once('loaderror', (id, err) => {
         console.error(`Failed to load sound ${id}: ${err}`)
         this.HandleHowlStop()
@@ -202,101 +149,55 @@ export class SoundContainer<TID extends GroupID | undefined = GroupID> {
         this.HandleHowlStop()
       })
       .on('load', () => {
-        this.HandleHowlLoaded()
-
         // When this loads, we know the duration. We may want to set it right away, but regardless,
         // we probably want to set a timer to trigger at D - N, where D is the duration of the song,
         // and N is the length of time before then to start fading out, while also fading in a new
         // instance.
-        // if (this.Variant === 'Soundtrack') {
-        // }
-
-        this._duration = this._howl.duration()
+        this.duration = this.howl.duration()
+        this.HandleHowlLoaded()
       })
       .on('stop', () => {
         this.HandleHowlStop()
       })
   }
 
-  async Play() {
-    // const timeToFade = this._howl.duration() - this._fadeTime
-
-    // if (this._variant === 'Looping' && timeToFade > 0) {
-    //   this._fadeOutRef = setTimeout(() => {
-    //     if (this && this._howl) {
-    //       this._howl.fade(this._targetVolume, 0, this._fadeTime)
-    //     }
-    //   }, this._fadeTime)
-    // }
-
-    this._howl.play()
-
-    if (this._variant === 'Rapid') {
-      const randomRate = getRandomArbitrary(0.8, 1.2)
-      this._howl.rate(randomRate)
-    }
-
-    if (this._fadeTime > 0) {
-      this._howl.fade(0, this._targetVolume, this._fadeTime)
-    }
-  }
-
-  GetStopHandle() {
-    return () => this.Stop()
-  }
-
-  GetVolumeHandle() {
-    return (volume: number) => {
-      this.ChangeVolume(volume)
-    }
-  }
-
-  GetPlayHandle() {
-    return () => this.Play()
-  }
-
-  private HandleHowlStop() {
-    clearTimeout(this._fadeOutRef)
-    this._howl.off()
+  protected HandleHowlStop() {
+    this.howl.off()
     if (this._stopHandler) {
       this._stopHandler.handler(this._stopHandler.id)
     }
   }
 
-  private HandleHowlLoaded() {
+  protected HandleHowlLoaded() {
     if (this._loadedHandler) {
       this._loadedHandler.handler()
     }
   }
 
-  Stop() {
-    if (this._variant === 'Looping' || this._variant === 'Soundtrack') {
-      this._howl.fade(this._targetVolume, 0, this._fadeTime)
-      setTimeout(() => {
-        this._howl.stop()
-      }, this._fadeTime)
-
-      return
+  Play() {
+    this.howl.play()
+    if (this.fadeTime > 0) {
+      this.howl.fade(0, this.targetVolume, this.fadeTime)
     }
+  }
 
-    this._howl.stop()
+  Stop() {
+    this.howl.stop()
     this.HandleHowlStop()
   }
 
   ChangeVolume(volume: number) {
-    if (this._howl.playing()) {
+    if (this.howl.playing()) {
       const newVolume = volume / 100
-      this._howl.volume(newVolume)
+      this.howl.volume(newVolume)
     }
   }
 
   Fade(ratio: number) {
-    if (this._howl.playing()) {
-      const oldVolume = this._targetVolume
+    if (this.howl.playing()) {
+      const oldVolume = this.targetVolume
       const newVolume = oldVolume * ratio
-      this._howl.fade(oldVolume, newVolume, 250)
+      this.howl.fade(oldVolume, newVolume, 250)
     }
   }
 }
-
-// Keep a running track of the last effect that was played that isn't a soundtrack effect. This way, when that effect stops, we can ensure that we fade back in.
