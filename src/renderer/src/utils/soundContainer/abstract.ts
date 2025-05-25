@@ -12,6 +12,7 @@ export abstract class AbstractSoundContainer<TID extends GroupID | undefined = G
   protected duration: number | undefined
   protected howl: Howl
   protected targetVolume: number
+  protected _src: string
 
   public abstract Variant: SoundVariants
 
@@ -19,16 +20,21 @@ export abstract class AbstractSoundContainer<TID extends GroupID | undefined = G
     return 200
   }
 
+  protected get src(): string | string[] {
+    return this._src
+  }
+
   protected constructor(setup: SoundContainerSetup<TID>, loop: boolean) {
     const { src, format, volume, stopHandler, loadedHandler, useHtml5 } = setup
 
     this.targetVolume = volume / 100
+    this._src = src
 
     const initVolume = loop ? 0 : this.targetVolume
 
     if (src.startsWith('aud://')) {
       this.howl = new Howl({
-        src,
+        src: this.src,
         volume: initVolume,
         loop,
         html5: useHtml5,
@@ -36,7 +42,7 @@ export abstract class AbstractSoundContainer<TID extends GroupID | undefined = G
       })
     } else {
       this.howl = new Howl({
-        src,
+        src: this.src,
         volume: initVolume,
         format: format?.replace('.', ''),
         loop,
@@ -48,12 +54,17 @@ export abstract class AbstractSoundContainer<TID extends GroupID | undefined = G
     this._stopHandler = stopHandler
 
     if (loop) {
-      this.howl.once('stop', () => {
-        this.HandleHowlStop()
-      })
+      this.howl
+        .once('stop', () => {
+          this.HandleHowlStop()
+        })
+        .on('end', () => {
+          this.HandleHowlEnded()
+        })
     } else {
       this.howl.once('end', () => {
         this.HandleHowlStop()
+        this.HandleHowlEnded()
       })
     }
 
@@ -71,7 +82,7 @@ export abstract class AbstractSoundContainer<TID extends GroupID | undefined = G
         // we probably want to set a timer to trigger at D - N, where D is the duration of the song,
         // and N is the length of time before then to start fading out, while also fading in a new
         // instance.
-        this.duration = this.howl.duration()
+        this.duration = this.howl.duration() * 1000
         this.HandleHowlLoaded()
       })
       .on('stop', () => {
@@ -84,6 +95,10 @@ export abstract class AbstractSoundContainer<TID extends GroupID | undefined = G
     if (this._stopHandler) {
       this._stopHandler.handler(this._stopHandler.id)
     }
+  }
+
+  protected HandleHowlEnded() {
+    //
   }
 
   protected HandleHowlLoaded() {
