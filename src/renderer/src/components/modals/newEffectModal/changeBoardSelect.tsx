@@ -12,11 +12,12 @@ export type ChangeBoardSelectProps = {
 export default function ChangeBoardSelect(props: ChangeBoardSelectProps) {
   const { groupID } = props
 
-  const { boards, activeBoardID, moveGroup } = useAudioStore(
+  const { boards, activeBoardID, moveGroup, resetEditingGroup } = useAudioStore(
     useShallow((state) => ({
       boards: state.boards,
       activeBoardID: state.activeBoardID ?? '',
-      moveGroup: state.moveGroup
+      moveGroup: state.moveGroup,
+      resetEditingGroup: state.resetEditingGroup
     }))
   )
 
@@ -36,6 +37,7 @@ export default function ChangeBoardSelect(props: ChangeBoardSelectProps) {
     (e) => {
       if (groupID) {
         moveGroup(groupID, e.target.value as BoardID)
+        resetEditingGroup()
         setSelectedValue(activeBoardID)
         ;(document.getElementById(EditEffectModalId) as HTMLDialogElement).close()
       }

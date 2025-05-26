@@ -22,7 +22,7 @@ export interface BoardSlice {
 }
 
 export const createBoardSlice: StateCreator<BoardSlice> = (set) => ({
-  activeBoardID: window.audio.Boards.GetAll({}).boards[0].id ?? null,
+  activeBoardID: window.audio.Boards.GetAll({}).boards[0]?.id ?? null,
   boards: window.audio.Boards.GetAll({}).boards,
   addBoard(req) {
     const newBoard = window.audio.Boards.Create(req)

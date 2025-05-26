@@ -53,6 +53,8 @@ export type SoundEffect = {
    * is the original volume of the audio.
    */
   volume: number
+
+  name: string
 }
 
 /**

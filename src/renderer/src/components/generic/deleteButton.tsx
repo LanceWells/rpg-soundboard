@@ -65,7 +65,7 @@ export default function DeleteButton(props: DeleteButtonProps) {
       <button
         onClick={onClickDelete}
         className={`
-        ${editingMode === 'Editing' && !isConfirming ? 'visible' : 'hidden'}
+        ${editingMode !== 'Off' && !isConfirming ? 'visible' : 'hidden'}
         btn
         btn-error
       `}

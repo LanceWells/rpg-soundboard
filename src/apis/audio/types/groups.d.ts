@@ -304,12 +304,6 @@ export interface IGroups {
    */
   GetSound(request: GetSoundRequest): Promise<GetSoundResponse>
 
-  /**
-   * Adds an effect to a particular group.
-   * @param request See {@link AddEffectRequest}.
-   */
-  AddEffect(request: AddEffectRequest): AddEffectResponse
-
   LinkGroup(request: LinkRequest): LinkResponse
 
   UnlinkGroup(request: UnlinkRequest): UnlinkResponse

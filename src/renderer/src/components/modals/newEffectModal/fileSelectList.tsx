@@ -31,7 +31,8 @@ export function FileSelectInput(props: FileSelectInputProps) {
 
       addWorkingFiles({
         path: newFile.path,
-        volume: 100
+        volume: 100,
+        name: newFile.name
       })
     },
     [fileInputRef, addWorkingFiles]
@@ -80,7 +81,7 @@ export default function FileSelectList(props: FileSelectListProps) {
   const fileEntries = useMemo(
     () =>
       editingGroup?.effects.map((f, i) => (
-        <FileEntry onClick={onRemoveFile} index={i} file={f} key={`file-${f.path}`} />
+        <FileEntry name={f.name} onClick={onRemoveFile} index={i} file={f} key={`file-${f.path}`} />
       )) ?? [],
     [editingGroup]
   )
@@ -109,6 +110,7 @@ export default function FileSelectList(props: FileSelectListProps) {
 
 type FileEntryProps = {
   file: SoundEffectEditableFields
+  name: string
   index: number
   onClick: (i: number) => void
 }
@@ -131,7 +133,8 @@ function FileEntry(props: FileEntryProps) {
       const soundData = await window.audio.Sounds.Preview({
         effect: {
           path: file.path,
-          volume: file.volume
+          volume: file.volume,
+          name: file.name
         }
       })
 
@@ -167,11 +170,6 @@ function FileEntry(props: FileEntryProps) {
       loadSound()
     }
   }, [file.path, file.volume, setPlayState])
-
-  const fileName = useMemo(() => {
-    const pathSegments = new Array(...file.path.split(/[/\\]/))
-    return pathSegments.at(-1) ?? ''
-  }, [file])
 
   const onClickRemove = useCallback(() => {
     onClick(index)
@@ -248,7 +246,7 @@ function FileEntry(props: FileEntryProps) {
         [grid-area:_title]
         `}
       >
-        {fileName}
+        {file.name}
       </span>
       <button
         onClick={onClickRemove}

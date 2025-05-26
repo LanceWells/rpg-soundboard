@@ -44,15 +44,25 @@ export const saveSoundEffect = (
     fs.mkdirSync(dstFileDir, { recursive: true })
   }
 
+  const contents = new Set(fs.readdirSync(dstFileDir))
+  console.log(contents)
+
+  let fNameID = 1
+  while (contents.has(`${fNameID}${srcFileData.ext}`)) {
+    fNameID++
+  }
+
+  const fName = `${fNameID}${srcFileData.ext}`
+
   const dstFilePath = path.format({
     dir: dstFileDir,
-    base: `${srcFileData.base}${srcFileData.ext}`
+    base: `${fName}`
   })
 
   const auxDirPath = path.join('board-data', boardID, groupID)
   const auxFilePath = path.format({
     dir: auxDirPath,
-    base: `${srcFileData.base}${srcFileData.ext}`
+    base: `${fName}`
   })
 
   // Windows paths don't seem to work with the net methods. That also means that we need to prepend
@@ -67,18 +77,19 @@ export const saveSoundEffect = (
 
 export const deleteFile = (pathToDelete: string) => {
   const appDataPath = GetAppDataPath()
+  const litPath = path.join(appDataPath, pathToDelete.replace('aud://', ''))
 
-  if (!pathToDelete.startsWith(appDataPath)) {
-    console.error(`Attempt to delete a file outside of app directory (${pathToDelete})`)
+  if (!litPath.startsWith(appDataPath)) {
+    console.error(`Attempt to delete a file outside of app directory (${litPath})`)
     return
   }
 
-  if (!fs.existsSync(pathToDelete)) {
-    console.error(`Attempt to delete a file that does not exist (${pathToDelete})`)
+  if (!fs.existsSync(litPath)) {
+    console.error(`Attempt to delete a file that does not exist (${litPath})`)
     return
   }
 
-  fs.rmSync(pathToDelete)
+  fs.rmSync(litPath)
 }
 
 export const deleteGroupFolder = (boardID: BoardID, groupID: GroupID) => {

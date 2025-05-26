@@ -53,6 +53,7 @@ export default function BoardGrid() {
   const onNewGroup = useCallback(() => {
     if (activeBoardID) {
       setEditingBoardID(activeBoardID)
+      resetEditingGroup()
       ;(document.getElementById(NewEffectModalId) as HTMLDialogElement).showModal()
     }
   }, [activeBoardID])

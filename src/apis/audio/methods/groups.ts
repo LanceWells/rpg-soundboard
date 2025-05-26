@@ -63,7 +63,8 @@ export const GroupsAudioAPI: IGroups = {
         id: newEffectID,
         path: savedFile.path,
         format: savedFile.format,
-        volume: eff.volume
+        volume: eff.volume,
+        name: path.parse(eff.path).name
       }
 
       return newEffect
@@ -121,11 +122,13 @@ export const GroupsAudioAPI: IGroups = {
 
       const newEffectID: EffectID = `eff-${crypto.randomUUID()}`
       const savedFile = saveSoundEffect(request.boardID, request.groupID, curr.path)
+      const name = path.parse(curr.name).name
       const newEffect: SoundEffect = {
         id: newEffectID,
         path: savedFile.path,
         format: savedFile.format,
-        volume: curr.volume
+        volume: curr.volume,
+        name
       }
 
       acc.push(newEffect)
@@ -379,45 +382,6 @@ export const GroupsAudioAPI: IGroups = {
       effectID: effect.id,
       variant: group.variant,
       useHtml5
-    }
-  },
-  /**
-   * @inheritdoc
-   */
-  AddEffect: function (request: AddEffectRequest): AddEffectResponse {
-    const matchingGroup = AudioConfig.getGroup(request.groupID)
-    if (!matchingGroup) {
-      throw new Error(`Could not find matching group with ID ${request.groupID}.`)
-    }
-
-    if (!isSourceGroup(matchingGroup)) {
-      throw new Error(`Group ${request.groupID} is not a source effect`)
-    }
-
-    const pathExt = path.parse(request.effectPath).ext
-
-    const uuid = crypto.randomUUID()
-    const newEffectID: EffectID = `eff-${uuid}`
-    const newEffect: SoundEffect = {
-      id: newEffectID,
-      path: request.effectPath,
-      format: pathExt as SupportedFileTypes,
-      volume: request.effectVolume
-    }
-
-    const newConfig = produce(AudioConfig.Config, (draft) => {
-      const matchingBoard = draft.boards.find((b) => b.id === request.boardID)
-      const matchingGroup = matchingBoard?.groups.find(
-        (g) => isSourceGroup(g) && g.id === request.groupID
-      ) as SoundGroupSource | undefined
-
-      matchingGroup?.effects.push(newEffect)
-    })
-
-    AudioConfig.Config = newConfig
-
-    return {
-      effect: newEffect
     }
   },
   LinkGroup: function (request: LinkRequest): LinkResponse {
