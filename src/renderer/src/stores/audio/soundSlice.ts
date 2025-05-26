@@ -1,12 +1,12 @@
 import { NewSoundContainer } from '@renderer/utils/soundContainer/util'
 import { EffectID } from 'src/apis/audio/types/effects'
-import { GetSoundResponse, GroupID } from 'src/apis/audio/types/groups'
+import { GetSoundsResponse, GroupID } from 'src/apis/audio/types/groups'
 import { StateCreator, StoreApi } from 'zustand'
 import { GroupSlice } from './groupSlice'
 import { ISoundContainer } from '@renderer/utils/soundContainer/interface'
 
 export interface SoundSlice {
-  playGroup: (groupID: GroupID) => Promise<GetSoundResponse>
+  playGroup: (groupID: GroupID) => Promise<GetSoundsResponse>
   stopGroup: (groupID: GroupID) => void
 }
 
@@ -19,23 +19,27 @@ export const createSoundSlice: StateCreator<SoundSlice & GroupSlice, [], [], Sou
   get
 ) => ({
   async playGroup(groupID) {
-    let soundsToAvoid: EffectID[] = []
+    // let soundsToAvoid: EffectID[] = []
 
-    // If this is a repeat sound effect, then avoid playing the same sound that we last played.
-    if (RepeatSoundIDs.has(groupID)) {
-      soundsToAvoid = [RepeatSoundIDs.get(groupID)!]
-    }
+    // // If this is a repeat sound effect, then avoid playing the same sound that we last played.
+    // if (RepeatSoundIDs.has(groupID)) {
+    //   soundsToAvoid = [RepeatSoundIDs.get(groupID)!]
+    // }
 
-    const audio = await window.audio.Groups.GetSound({
-      groupID: groupID,
-      idsToSkip: soundsToAvoid
+    // const audio = await window.audio.Groups.GetSound({
+    //   groupID: groupID,
+    //   idsToSkip: soundsToAvoid
+    // })
+
+    const audio = await window.audio.Groups.GetSounds({
+      groupID
     })
 
     const playingSoundTracks = get()
       .playingGroups.map((g) => get().getGroup(g))
       .filter((g) => g?.variant === 'Soundtrack')
 
-    RepeatSoundIDs.set(groupID, audio.effectID)
+    // RepeatSoundIDs.set(groupID, audio.effectID)
 
     if (audio.variant === 'Soundtrack') {
       // If this is a soundtrack, and we already have one playing, then fade out the old soundtrack
@@ -55,16 +59,26 @@ export const createSoundSlice: StateCreator<SoundSlice & GroupSlice, [], [], Sou
       }
     }
 
-    const sound = NewSoundContainer(audio.variant, {
-      format: audio.format,
+    // const sound = NewSoundContainer(audio.variant, RepeatSoundIDs.get(groupID), {
+    //   format: audio.format,
+    //   stopHandler: {
+    //     id: groupID,
+    //     handler: (groupID: GroupID) => handleHowlStop(groupID, set, get)
+    //   },
+    //   src: audio.soundB64,
+    //   volume: audio.volume,
+    //   useHtml5: audio.useHtml5
+    // })
+
+    const sound = NewSoundContainer(audio.variant, RepeatSoundIDs.get(groupID), {
+      effects: audio.sounds,
       stopHandler: {
         id: groupID,
         handler: (groupID: GroupID) => handleHowlStop(groupID, set, get)
-      },
-      src: audio.soundB64,
-      volume: audio.volume,
-      useHtml5: audio.useHtml5
+      }
     })
+
+    RepeatSoundIDs.set(groupID, sound.LoadedEffectID)
 
     if (!GroupHandles.has(groupID)) {
       GroupHandles.set(groupID, [])

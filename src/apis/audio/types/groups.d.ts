@@ -154,7 +154,7 @@ export type GetSoundResponse = {
    * The base64 data URL for the file. This can be handed off directly to an audio player to load
    * the sound effect.
    */
-  soundB64: string
+  src: string
 
   /**
    * The file format from the original file. This is necessary when sending a data URL into an audio
@@ -186,6 +186,28 @@ export type GetSoundResponse = {
    * opposed to fully downloaded.
    */
   useHtml5: boolean
+}
+
+export type SoundEffectWithPlayerDetails = SoundEffect & {
+  // /**
+  //  * The base64 data URL for the file. This can be handed off directly to an audio player to load
+  //  * the sound effect.
+  //  */
+  // soundB64: string
+
+  /**
+   * If true, this provided sound effect should utilize HTML5 audio. This should be "false" in
+   * general. The Web Audio API is preferable in most aspects, but at time of writing our
+   * implementation does not allow for audio streaming using the Web Audio API. As a result, any
+   * large files that should be streamed, should use html5 to ensure that they are streamed as
+   * opposed to fully downloaded.
+   */
+  useHtml5: boolean
+}
+
+export type GetSoundsResponse = {
+  variant: SoundVariants
+  sounds: SoundEffectWithPlayerDetails[]
 }
 
 /**
@@ -303,6 +325,8 @@ export interface IGroups {
    * @param request See {@link GetSoundRequest}.
    */
   GetSound(request: GetSoundRequest): Promise<GetSoundResponse>
+
+  GetSounds(request: GetSoundRequest): Promise<GetSoundsResponse>
 
   LinkGroup(request: LinkRequest): LinkResponse
 

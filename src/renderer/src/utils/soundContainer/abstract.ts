@@ -1,7 +1,9 @@
 import { Howl } from 'howler'
-import { GroupID } from 'src/apis/audio/types/groups'
+import { GroupID, SoundEffectWithPlayerDetails } from 'src/apis/audio/types/groups'
 import { SoundVariants } from 'src/apis/audio/types/soundVariants'
 import { ISoundContainer, LoadedHandler, SoundContainerSetup, StopHandler } from './interface'
+import { EffectID } from 'src/apis/audio/types/effects'
+import { getRandomInt } from '../random'
 
 export abstract class AbstractSoundContainer<TID extends GroupID | undefined = GroupID>
   implements ISoundContainer
@@ -9,10 +11,12 @@ export abstract class AbstractSoundContainer<TID extends GroupID | undefined = G
   private _stopHandler: StopHandler<TID> | undefined
   private _loadedHandler: LoadedHandler | undefined
 
+  protected _lastEffectID: EffectID | undefined
   protected duration: number | undefined
   protected howl: Howl
   protected targetVolume: number
-  protected _src: string
+  protected effects: SoundEffectWithPlayerDetails[] = []
+  protected _loadedEffect: SoundEffectWithPlayerDetails
 
   public abstract Variant: SoundVariants
 
@@ -20,33 +24,42 @@ export abstract class AbstractSoundContainer<TID extends GroupID | undefined = G
     return 200
   }
 
-  protected get src(): string | string[] {
-    return this._src
+  public get LoadedEffectID(): EffectID {
+    return this._loadedEffect.id
   }
 
-  protected constructor(setup: SoundContainerSetup<TID>, loop: boolean) {
-    const { src, format, volume, stopHandler, loadedHandler, useHtml5 } = setup
+  protected SelectEffect(effects: SoundEffectWithPlayerDetails[]): SoundEffectWithPlayerDetails {
+    const effectIndex = getRandomInt(0, effects.length - 1)
+    return this.effects[effectIndex]
+  }
 
-    this.targetVolume = volume / 100
-    this._src = src
+  protected constructor(setup: SoundContainerSetup<TID>, loop: boolean, lastEffectID?: EffectID) {
+    const { effects, stopHandler, loadedHandler } = setup
+
+    this.effects = effects
+    this._lastEffectID = lastEffectID
+
+    this._loadedEffect = this.SelectEffect(effects)
+    this.targetVolume = this._loadedEffect.volume / 100
 
     const initVolume = loop ? 0 : this.targetVolume
+    const src = this._loadedEffect.path
 
     if (src.startsWith('aud://')) {
       this.howl = new Howl({
-        src: this.src,
+        src,
         volume: initVolume,
         loop,
-        html5: useHtml5,
-        preload: useHtml5 ? 'metadata' : true
+        html5: this._loadedEffect.useHtml5,
+        preload: this._loadedEffect.useHtml5 ? 'metadata' : true
       })
     } else {
       this.howl = new Howl({
-        src: this.src,
+        src,
         volume: initVolume,
-        format: format?.replace('.', ''),
+        format: this._loadedEffect.format.replace('.', ''),
         loop,
-        html5: useHtml5
+        html5: this._loadedEffect.useHtml5
       })
     }
 

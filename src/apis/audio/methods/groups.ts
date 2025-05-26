@@ -29,7 +29,9 @@ import {
   MoveRequest,
   MoveResponse,
   LinkRequest,
-  LinkResponse
+  LinkResponse,
+  GetSoundsResponse,
+  SoundEffectWithPlayerDetails
 } from '../types/groups'
 import { isReferenceGroup, isSourceGroup } from './typePredicates'
 
@@ -376,12 +378,48 @@ export const GroupsAudioAPI: IGroups = {
     const useHtml5 = srcFileSizeInMb > html5ThresholdSizeMb
 
     return {
-      soundB64: effect.path,
+      src: effect.path,
       format: effect.format as SupportedFileTypes,
       volume: effect.volume,
       effectID: effect.id,
       variant: group.variant,
       useHtml5
+    }
+  },
+  /**
+   * @inheritdoc
+   */
+  GetSounds: async function (request: GetSoundRequest): Promise<GetSoundsResponse> {
+    const group = AudioConfig.getGroup(request.groupID)
+
+    if (!group || group.effects.length === 0) {
+      throw new Error(`Could not find group with effects with id ${request.groupID}.`)
+    }
+
+    const effectPromises = group.effects.map<Promise<SoundEffectWithPlayerDetails>>(
+      async (effect) => {
+        const appDataPath = GetAppDataPath() + '/'
+        const actualSystemPath = effect.path.replace('aud://', appDataPath)
+
+        const srcFileSizeInMb = await getFileSize(actualSystemPath)
+        const useHtml5 = srcFileSizeInMb > html5ThresholdSizeMb
+
+        return {
+          id: effect.id,
+          name: effect.name,
+          path: effect.path,
+          format: effect.format as SupportedFileTypes,
+          volume: effect.volume,
+          useHtml5
+        }
+      }
+    )
+
+    const effects = await Promise.all(effectPromises)
+
+    return {
+      variant: group.variant,
+      sounds: effects
     }
   },
   LinkGroup: function (request: LinkRequest): LinkResponse {

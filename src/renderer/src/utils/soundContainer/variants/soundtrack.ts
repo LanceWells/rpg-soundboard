@@ -43,10 +43,6 @@ export class SoundtrackSoundContainer<
     return 2500
   }
 
-  protected override get src() {
-    return [this._src, this._src]
-  }
-
   constructor(setup: SoundContainerSetup<TID>) {
     super(setup, false)
   }

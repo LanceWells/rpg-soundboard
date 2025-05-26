@@ -146,19 +146,39 @@ function FileEntry(props: FileEntryProps) {
         setPlayState('Stopped')
       }
 
-      const sound = NewSoundContainer('Default', {
-        format: soundData.format,
-        src: soundData.soundB64,
-        volume: file.volume,
-        stopHandler: {
-          id: undefined,
-          handler: handleStop
-        },
+      // const sound = NewSoundContainer('Default', {
+      //   format: soundData.format,
+      //   src: soundData.soundB64,
+      //   volume: file.volume,
+      //   stopHandler: {
+      //     id: undefined,
+      //     handler: handleStop
+      //   },
+      //   loadedHandler: {
+      //     handler: handleLoaded
+      //   },
+      //   // Preview sounds are data URLs, so don't use html5.
+      //   useHtml5: false
+      // })
+
+      const sound = NewSoundContainer('Default', undefined, {
+        effects: [
+          {
+            format: soundData.format,
+            path: soundData.soundB64,
+            volume: soundData.volume,
+            id: 'eff-1-1-1-1-1',
+            name: 'preview',
+            useHtml5: false
+          }
+        ],
         loadedHandler: {
           handler: handleLoaded
         },
-        // Preview sounds are data URLs, so don't use html5.
-        useHtml5: false
+        stopHandler: {
+          id: undefined,
+          handler: handleStop
+        }
       })
 
       stopHandler.current = () => sound.Stop()
