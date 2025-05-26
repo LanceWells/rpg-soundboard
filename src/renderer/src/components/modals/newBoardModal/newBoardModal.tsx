@@ -1,4 +1,4 @@
-import { useAudioStore } from '@renderer/stores/audioStore'
+import { useAudioStore } from '@renderer/stores/audio/audioStore'
 import BoardModal from './boardModal'
 
 export const NewBoardModalId = 'new-board-modal'

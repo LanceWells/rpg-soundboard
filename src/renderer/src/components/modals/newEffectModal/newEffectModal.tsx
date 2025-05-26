@@ -1,4 +1,4 @@
-import { useAudioStore } from '@renderer/stores/audioStore'
+import { useAudioStore } from '@renderer/stores/audio/audioStore'
 import EffectModal from './effectModal'
 
 export const NewEffectModalId = 'new-effect-modal'

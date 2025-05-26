@@ -1,4 +1,4 @@
-import { useAudioStore } from '@renderer/stores/audioStore'
+import { useAudioStore } from '@renderer/stores/audio/audioStore'
 import { ChangeEventHandler, useCallback, useMemo } from 'react'
 import { BoardID } from 'src/apis/audio/types/boards'
 import { SoundGroupSource } from 'src/apis/audio/types/items'

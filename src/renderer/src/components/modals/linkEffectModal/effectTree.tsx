@@ -1,4 +1,4 @@
-import { useAudioStore } from '@renderer/stores/audioStore'
+import { useAudioStore } from '@renderer/stores/audio/audioStore'
 import { useMemo } from 'react'
 import { useShallow } from 'zustand/react/shallow'
 import GroupCategory from './effectCategory'

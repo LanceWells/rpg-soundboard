@@ -1,7 +1,7 @@
 import { useCallback } from 'react'
 import BoardModal from './boardModal'
 import { CreateRequest } from 'src/apis/audio/types/boards'
-import { useAudioStore } from '@renderer/stores/audioStore'
+import { useAudioStore } from '@renderer/stores/audio/audioStore'
 import { useShallow } from 'zustand/react/shallow'
 
 export const EditBoardModalId = 'edit-board-modal'

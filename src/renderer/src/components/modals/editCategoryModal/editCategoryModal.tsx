@@ -1,7 +1,7 @@
 import { useState, useCallback, ChangeEventHandler, MouseEventHandler, useEffect } from 'react'
 import TextField from '../../generic/textField'
 import { NewCategoryModalId } from '../newCategoryModal/newCategoryModal'
-import { useAudioStore } from '@renderer/stores/audioStore'
+import { useAudioStore } from '@renderer/stores/audio/audioStore'
 import CloseIcon from '@renderer/assets/icons/close'
 import DeleteButton from '@renderer/components/generic/deleteButton'
 

@@ -1,6 +1,6 @@
 import CloseIcon from '@renderer/assets/icons/close'
 import TextField from '@renderer/components/generic/textField'
-import { useAudioStore } from '@renderer/stores/audioStore'
+import { useAudioStore } from '@renderer/stores/audio/audioStore'
 import { MouseEventHandler, useCallback } from 'react'
 import { CreateRequest } from 'src/apis/audio/types/boards'
 import { useShallow } from 'zustand/react/shallow'

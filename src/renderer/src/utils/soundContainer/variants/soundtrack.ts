@@ -9,8 +9,7 @@ export class SoundtrackSoundContainer<
 > extends AbstractSoundContainer<TID> {
   Variant: SoundVariants = 'Soundtrack'
 
-  private _timeouts: NodeJS.Timeout[] = []
-  private _intervals: NodeJS.Timeout[] = []
+  private _interval: NodeJS.Timeout | undefined
 
   private readonly CROSSFADE_TIME = 10000
   private soundIDs: [number, number] = [0, 0]
@@ -58,8 +57,7 @@ export class SoundtrackSoundContainer<
       this.howl.stop(this.inactiveSoundId)
       this.howl.stop(this.activeSoundId)
 
-      this._timeouts.forEach((t) => clearTimeout(t))
-      this._intervals.forEach((t) => clearInterval(t))
+      clearInterval(this._interval)
 
       super.HandleHowlStop()
     }, this.fadeTime)
@@ -93,12 +91,10 @@ export class SoundtrackSoundContainer<
       Inactv Dx: ${this.inactiveSoundIndex}
     `)
 
-    const t = setTimeout(() => {
+    setTimeout(() => {
       this.howl.pause(this.inactiveSoundId)
       this.howl.seek(0, this.inactiveSoundId)
     }, this.CROSSFADE_TIME)
-
-    this._timeouts.push(t)
   }
 
   protected override HandleHowlStop(): void {
@@ -119,6 +115,6 @@ export class SoundtrackSoundContainer<
       return
     }
 
-    this._intervals.push(setInterval(() => this.Crossfade(), fadeInMs))
+    this._interval = setInterval(() => this.Crossfade(), fadeInMs)
   }
 }

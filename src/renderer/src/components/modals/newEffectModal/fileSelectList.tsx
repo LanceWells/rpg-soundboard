@@ -1,5 +1,5 @@
 import { ChangeEventHandler, useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useAudioStore } from '@renderer/stores/audioStore'
+import { useAudioStore } from '@renderer/stores/audio/audioStore'
 import SoundIcon from '@renderer/assets/icons/sound'
 import CloseIcon from '@renderer/assets/icons/close'
 import StopIcon from '@renderer/assets/icons/stop'
@@ -155,31 +155,12 @@ function FileEntry(props: FileEntryProps) {
           handler: handleLoaded
         },
         // Preview sounds are data URLs, so don't use html5.
-        useHtml5: false,
-        variant: 'Default'
+        useHtml5: false
       })
-      // const sound = new SoundContainer<undefined>({
-      //   format: soundData.format,
-      //   src: soundData.soundB64,
-      //   volume: file.volume,
-      //   stopHandler: {
-      //     id: undefined,
-      //     handler: handleStop
-      //   },
-      //   loadedHandler: {
-      //     handler: handleLoaded
-      //   },
-      //   // Preview sounds are data URLs, so don't use html5.
-      //   useHtml5: false,
-      //   variant: 'Default'
-      // })
 
       stopHandler.current = () => sound.Stop()
       volumeHandler.current = (volume: number) => sound.ChangeVolume(volume)
       playHandler.current = () => sound.Play()
-      // stopHandler.current = sound.GetStopHandle()
-      // volumeHandler.current = sound.GetVolumeHandle()
-      // playHandler.current = sound.GetPlayHandle()
     }
 
     if (file.path) {

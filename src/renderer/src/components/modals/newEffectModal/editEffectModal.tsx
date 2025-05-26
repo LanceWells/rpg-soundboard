@@ -1,4 +1,4 @@
-import { useAudioStore } from '@renderer/stores/audioStore'
+import { useAudioStore } from '@renderer/stores/audio/audioStore'
 import EffectModal from './effectModal'
 import { useCallback, useMemo, useState } from 'react'
 import DeleteButton from '@renderer/components/generic/deleteButton'

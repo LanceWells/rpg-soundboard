@@ -1,7 +1,7 @@
 import { SortableContext } from '@dnd-kit/sortable'
 import { useMemo } from 'react'
 import Group from '../group/group'
-import { useAudioStore } from '@renderer/stores/audioStore'
+import { useAudioStore } from '@renderer/stores/audio/audioStore'
 import { BoardID } from 'src/apis/audio/types/boards'
 import { SoundGroup } from 'src/apis/audio/types/items'
 import { CategoryID } from 'src/apis/audio/types/categories'

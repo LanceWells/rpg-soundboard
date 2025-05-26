@@ -1,4 +1,4 @@
-import { useAudioStore } from '@renderer/stores/audioStore'
+import { useAudioStore } from '@renderer/stores/audio/audioStore'
 import TextField from '../../generic/textField'
 import { ChangeEventHandler, MouseEventHandler, useCallback, useState } from 'react'
 import CloseIcon from '@renderer/assets/icons/close'

@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from 'react'
-import { useAudioStore } from '@renderer/stores/audioStore'
+import { useAudioStore } from '@renderer/stores/audio/audioStore'
 import {
   closestCenter,
   CollisionDetection,

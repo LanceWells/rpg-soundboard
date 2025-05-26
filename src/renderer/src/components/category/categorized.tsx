@@ -1,4 +1,4 @@
-import { useAudioStore } from '@renderer/stores/audioStore'
+import { useAudioStore } from '@renderer/stores/audio/audioStore'
 import { useShallow } from 'zustand/react/shallow'
 import GenericCategoryContainer from './genericCategoryContainer'
 import { CSS } from '@dnd-kit/utilities'

@@ -1,4 +1,4 @@
-import { EditingMode, useAudioStore } from '@renderer/stores/audioStore'
+import { useAudioStore } from '@renderer/stores/audio/audioStore'
 import { useCallback, useMemo } from 'react'
 import Board from './board'
 import { NewBoardModalId } from '../modals/newBoardModal/newBoardModal'
@@ -13,6 +13,7 @@ import { EditBoardModalId } from '../modals/newBoardModal/editBoardModal'
 import { SoundBoard } from 'src/apis/audio/types/items'
 import LinkIcon from '@renderer/assets/icons/link'
 import { LinkEffectModalId } from '../modals/linkEffectModal/linkEffectModal'
+import { EditingMode } from '@renderer/stores/audio/editingSlice'
 
 /**
  * A root-level component that is used to render every various soundboard, along with a means to

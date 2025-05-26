@@ -1,5 +1,5 @@
 import DeleteIcon from '@renderer/assets/icons/delete'
-import { useAudioStore } from '@renderer/stores/audioStore'
+import { useAudioStore } from '@renderer/stores/audio/audioStore'
 import { useCallback, MouseEventHandler } from 'react'
 import { useShallow } from 'zustand/react/shallow'
 

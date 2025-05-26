@@ -1,4 +1,4 @@
-import { useAudioStore } from '@renderer/stores/audioStore'
+import { useAudioStore } from '@renderer/stores/audio/audioStore'
 import { IconBody } from '@renderer/utils/fetchIcons'
 import { useCallback } from 'react'
 import { IconEffect } from '../../effect/icon-effect'

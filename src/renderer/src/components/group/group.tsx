@@ -1,6 +1,6 @@
 import { IconEffect } from '../effect/icon-effect'
 import { useCallback, useMemo } from 'react'
-import { useAudioStore } from '@renderer/stores/audioStore'
+import { useAudioStore } from '@renderer/stores/audio/audioStore'
 import { EditEffectModalId } from '../modals/newEffectModal/editEffectModal'
 import { CSS } from '@dnd-kit/utilities'
 import RepeatIcon from '@renderer/assets/icons/repeat'
