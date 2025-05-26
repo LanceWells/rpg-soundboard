@@ -110,12 +110,9 @@ export default function Categorized(props: CategorizedProps) {
             justify-items-center
             gap-6
             z-0
-            grid
-            sm:grid-cols-4
-            md:grid-cols-6
-            lg:grid-cols-8
-            xl:grid-cols-10
-            2xl:grid-cols-12
+            w-full
+            flex
+            flex-wrap
           `}
         >
           <GenericCategoryContainer boardID={boardID} groups={groups} />

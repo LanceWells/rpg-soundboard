@@ -431,10 +431,10 @@
   resolved "https://registry.npmjs.org/@humanwhocodes/object-schema/-/object-schema-2.0.3.tgz"
   integrity sha512-93zYdMES/c1D69yZiKDBj0V24vqNzB/koF26KPaagAfd3P/4gUlh3Dys5ogAK+Exi9QyzlD8x/08Zt7wIKcDcA==
 
-"@iconify-json/game-icons@^1.1.9":
-  version "1.1.9"
-  resolved "https://registry.npmjs.org/@iconify-json/game-icons/-/game-icons-1.1.9.tgz"
-  integrity sha512-DipxbRFPK+KgDekVGx5if3mlxzKvTNM74yF5y9LIU8FPNShND9JnaDGCz5cfyaGVQxj7BITztO5v042hRFsahg==
+"@iconify-json/game-icons@^1.2.3":
+  version "1.2.3"
+  resolved "https://registry.npmjs.org/@iconify-json/game-icons/-/game-icons-1.2.3.tgz"
+  integrity sha512-JnrHQjNI/2nJxlnEAPlU4ta6S44XTX7RJnBUyBV27GbVhJhfwpY9kqzkTqmPs4nyAJaGUjZwOcnBUQ9Dc21nlA==
   dependencies:
     "@iconify/types" "*"
 

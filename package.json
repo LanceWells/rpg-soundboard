@@ -59,7 +59,7 @@
     "@electron-toolkit/eslint-config-prettier": "^2.0.0",
     "@electron-toolkit/eslint-config-ts": "^2.0.0",
     "@electron-toolkit/tsconfig": "^1.0.1",
-    "@iconify-json/game-icons": "^1.1.9",
+    "@iconify-json/game-icons": "^1.2.3",
     "@iconify/utils": "^2.1.29",
     "@types/node": "^20.14.8",
     "@types/react": "^18.3.3",
