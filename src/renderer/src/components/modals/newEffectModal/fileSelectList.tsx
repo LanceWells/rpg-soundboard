@@ -30,9 +30,11 @@ export function FileSelectInput(props: FileSelectInputProps) {
       }
 
       const newFile = e.target.files.item(0)!
+      const { webUtils } = require('electron')
+      const newPath = webUtils.getPathForFile(newFile)
 
       addWorkingFiles({
-        path: newFile.webkitRelativePath,
+        path: newPath,
         volume: 100,
         name: newFile.name
       })
@@ -122,9 +124,11 @@ function FileEntry(props: FileEntryProps) {
 
   const [playState, setPlayState] = useState<'Loading' | 'Playing' | 'Stopped'>('Loading')
 
-  const { updateWorkingFile } = useAudioStore((state) => ({
-    updateWorkingFile: state.updateWorkingFile
-  }))
+  const { updateWorkingFile } = useAudioStore(
+    useShallow((state) => ({
+      updateWorkingFile: state.updateWorkingFile
+    }))
+  )
 
   const stopHandler = useRef<() => void>(null)
   const volumeHandler = useRef<(volume: number) => void>(null)

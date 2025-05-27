@@ -3,6 +3,7 @@ import MusicNoteIcon from '@renderer/assets/icons/musicnote'
 import SequenceIcon from '@renderer/assets/icons/sequence'
 import { NewSequenceModalId } from '../sequenceModal/newSequenceModal'
 import { useAudioStore } from '@renderer/stores/audio/audioStore'
+import { NewEffectModalId } from '../newEffectModal/newEffectModal'
 
 export const NewGroupSelectModalId = 'NewGroupSelectModal'
 
@@ -26,7 +27,13 @@ export default function NewGroupSelectModal() {
               <SequenceIcon className="w-12 h-12" />
               Sequence
             </button>
-            <button className="btn btn-square h-24 w-24 p-4">
+            <button
+              className="btn btn-square h-24 w-24 p-4"
+              onClick={() => {
+                resetEditingSequence()
+                ;(document.getElementById(NewEffectModalId) as HTMLDialogElement).showModal()
+              }}
+            >
               <MusicNoteIcon className="w-12 h-12" />
               Default
             </button>
