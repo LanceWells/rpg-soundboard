@@ -30,5 +30,7 @@ export const SoundVariant: {
   /**
    * See {@link SoundVariantFields.Soundtrack}.
    */
-  Soundtrack: 'Soundtrack'
+  Soundtrack: 'Soundtrack',
+
+  Sequence: 'Sequence'
 }

@@ -2,7 +2,9 @@ import type {
   SoundGroupSourceEditableFields,
   SoundGroupSource,
   SoundEffect,
-  SoundGroupReferenceEditableFields
+  SoundGroupReferenceEditableFields,
+  SoundGroupSequenceEditableFields,
+  SoundGroupSequence
 } from './items'
 import type { BoardID } from './boards'
 import type { EffectID } from './effects'
@@ -30,39 +32,12 @@ export type CreateResponse = {
   group: SoundGroupSource
 }
 
-/**
- * The request object for {@link IGroups.AddEffect}.
- */
-export type AddEffectRequest = {
-  /**
-   * The group to add the effect to.
-   */
-  groupID: GroupID
-
-  /**
-   * The board that the group is a part of.
-   */
+export type CreateSequenceRequest = {
   boardID: BoardID
+} & SoundGroupSequenceEditableFields
 
-  /**
-   * The path to the originating sound effect file.
-   */
-  effectPath: string
-
-  /**
-   * The target volume for the sound effect. Should range from 0-100.
-   */
-  effectVolume: number
-}
-
-/**
- * The response object for {@link IGroups.AddEffect}.
- */
-export type AddEffectResponse = {
-  /**
-   * The sound effect that has been created.
-   */
-  effect: SoundEffect
+export type CreateSequenceResponse = {
+  sequence: SoundGroupSequence
 }
 
 export type LinkRequest = {
@@ -333,4 +308,6 @@ export interface IGroups {
   UnlinkGroup(request: UnlinkRequest): UnlinkResponse
 
   UpdateLink(request: UpdateLinkRequest): UpdateLinkResponse
+
+  CreateSequence(request: CreateSequenceRequest): CreateSequenceResponse
 }

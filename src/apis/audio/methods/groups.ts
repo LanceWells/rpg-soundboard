@@ -24,14 +24,13 @@ import {
   ReorderResponse,
   GetSoundRequest,
   GetSoundResponse,
-  AddEffectRequest,
-  AddEffectResponse,
   MoveRequest,
   MoveResponse,
   LinkRequest,
   LinkResponse,
   GetSoundsResponse,
-  SoundEffectWithPlayerDetails
+  SoundEffectWithPlayerDetails,
+  CreateSequenceRequest
 } from '../types/groups'
 import { isReferenceGroup, isSourceGroup } from './typePredicates'
 
@@ -92,6 +91,9 @@ export const GroupsAudioAPI: IGroups = {
     return {
       group: newGroup
     }
+  },
+  CreateSequence(request: CreateSequenceRequest) {
+    throw new Error('NYI')
   },
   /**
    * @inheritdoc

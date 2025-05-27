@@ -14,6 +14,7 @@ import { SoundBoard } from 'src/apis/audio/types/items'
 import LinkIcon from '@renderer/assets/icons/link'
 import { LinkEffectModalId } from '../modals/linkEffectModal/linkEffectModal'
 import { EditingMode } from '@renderer/stores/audio/editingSlice'
+import { NewGroupSelectModalId } from '../modals/newGroupSelectModal/newGroupSelectModal'
 
 /**
  * A root-level component that is used to render every various soundboard, along with a means to
@@ -54,7 +55,9 @@ export default function BoardGrid() {
     if (activeBoardID) {
       setEditingBoardID(activeBoardID)
       resetEditingGroup()
-      ;(document.getElementById(NewEffectModalId) as HTMLDialogElement).showModal()
+      // TODO: UNDO PLZ
+      // ;(document.getElementById(NewEffectModalId) as HTMLDialogElement).showModal()
+      ;(document.getElementById(NewGroupSelectModalId) as HTMLDialogElement).showModal()
     }
   }, [activeBoardID])
 

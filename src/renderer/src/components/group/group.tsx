@@ -11,6 +11,7 @@ import type { SoundGroup } from 'src/apis/audio/types/items'
 import { useSortable } from '@dnd-kit/sortable'
 import MoveIcon from '@renderer/assets/icons/move'
 import MusicNoteIcon from '@renderer/assets/icons/musicnote'
+import SequenceIcon from '@renderer/assets/icons/sequence'
 
 export type GroupProps = {
   group: SoundGroup
@@ -161,6 +162,21 @@ export default function Group(props: GroupProps) {
           `}
           >
             <MusicNoteIcon className="h-4 w-4 m-1" />
+          </span>
+        )
+      }
+      case 'Sequence': {
+        return (
+          <span
+            className={`
+            indicator-item
+            rounded-full
+            indicator-bottom
+            indicator-start
+            badge-neutral
+          `}
+          >
+            <SequenceIcon className="h-4 w-4 m-1" />
           </span>
         )
       }

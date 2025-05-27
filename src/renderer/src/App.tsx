@@ -6,6 +6,8 @@ import NewBoardModal from './components/modals/newBoardModal/newBoardModal'
 import NewCategoryModal from './components/modals/newCategoryModal/newCategoryModal'
 import EditEffectModal from './components/modals/newEffectModal/editEffectModal'
 import NewEffectModal from './components/modals/newEffectModal/newEffectModal'
+import NewGroupSelectModal from './components/modals/newGroupSelectModal/newGroupSelectModal'
+import NewSequenceModal from './components/modals/sequenceModal/newSequenceModal'
 
 /**
  * The base of the application. This is the root of the tree and contains all base-level elements.
@@ -13,6 +15,8 @@ import NewEffectModal from './components/modals/newEffectModal/newEffectModal'
 export default function App() {
   return (
     <div className="flex flex-col h-full flex-grow">
+      <NewSequenceModal />
+      <NewGroupSelectModal />
       <NewEffectModal />
       <EditEffectModal />
       <NewBoardModal />

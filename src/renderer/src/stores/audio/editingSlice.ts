@@ -8,13 +8,16 @@ import {
   SoundEffectEditableFields,
   SoundIcon,
   SoundBoard,
-  SoundGroupReference
+  SoundGroupReference,
+  SoundGroupSequenceElement,
+  SoundGroupSequenceEditableFields
 } from 'src/apis/audio/types/items'
 import { SoundVariants } from 'src/apis/audio/types/soundVariants'
 import { StateCreator } from 'zustand'
 import { BoardSlice } from './boardSlice'
 import { produce } from 'immer'
 import { getDefaultGroup } from './groupSlice'
+import { ColorOptions } from '@renderer/components/modals/newEffectModal/colorPicker'
 
 export type SoundBoardFields = Pick<SoundBoard, 'name'> & { referenceGroups: SoundGroupReference[] }
 
@@ -78,8 +81,11 @@ export interface EditingSlice {
 
   draggingID: string | null
 
+  editingSequence: SoundGroupSequenceEditableFields | undefined
+
   resetEditingGroup: () => void
   resetEditingBoard: () => void
+  resetEditingSequence: () => void
   setEditingMode: (isEditing: EditingMode) => void
   setEditingGroupID: (id: GroupID) => void
   addWorkingFiles: (list: SoundEffectEditableFields | SoundEffectEditableFields[]) => void
@@ -97,6 +103,10 @@ export interface EditingSlice {
   addBoardReference: (sourceBoard: BoardID, sourceGroup: GroupID) => void
   removeBoardReference: (sourceBoard: BoardID, sourceGroup: GroupID) => void
   updateBoardReference: IAudioApi['Groups']['UpdateLink']
+  updateSequenceName: (newName: string) => void
+  updateSequenceElements: (
+    newSequence: [SoundGroupSequenceElement, ...SoundGroupSequenceElement[]]
+  ) => void
 }
 
 export const createEditingSlice: StateCreator<EditingSlice & BoardSlice, [], [], EditingSlice> = (
@@ -110,6 +120,7 @@ export const createEditingSlice: StateCreator<EditingSlice & BoardSlice, [], [],
   editingGroup: null,
   editingGroupID: undefined,
   editingMode: 'Off' as EditingMode,
+  editingSequence: undefined,
   addBoardReference(sourceBoard, sourceGroup) {
     const activeBoardID = get().activeBoardID
     const activeBoard = get().boards.find((b) => b.id === activeBoardID) ?? null
@@ -298,6 +309,48 @@ export const createEditingSlice: StateCreator<EditingSlice & BoardSlice, [], [],
       produce((state: EditingSlice) => {
         if (state.editingGroup !== null && state.editingGroup.effects.length > index) {
           state.editingGroup.effects[index].volume = volume
+        }
+      })
+    )
+  },
+  resetEditingSequence() {
+    const activeBoardID = get().activeBoardID
+    const activeBoard = get().boards.find((b) => b.id === activeBoardID) ?? null
+
+    if (activeBoardID == null || activeBoard === null) {
+      return
+    }
+
+    set(
+      produce((state: EditingSlice) => {
+        state.editingSequence = {
+          boardID: activeBoardID,
+          category: activeBoard.categories[0].id,
+          name: '',
+          sequence: [],
+          icon: {
+            backgroundColor: ColorOptions.black,
+            foregroundColor: ColorOptions.white,
+            name: 'moon'
+          }
+        }
+      })
+    )
+  },
+  updateSequenceName(newName) {
+    set(
+      produce((state: EditingSlice) => {
+        if (state.editingSequence) {
+          state.editingSequence.name = newName
+        }
+      })
+    )
+  },
+  updateSequenceElements(newSequence) {
+    set(
+      produce((state: EditingSlice) => {
+        if (state.editingSequence) {
+          state.editingSequence.sequence = newSequence
         }
       })
     )

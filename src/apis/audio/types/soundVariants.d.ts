@@ -30,6 +30,8 @@ export type SoundVariantFields = {
   Rapid: unknown
 
   Soundtrack: unknown
+
+  Sequence: unknown
 }
 
 /**

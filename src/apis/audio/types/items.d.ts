@@ -62,7 +62,9 @@ export type SoundEffect = {
  */
 export type SoundEffectEditableFields = Omit<SoundEffect, 'id' | 'format'>
 
-export type SoundGroup = SoundGroupSource | SoundGroupReference
+export type SoundGroup = SoundGroupSource | SoundGroupReference | SoundGroupSequence
+
+export type SequenceElementID = `seq-${string}-${string}-${string}-${string}-${string}`
 
 /**
  * Represents a group of independent sound effects. Note that this is represented by a series of
@@ -117,6 +119,37 @@ export type SoundGroupReference = {
   id: GroupID
   boardID: BoardID
   category: CategoryID
+}
+
+export type SoundGroupSequenceDelay = {
+  type: 'delay'
+  id: SequenceElementID
+  msToDelay: number
+}
+
+export type SoundGroupSequenceGroup = {
+  type: 'group'
+  id: SequenceElementID
+  groupID: GroupID
+}
+
+export type SoundGroupSequenceElement = SoundGroupSequenceGroup | SoundGroupSequenceDelay
+
+export type SoundGroupSequence = {
+  type: 'sequence'
+  id: GroupID
+  name: string
+  icon: SoundIcon
+  boardID: BoardID
+  category: CategoryID
+  sequence: [SoundGroupSequenceElement, ...SoundGroupSequenceElement[]]
+}
+
+export type SoundGroupSequenceEditableFields = Omit<
+  SoundGroupSequence,
+  'id' | 'type' | 'sequence'
+> & {
+  sequence: SoundGroupSequenceElement[]
 }
 
 /**

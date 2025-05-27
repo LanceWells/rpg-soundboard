@@ -2968,6 +2968,22 @@ html {
   height: 100%;
 }
 
+.h-12 {
+  height: 3rem;
+}
+
+.h-48 {
+  height: 12rem;
+}
+
+.h-16 {
+  height: 4rem;
+}
+
+.h-14 {
+  height: 3.5rem;
+}
+
 .max-h-72 {
   max-height: 18rem;
 }
@@ -3026,6 +3042,22 @@ html {
   width: max-content;
 }
 
+.w-12 {
+  width: 3rem;
+}
+
+.w-48 {
+  width: 12rem;
+}
+
+.w-16 {
+  width: 4rem;
+}
+
+.w-14 {
+  width: 3.5rem;
+}
+
 .min-w-36 {
   min-width: 9rem;
 }
@@ -3051,11 +3083,6 @@ html {
   max-width: 20rem;
 }
 
-.max-w-max {
-  max-width: -moz-max-content;
-  max-width: max-content;
-}
-
 .flex-grow {
   flex-grow: 1;
 }
@@ -3078,56 +3105,16 @@ html {
           user-select: none;
 }
 
-.auto-cols-min {
-  grid-auto-columns: min-content;
-}
-
-.auto-cols-max {
-  grid-auto-columns: max-content;
-}
-
-.auto-cols-fr {
-  grid-auto-columns: minmax(0, 1fr);
-}
-
-.auto-cols-auto {
-  grid-auto-columns: auto;
-}
-
-.grid-flow-col {
-  grid-auto-flow: column;
-}
-
-.grid-flow-dense {
-  grid-auto-flow: dense;
-}
-
-.grid-flow-row-dense {
-  grid-auto-flow: row dense;
-}
-
-.auto-rows-max {
-  grid-auto-rows: max-content;
-}
-
-.auto-rows-min {
-  grid-auto-rows: min-content;
-}
-
-.auto-rows-fr {
-  grid-auto-rows: minmax(0, 1fr);
-}
-
-.auto-rows-auto {
-  grid-auto-rows: auto;
-}
-
 .grid-cols-\[minmax\(0\2c _1fr\)_min-content\] {
   grid-template-columns: minmax(0, 1fr) min-content;
 }
 
-.grid-cols-2 {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+.grid-rows-2 {
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+}
+
+.grid-rows-1 {
+  grid-template-rows: repeat(1, minmax(0, 1fr));
 }
 
 .flex-row {
@@ -3316,10 +3303,6 @@ html {
   text-align: center;
 }
 
-.align-middle {
-  vertical-align: middle;
-}
-
 .text-2xl {
   font-size: 1.5rem;
   line-height: 2rem;
@@ -3441,6 +3424,14 @@ html {
   grid-area: lookup;
 }
 
+.\[grid-area\:_name\] {
+  grid-area: name;
+}
+
+.\[grid-area\:_newbutton\] {
+  grid-area: newbutton;
+}
+
 .\[grid-area\:_preview\] {
   grid-area: preview;
 }
@@ -3467,6 +3458,10 @@ html {
 
 .\[grid-template-areas\:\"title_delete\"_\"slider_preview\"\] {
   grid-template-areas: "title delete" "slider preview";
+}
+
+.\[grid-template-areas\:_\"\"\] {
+  grid-template-areas: "";
 }
 
 .\[grid-template-areas\:_\"board_category_link_group\"_\"edit_edit_edit_edit\"\] {

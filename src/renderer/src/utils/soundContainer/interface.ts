@@ -1,11 +1,5 @@
 import { EffectID } from 'src/apis/audio/types/effects'
-import {
-  GetSoundResponse,
-  GetSoundsResponse,
-  GroupID,
-  SoundEffectWithPlayerDetails
-} from 'src/apis/audio/types/groups'
-import { SoundEffect } from 'src/apis/audio/types/items'
+import { GroupID, SoundEffectWithPlayerDetails } from 'src/apis/audio/types/groups'
 import { SoundVariants } from 'src/apis/audio/types/soundVariants'
 
 /**
