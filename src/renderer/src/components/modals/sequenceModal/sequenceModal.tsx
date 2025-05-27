@@ -1,6 +1,6 @@
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { useAudioStore } from '@renderer/stores/audio/audioStore'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { CreateSequenceRequest } from 'src/apis/audio/types/groups'
 import { useShallow } from 'zustand/react/shallow'
 import SequenceItem from './sequenceItem'
@@ -20,27 +20,25 @@ export type SequenceModalProps = {
 export default function SequenceModal(props: SequenceModalProps) {
   const { actionName, handleSubmit, id, modalTitle, handleClose } = props
 
-  const { editingSequence, updateSequenceName, newBlankElement, updateSequenceOrder } =
-    useAudioStore(
-      useShallow((state) => ({
-        editingSequence: state.editingSequence,
-        updateSequenceName: state.updateSequenceName,
-        updateSequenceOrder: state.updateSequenceElements,
-        newBlankElement: () =>
-          state.updateSequenceElements([
-            { type: 'delay', id: `seq-${crypto.randomUUID()}`, msToDelay: 0 },
-            ...(state.editingSequence?.sequence ?? [])
-          ])
-      }))
-    )
+  const { editingSequence, updateSequenceName, updateSequenceOrder } = useAudioStore(
+    useShallow((state) => ({
+      editingSequence: state.editingSequence,
+      updateSequenceName: state.updateSequenceName,
+      updateSequenceOrder: state.updateSequenceElements
+    }))
+  )
+
+  const newBlankElement = () =>
+    updateSequenceOrder([
+      { type: 'delay', id: `seq-${crypto.randomUUID()}`, msToDelay: 0 },
+      ...(editingSequence?.sequence ?? [])
+    ])
 
   const [effectNameErr, setEffectNameErr] = useState('')
 
   const seq = editingSequence?.sequence ?? []
   const editableItems = seq.map((e) => e.id) ?? []
-  const sortableElements = useMemo(() => {
-    return seq.map((s) => <SequenceItem sequence={s} key={s.id} />)
-  }, [seq])
+  const sortableElements = seq.map((s) => <SequenceItem sequence={s} key={s.id} />)
 
   const onDragEnd = (event: DragEndEvent) => {
     const { active, over } = event

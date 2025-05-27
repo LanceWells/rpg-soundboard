@@ -2,14 +2,17 @@ import { useAudioStore } from '@renderer/stores/audio/audioStore'
 import TextField from '../../generic/textField'
 import { ChangeEventHandler, MouseEventHandler, useCallback, useState } from 'react'
 import CloseIcon from '@renderer/assets/icons/close'
+import { useShallow } from 'zustand/react/shallow'
 
 export const NewCategoryModalId = 'new-category-modal'
 
 export default function NewCategoryModal() {
-  const { addCategory, editingBoardID } = useAudioStore((state) => ({
-    addCategory: state.addCategory,
-    editingBoardID: state.editingBoardID
-  }))
+  const { addCategory, editingBoardID } = useAudioStore(
+    useShallow((state) => ({
+      addCategory: state.addCategory,
+      editingBoardID: state.editingBoardID
+    }))
+  )
 
   const [name, setName] = useState('')
   const [nameErr, setNameErr] = useState('')

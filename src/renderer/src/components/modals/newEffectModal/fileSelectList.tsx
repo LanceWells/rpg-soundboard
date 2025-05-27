@@ -15,9 +15,11 @@ export type FileSelectInputProps = {
 export function FileSelectInput(props: FileSelectInputProps) {
   const { className, error } = props
 
-  const { addWorkingFiles } = useAudioStore((state) => ({
-    addWorkingFiles: state.addWorkingFiles
-  }))
+  const { addWorkingFiles } = useAudioStore(
+    useShallow((state) => ({
+      addWorkingFiles: state.addWorkingFiles
+    }))
+  )
 
   const fileInputRef = useRef<HTMLInputElement>(null)
 
@@ -30,7 +32,7 @@ export function FileSelectInput(props: FileSelectInputProps) {
       const newFile = e.target.files.item(0)!
 
       addWorkingFiles({
-        path: newFile.path,
+        path: newFile.webkitRelativePath,
         volume: 100,
         name: newFile.name
       })
@@ -124,9 +126,9 @@ function FileEntry(props: FileEntryProps) {
     updateWorkingFile: state.updateWorkingFile
   }))
 
-  const stopHandler = useRef<() => void>()
-  const volumeHandler = useRef<(volume: number) => void>()
-  const playHandler = useRef<() => void>()
+  const stopHandler = useRef<() => void>(null)
+  const volumeHandler = useRef<(volume: number) => void>(null)
+  const playHandler = useRef<() => void>(null)
 
   useEffect(() => {
     async function loadSound() {

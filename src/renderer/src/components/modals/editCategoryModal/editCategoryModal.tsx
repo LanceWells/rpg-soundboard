@@ -4,17 +4,18 @@ import { NewCategoryModalId } from '../newCategoryModal/newCategoryModal'
 import { useAudioStore } from '@renderer/stores/audio/audioStore'
 import CloseIcon from '@renderer/assets/icons/close'
 import DeleteButton from '@renderer/components/generic/deleteButton'
+import { useShallow } from 'zustand/react/shallow'
 
 export const EditCategoryModalId = 'edit-category-modal'
 
 export default function EditCategoryModal() {
   const { updateCategory, deleteCategory, editingBoardID, editingCategory } = useAudioStore(
-    (state) => ({
+    useShallow((state) => ({
       updateCategory: state.updateCategory,
       deleteCategory: state.deleteCategory,
       editingBoardID: state.editingBoardID,
       editingCategory: state.editingCategory
-    })
+    }))
   )
 
   const [name, setName] = useState('')
