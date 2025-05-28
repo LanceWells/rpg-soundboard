@@ -26,12 +26,19 @@ export default function SequenceItem(props: SequenceItemProps) {
 
   return (
     <div>
-      <div ref={setNodeRef} style={style} {...attributes} className="flex flex-row">
+      <div ref={setNodeRef} style={style} {...attributes} className="flex flex-row items-center">
+        <input
+          type="number"
+          className="input validator"
+          required
+          placeholder="Delay (in ms)"
+          min="-10000"
+          max="10000"
+          title="Must be between -10000 and 10000"
+        />
         <div {...listeners}>
           <MoveIcon />
         </div>
-        <input />
-        <span>{sequence.id}</span>
       </div>
     </div>
   )

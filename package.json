@@ -60,6 +60,7 @@
     "@electron-toolkit/tsconfig": "^1.0.1",
     "@iconify-json/game-icons": "^1.2.3",
     "@iconify/utils": "^2.3.0",
+    "@tailwindcss/cli": "^4.1.7",
     "@types/node": "^22.15.23",
     "@types/react": "^19.1.0",
     "@types/react-color": "^3.0.12",
