@@ -87,48 +87,48 @@ export default function Board(props: BoardProps) {
 
   // const groupCategories = board.groups.map((g) => g.category)
 
-  const collisionDetectionStrategy: CollisionDetection = useCallback(
-    (args) => {
-      if (IdIsCategory(draggingID)) {
-        return closestCenter({
-          ...args,
-          droppableContainers: args.droppableContainers.filter((c) => IdIsCategory(c.id))
-        })
+  const collisionDetectionStrategy: CollisionDetection = (args) => {
+    if (IdIsCategory(draggingID)) {
+      console.debug(
+        JSON.stringify(args.droppableContainers.filter((c) => IdIsCategory(c.id)).map((c) => c.id))
+      )
+      return closestCenter({
+        ...args,
+        droppableContainers: args.droppableContainers.filter((c) => IdIsCategory(c.id))
+      })
+    }
+
+    // This should be the only other possible path, but add this check anyway JIC we decide to add
+    // new container types.
+    if (IdIsGroup(draggingID)) {
+      const intersectingCategories = pointerWithin(args).filter((c) => IdIsCategory(c.id))
+
+      // If we're not over any containers, assume that we're dragging this group into the
+      // uncategorized section.
+      if (intersectingCategories.length === 0) {
+        return []
       }
 
-      // This should be the only other possible path, but add this check anyway JIC we decide to add
-      // new container types.
-      if (IdIsGroup(draggingID)) {
-        const intersectingCategories = pointerWithin(args).filter((c) => IdIsCategory(c.id))
+      const overCategory = intersectingCategories[0]
+      const overCategoryGroups = getGroupsForCategory(overCategory.id as CategoryID)
+      const overCategoryGroupIDs = overCategoryGroups.map((g) => g.id)
 
-        // If we're not over any containers, assume that we're dragging this group into the
-        // uncategorized section.
-        if (intersectingCategories.length === 0) {
-          return []
-        }
-
-        const overCategory = intersectingCategories[0]
-        const overCategoryGroups = getGroupsForCategory(overCategory.id as CategoryID)
-        const overCategoryGroupIDs = overCategoryGroups.map((g) => g.id)
-
-        if (!overCategoryGroupIDs.includes(draggingID)) {
-          return [overCategory]
-        }
-
-        const closestGroupInCategory = closestCenter({
-          ...args,
-          droppableContainers: args.droppableContainers.filter((c) =>
-            overCategoryGroupIDs.includes(c.id as GroupID)
-          )
-        })
-
-        return closestGroupInCategory
+      if (!overCategoryGroupIDs.includes(draggingID)) {
+        return [overCategory]
       }
 
-      return []
-    },
-    [draggingID, categoryIDs, groupIDs]
-  )
+      const closestGroupInCategory = closestCenter({
+        ...args,
+        droppableContainers: args.droppableContainers.filter((c) =>
+          overCategoryGroupIDs.includes(c.id as GroupID)
+        )
+      })
+
+      return closestGroupInCategory
+    }
+
+    return []
+  }
 
   const onDragEnd = useCallback(
     (event: DragEndEvent) => {

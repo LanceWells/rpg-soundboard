@@ -1,8 +1,12 @@
+import { twMerge } from 'tailwind-merge'
+
 export default function GroupIcon(props: { className?: string }) {
   const { className } = props
 
+  const mergedClass = twMerge('fill-current stroke-current w-8 h-8', className)
+
   return (
-    <svg className={`fill-current w-8 h-8 ${className}`} viewBox="0 0 512 512">
+    <svg className={mergedClass} viewBox="0 0 512 512">
       <g>
         <path
           d="M256,0C114.609,0,0,114.609,0,256s114.609,256,256,256s256-114.609,256-256

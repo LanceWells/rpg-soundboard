@@ -27,7 +27,7 @@ export const BoardsAudioAPI: IBoards = {
     const uuid = crypto.randomUUID()
     const newBoardID: BoardID = `brd-${uuid}`
     const defaultCategory: SoundCategory = {
-      id: `brd-${crypto.randomUUID()}` as CategoryID,
+      id: `cat-${crypto.randomUUID()}`,
       name: request.name
     }
 

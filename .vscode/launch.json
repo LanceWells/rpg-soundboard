@@ -24,8 +24,7 @@
       "timeout": 60000,
       "presentation": {
         "hidden": true
-      },
-      "preLaunchTask": "npm: tailwind"
+      }
     }
   ],
   "compounds": [
