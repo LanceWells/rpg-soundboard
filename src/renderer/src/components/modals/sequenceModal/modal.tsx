@@ -1,5 +1,5 @@
 import { useAudioStore } from '@renderer/stores/audio/audioStore'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { CreateSequenceRequest, GroupID } from 'src/apis/audio/types/groups'
 import { useShallow } from 'zustand/react/shallow'
 import TextField from '@renderer/components/generic/textField'
@@ -9,8 +9,9 @@ import { SequenceElementID, SoundGroupSequenceElement } from 'src/apis/audio/typ
 import { snapCenterToCursor } from '@dnd-kit/modifiers'
 import SequenceGroupSelector, { SelectorElement } from './groupSelector'
 import { IdIsGroup } from '@renderer/utils/id'
-import SequenceEditingZone from './editingZone'
+import SequenceEditingZone, { dropZoneScrollContainerID, EditingDropZoneID } from './editingZone'
 import { v4 as uuidv4 } from 'uuid'
+import { usePrevious } from '@dnd-kit/utilities'
 
 export type SequenceModalProps = {
   id: string
@@ -53,11 +54,25 @@ export default function SequenceModal(props: SequenceModalProps) {
 
   const seq = editingSequence?.sequence ?? []
   const [draggingID, setDraggingID] = useState<GroupID | null>(null)
+  const prevItemCount = usePrevious(editingSequence?.sequence.length)
+
+  useEffect(() => {
+    const itemCount = editingSequence?.sequence.length
+    if (itemCount === (prevItemCount ?? 0) + 1) {
+      const scrollContainer = document.getElementById(dropZoneScrollContainerID)
+      const lastElement = scrollContainer?.children[scrollContainer.children.length - 1]
+      lastElement?.scrollIntoView({ behavior: 'smooth' })
+    }
+  }, [editingSequence, prevItemCount])
 
   const onDragEnd = (event: DragEndEvent) => {
     const { active, over } = event
     console.debug(active)
     console.debug(over)
+
+    if (over?.id !== EditingDropZoneID) {
+      return
+    }
 
     const activeID = active.id
 
@@ -111,9 +126,11 @@ export default function SequenceModal(props: SequenceModalProps) {
               grid
               py-2
               [grid-template-areas:"sequence_picker"_"sequence_picker"_"controls_controls"]
-              grid-cols-[1fr_1fr]
+              grid-cols-[2fr_1fr]
               grid-rows-[1fr_min-content]
-              h-80
+              w-[640px]
+              h-[360px]
+              max-h-[360px]
               gap-2
             `}
           >

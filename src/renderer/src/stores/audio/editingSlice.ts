@@ -106,9 +106,7 @@ export interface EditingSlice {
   removeBoardReference: (sourceBoard: BoardID, sourceGroup: GroupID) => void
   updateBoardReference: IAudioApi['Groups']['UpdateLink']
   updateSequenceName: (newName: string) => void
-  updateSequenceElements: (
-    newSequence: [SoundGroupSequenceElement, ...SoundGroupSequenceElement[]]
-  ) => void
+  updateSequenceElements: (newSequence: SoundGroupSequenceElement[]) => void
 }
 
 export const createEditingSlice: StateCreator<EditingSlice & BoardSlice, [], [], EditingSlice> = (

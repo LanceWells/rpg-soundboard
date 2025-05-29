@@ -3,9 +3,12 @@ import { useShallow } from 'zustand/shallow'
 import SequenceItem from './item'
 import { DndContext, DragEndEvent, useDroppable } from '@dnd-kit/core'
 import { produce } from 'immer'
-import { SoundGroupSequenceElement } from 'src/apis/audio/types/items'
 import { SortableContext } from '@dnd-kit/sortable'
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers'
+
+export const EditingDropZoneID = 'sequence-edit-drop-zone'
+
+export const dropZoneScrollContainerID = 'drop-zone-scroll-container'
 
 export default function SequenceEditingZone() {
   const { editingSequence, updateSequenceOrder } = useAudioStore(
@@ -15,8 +18,8 @@ export default function SequenceEditingZone() {
     }))
   )
 
-  const { setNodeRef, isOver } = useDroppable({
-    id: 'sequence-edit-drop-zone'
+  const { setNodeRef, isOver, active } = useDroppable({
+    id: EditingDropZoneID
   })
 
   const onDragEnd = (event: DragEndEvent) => {
@@ -41,7 +44,7 @@ export default function SequenceEditingZone() {
       return
     }
 
-    updateSequenceOrder(newOrder as [SoundGroupSequenceElement, ...SoundGroupSequenceElement[]])
+    updateSequenceOrder(newOrder)
   }
 
   const seq = editingSequence?.sequence ?? []
@@ -52,16 +55,49 @@ export default function SequenceEditingZone() {
     <DndContext modifiers={[restrictToVerticalAxis]} onDragEnd={onDragEnd}>
       <SortableContext items={editableItems}>
         <div
-          ref={setNodeRef}
           className={`
-            bg-base-300
-            h-full
-            rounded-md
-            overflow-y-scroll
-            ${isOver && `inset-ring`}
-          `}
+          h-full
+          w-full
+          max-h-full
+          relative
+          overflow-hidden
+          bg-base-300
+          transition-shadow
+          border-dashed
+          rounded-md
+          ${
+            isOver &&
+            `
+              inset-ring
+              ring-offset-2
+              brightness-125
+              after:content-['+']
+              after:absolute
+              after:top-1/2
+              after:left-1/2
+              after:z-10
+              after:text-9xl
+              after:-translate-1/2
+            `
+          }
+        `}
         >
-          {sortableElements}
+          <div
+            ref={setNodeRef}
+            id={dropZoneScrollContainerID}
+            className={`
+            flex
+            gap-2
+            p-2
+            flex-col
+            h-full
+            max-h-full
+            overflow-y-scroll
+            overflow-x-hidden
+          `}
+          >
+            {sortableElements}
+          </div>
         </div>
       </SortableContext>
     </DndContext>
