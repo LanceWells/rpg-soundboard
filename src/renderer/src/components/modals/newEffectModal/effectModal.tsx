@@ -162,7 +162,7 @@ export default function EffectModal(props: PropsWithChildren<EffectModalProps>) 
             required
             className="w-fit [grid-area:form]"
             fieldName="Name"
-            value={editingGroup?.name}
+            value={editingGroup?.name ?? ''}
             error={effectNameErr}
             placeholder="My Sound Effect"
             onChange={(e) => setGroupName(e.target.value)}

@@ -1,3 +1,5 @@
+import { JSX } from 'react'
+
 /**
  * Props for {@link TextField}.
  */
