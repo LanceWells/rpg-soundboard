@@ -80,6 +80,7 @@ export interface EditingSlice {
   editingBoard: SoundBoardFields | null
 
   draggingID: string | null
+  sequenceDraggingID: GroupID | null
 
   editingSequence: SoundGroupSequenceEditableFields | undefined
 
@@ -99,6 +100,7 @@ export interface EditingSlice {
   setGroupCategory: (categoryID: CategoryID) => void
   setSelectedIcon: (icon: SoundIcon) => void
   setDraggingID: (id: string | null) => void
+  setSequenceDraggingID: (id: GroupID | null) => void
   setBoardName: (name: string | undefined) => void
   addBoardReference: (sourceBoard: BoardID, sourceGroup: GroupID) => void
   removeBoardReference: (sourceBoard: BoardID, sourceGroup: GroupID) => void
@@ -121,6 +123,7 @@ export const createEditingSlice: StateCreator<EditingSlice & BoardSlice, [], [],
   editingGroupID: undefined,
   editingMode: 'Off' as EditingMode,
   editingSequence: undefined,
+  sequenceDraggingID: null,
   addBoardReference(sourceBoard, sourceGroup) {
     const activeBoardID = get().activeBoardID
     const activeBoard = get().boards.find((b) => b.id === activeBoardID) ?? null
@@ -240,6 +243,11 @@ export const createEditingSlice: StateCreator<EditingSlice & BoardSlice, [], [],
   setDraggingID(id) {
     set({
       draggingID: id
+    })
+  },
+  setSequenceDraggingID(id) {
+    set({
+      sequenceDraggingID: id
     })
   },
   setEditingBoardID(id) {

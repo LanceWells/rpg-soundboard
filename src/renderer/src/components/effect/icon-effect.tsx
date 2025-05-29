@@ -1,6 +1,8 @@
 import { soundboardIcons } from '@renderer/utils/fetchIcons'
-import { Parser } from 'html-to-react'
+import { Parser, ProcessNodeDefinitions } from 'html-to-react'
+import { JSX } from 'react'
 import { SoundIcon } from 'src/apis/audio/types/items'
+import { twMerge } from 'tailwind-merge'
 
 /**
  * Props for {@link IconEffect}.
@@ -15,6 +17,8 @@ export type IconEffectProps = {
    * Optional class name, will be rendered on the root element after other, required classes.
    */
   className?: string
+
+  size?: number
 }
 
 /**
@@ -25,10 +29,27 @@ export type IconEffectProps = {
  * @param props See {@link IconEffectProps}.
  */
 export function IconEffect(props: IconEffectProps) {
-  const { icon, className } = props
+  const { icon, className, size } = props
 
   const iconBody = soundboardIcons.GetIcon(icon?.name ?? 'moon')
-  const reactNode = Parser().parse(iconBody?.body ?? '')
+  const { processDefaultNode } = ProcessNodeDefinitions()
+
+  const reactNode = Parser().parseWithInstructions(iconBody?.body, () => true, [
+    {
+      shouldProcessNode: (_node) => {
+        return true
+      },
+      processNode: function (node, children, index) {
+        if (size && size > 0) {
+          node.attribs.height = size?.toString()
+          node.attribs.width = size?.toString()
+        }
+        return processDefaultNode(node, children, index)
+      }
+    }
+  ])
+
+  const mergedClass = twMerge(`rounded-lg w-24 h-24`, className)
 
   return (
     <div
@@ -36,7 +57,7 @@ export function IconEffect(props: IconEffectProps) {
         backgroundColor: icon?.backgroundColor ?? 'white',
         color: icon?.foregroundColor ?? 'black'
       }}
-      className={`rounded-lg w-24 h-24 ${className}`}
+      className={mergedClass}
     >
       {reactNode}
     </div>

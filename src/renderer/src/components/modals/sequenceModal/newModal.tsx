@@ -1,4 +1,4 @@
-import SequenceModal from './sequenceModal'
+import SequenceModal from './modal'
 
 export const NewSequenceModalId = 'new-sequence-modal'
 

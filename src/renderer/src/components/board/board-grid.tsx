@@ -6,7 +6,6 @@ import { useShallow } from 'zustand/react/shallow'
 import BoardIcon from '@renderer/assets/icons/board'
 import GroupIcon from '@renderer/assets/icons/group'
 import CategoryIcon from '@renderer/assets/icons/category'
-import { NewEffectModalId } from '../modals/newEffectModal/newEffectModal'
 import { NewCategoryModalId } from '../modals/newCategoryModal/newCategoryModal'
 import PencilIcon from '@renderer/assets/icons/pencil'
 import { EditBoardModalId } from '../modals/newBoardModal/editBoardModal'
@@ -55,8 +54,6 @@ export default function BoardGrid() {
     if (activeBoardID) {
       setEditingBoardID(activeBoardID)
       resetEditingGroup()
-      // TODO: UNDO PLZ
-      // ;(document.getElementById(NewEffectModalId) as HTMLDialogElement).showModal()
       ;(document.getElementById(NewGroupSelectModalId) as HTMLDialogElement).showModal()
     }
   }, [activeBoardID])

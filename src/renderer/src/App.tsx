@@ -7,7 +7,7 @@ import NewCategoryModal from './components/modals/newCategoryModal/newCategoryMo
 import EditEffectModal from './components/modals/newEffectModal/editEffectModal'
 import NewEffectModal from './components/modals/newEffectModal/newEffectModal'
 import NewGroupSelectModal from './components/modals/newGroupSelectModal/newGroupSelectModal'
-import NewSequenceModal from './components/modals/sequenceModal/newSequenceModal'
+import NewSequenceModal from './components/modals/sequenceModal/newModal'
 
 /**
  * The base of the application. This is the root of the tree and contains all base-level elements.
