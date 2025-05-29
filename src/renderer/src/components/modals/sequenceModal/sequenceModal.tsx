@@ -69,10 +69,10 @@ export default function SequenceModal(props: SequenceModalProps) {
     <dialog id={id} className="modal">
       <div className="modal-box min-w-fit overflow-visible relative">
         <h3 className="font-bold text-lg">{modalTitle}</h3>
-        <div className='[grid-template-areas:_""]'>
+        <div className='[grid-template-areas:""]'>
           <TextField
             required
-            className="[grid-area:_name]"
+            className="[grid-area:name]"
             fieldName="Name"
             value={editingSequence?.name}
             error={effectNameErr}
@@ -87,7 +87,7 @@ export default function SequenceModal(props: SequenceModalProps) {
                 </SortableContext>
               </DndContext>
             </div>
-            <button className="[grid-area:_newbutton] btn btn-secondary" onClick={newBlankElement}>
+            <button className="[grid-area:newbutton] btn btn-secondary" onClick={newBlankElement}>
               New Element
             </button>
           </div>

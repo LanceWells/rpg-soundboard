@@ -8,7 +8,6 @@ import {
   useState
 } from 'react'
 import IconLookup from '../../effect/iconLookup'
-import { ColorResult } from 'react-color'
 import { IconEffect } from '../../effect/icon-effect'
 import ColorPicker from './colorPicker'
 import TextField from '../../generic/textField'
@@ -54,11 +53,11 @@ export default function EffectModal(props: PropsWithChildren<EffectModalProps>) 
   const [fileListErr, setFileListErr] = useState('')
 
   const handleForegroundSelect = useCallback(
-    (c: ColorResult) => {
+    (hex: string) => {
       if (editingGroup !== null) {
         setSelectedIcon({
           backgroundColor: editingGroup.icon.backgroundColor,
-          foregroundColor: c.hex,
+          foregroundColor: hex,
           name: editingGroup.icon.name
         })
       }
@@ -67,10 +66,10 @@ export default function EffectModal(props: PropsWithChildren<EffectModalProps>) 
   )
 
   const handleBackgroundSelect = useCallback(
-    (c: ColorResult) => {
+    (hex: string) => {
       if (editingGroup !== null) {
         setSelectedIcon({
-          backgroundColor: c.hex,
+          backgroundColor: hex,
           foregroundColor: editingGroup.icon.foregroundColor,
           name: editingGroup.icon.name
         })
@@ -153,35 +152,37 @@ export default function EffectModal(props: PropsWithChildren<EffectModalProps>) 
           className={`
             grid
             gap-4
-            [grid-template-areas:_"icon_form_fileselect"_"lookup_lookup_files"_"foreground_background_toggles"]
+            [grid-template-areas:"icon_form_fileselect"_"lookup_lookup_files"_"foreground_background_toggles"]
             items-center
             w-full
           `}
         >
-          <IconEffect className="[grid-area:_icon]" icon={editingGroup?.icon} />
+          <IconEffect className="[grid-area:icon]" icon={editingGroup?.icon} />
           <TextField
             required
-            className="w-fit [grid-area:_form]"
+            className="w-fit [grid-area:form]"
             fieldName="Name"
             value={editingGroup?.name}
             error={effectNameErr}
             placeholder="My Sound Effect"
             onChange={(e) => setGroupName(e.target.value)}
           />
-          <FileSelectInput error={fileListErr} className="[grid-area:_fileselect]" />
-          <FileSelectList className="[grid-area:_files]" />
-          <IconLookup className="[grid-area:_lookup] w-full" />
+          <FileSelectInput error={fileListErr} className="[grid-area:fileselect]" />
+          <FileSelectList className="[grid-area:files]" />
+          <IconLookup className="[grid-area:lookup] w-full" />
           <ColorPicker
+            pickerID="foreground-icon"
             title="Foreground"
             color={editingGroup?.icon.foregroundColor ?? 'gray'}
             onColorChange={handleForegroundSelect}
-            className="[grid-area:_foreground]"
+            className="[grid-area:foreground]"
           />
           <ColorPicker
+            pickerID="background-icon"
             title="Background"
             color={editingGroup?.icon.backgroundColor ?? 'gray'}
             onColorChange={handleBackgroundSelect}
-            className="[grid-area:_background]"
+            className="[grid-area:background]"
           />
           <label className="form-control w-full max-w-xs">
             <div className="label">

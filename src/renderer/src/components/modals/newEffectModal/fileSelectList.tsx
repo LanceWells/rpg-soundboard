@@ -255,7 +255,7 @@ function FileEntry(props: FileEntryProps) {
       className={`
         grid
         items-center
-        grid-cols-[minmax(0,_1fr)_min-content]
+        grid-cols-[minmax(0,1fr)_min-content]
         w-full
         max-w-80
         p-4
@@ -269,7 +269,7 @@ function FileEntry(props: FileEntryProps) {
         text-ellipsis
         overflow-hidden
         text-nowrap
-        [grid-area:_title]
+        [grid-area:title]
         `}
       >
         {file.name}
@@ -280,7 +280,7 @@ function FileEntry(props: FileEntryProps) {
         btn
         btn-square
         btn-error
-        [grid-area:_delete]
+        [grid-area:delete]
         `}
       >
         <CloseIcon />
@@ -299,7 +299,7 @@ function FileEntry(props: FileEntryProps) {
         className={`
           btn
         btn-square
-        [grid-area:_preview]
+        [grid-area:preview]
         ${playState === 'Loading' ? 'disabled btn-disabled' : 'btn btn-secondary'}
       `}
       >

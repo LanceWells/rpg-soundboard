@@ -42,7 +42,7 @@ export function IconPreview(props: IconPreviewProps) {
         gap-4
         rounded-md
         p-2
-        [grid-template-columns:_min-content_1fr]
+        grid-cols-[min-content_1fr]
         w-full
         btn
         h-fit

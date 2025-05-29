@@ -291,9 +291,9 @@ export default function Board(props: BoardProps) {
         relative
         h-full
         max-h-full
-        [grid-template-areas:_"categories_categories_categories"_"groups_groups_groups"_"delete_._."]
-        [grid-template-columns:_max-content_1fr_min-content]
-        [grid-template-rows:_max-content_1fr_80px]
+        [grid-template-areas:"categories_categories_categories"_"groups_groups_groups"_"delete_._."]
+        grid-cols-[max-content_1fr_min-content]
+        grid-rows-[max-content_1fr_80px]
     `}
     >
       <DndContext

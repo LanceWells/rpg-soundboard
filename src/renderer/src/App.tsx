@@ -14,7 +14,7 @@ import NewSequenceModal from './components/modals/sequenceModal/newSequenceModal
  */
 export default function App() {
   return (
-    <div className="flex flex-col h-full flex-grow">
+    <div className="flex flex-col h-full grow">
       <NewSequenceModal />
       <NewGroupSelectModal />
       <NewEffectModal />

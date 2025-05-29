@@ -122,7 +122,7 @@ export default function Categorized(props: CategorizedProps) {
         </div>
         <div
           className={`
-          bg-[rgb(255_255_255_/_10%)]
+          bg-[rgb(255_255_255/10%)]
           absolute w-full
           h-full
           top-0

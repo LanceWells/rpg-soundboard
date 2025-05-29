@@ -137,7 +137,7 @@ export default function BoardGrid() {
           </button>
           <a
             className={`
-            ${b.id === activeBoardID ? 'outline' : ''}
+            ${b.id === activeBoardID ? 'outline w-full' : ''}
             `}
           >
             {b.name}
@@ -161,35 +161,37 @@ export default function BoardGrid() {
         w-full
         max-h-full
         overflow-hidden
-        [grid-template-columns:_min-content_1fr]
+        grid-cols-[min-content_1fr]
     `}
     >
-      <div className="bg-base-200 w-56 grid [grid-template-rows:_1fr_min-content]">
-        <ul className="menu m-2">{boardTabs}</ul>
+      <div className="bg-base-200 w-56 grid grid-rows-[1fr_min-content]">
+        <ul className="menu w-full">{boardTabs}</ul>
         <div
           className={`
             grid
-            [grid-template-areas:_"board_category_link_group"_"edit_edit_edit_edit"]
+            [grid-template-areas:"board_category_link_group"_"edit_edit_edit_edit"]
             gap-y-2
-            m-2`}
+            justify-between
+            p-2
+            w-full`}
         >
           <div className="tooltip" data-tip="New Board">
-            <button className="btn btn-secondary btn-circle" onClick={onNewBoard}>
+            <button className="btn btn-secondary btn-soft p-2" onClick={onNewBoard}>
               <BoardIcon />
             </button>
           </div>
           <div className="tooltip" data-tip="New Category" onClick={onNewCategory}>
-            <button className="btn btn-accent btn-circle">
+            <button className="btn btn-accent btn-soft p-2">
               <CategoryIcon />
             </button>
           </div>
           <div className="tooltip" data-tip="Link Effect" onClick={onLinkGroup}>
-            <button className="btn btn-primary btn-circle">
+            <button className="btn btn-primary btn-soft p-2">
               <LinkIcon />
             </button>
           </div>
           <div className="tooltip" data-tip="New Effect" onClick={onNewGroup}>
-            <button className="btn btn-primary btn-circle">
+            <button className="btn btn-primary btn-soft p-2">
               <GroupIcon />
             </button>
           </div>
@@ -198,7 +200,7 @@ export default function BoardGrid() {
               btn
               w-full
               [grid-area:edit]
-              ${editingMode === 'Editing' ? 'btn-ghost' : 'btn-outline'}
+              ${editingMode === 'Editing' ? 'btn-ghost' : 'btn-soft'}
             `}
             onClick={onClickEdit}
           >

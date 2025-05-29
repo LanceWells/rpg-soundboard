@@ -1,5 +1,4 @@
-import { useCallback, useState } from 'react'
-import { CirclePicker, ColorResult } from 'react-color'
+import { useCallback, useRef, useState } from 'react'
 
 export const ColorOptions = {
   cyan: '#16a085',
@@ -15,18 +14,18 @@ export const ColorOptions = {
 }
 
 export type ColorOptions = keyof typeof ColorOptions
-
 export const ColorOptionsHexes = Object.values(ColorOptions)
 
 export type ColorPickerProps = {
+  pickerID: string
   color: string
-  onColorChange: (color: ColorResult) => void
+  onColorChange: (hex: string) => void
   title: string
   className?: string
 }
 
 export default function ColorPicker(props: ColorPickerProps) {
-  const { color, onColorChange, title, className } = props
+  const { pickerID, color, onColorChange, title, className } = props
 
   const [pickerOpen, setPickerOpen] = useState(false)
 
@@ -34,39 +33,44 @@ export default function ColorPicker(props: ColorPickerProps) {
     setPickerOpen(!pickerOpen)
   }, [pickerOpen, setPickerOpen])
 
-  const handleSelectColor = useCallback(
-    (e: ColorResult) => {
-      setPickerOpen(false)
-      onColorChange(e)
-    },
-    [setPickerOpen, onColorChange]
-  )
+  const popoverTarget = `popover-${pickerID}`
+  const anchorTarget = `--anchor-${pickerID}`
+
+  const popoverRef = useRef<HTMLDivElement | null>(null)
 
   return (
     <div className={`relative flex items-center gap-4 mt-4 ${className}`}>
       <span className="text-lg">{title}</span>
       <button
-        style={{
-          background: color,
-          borderWidth: 4
-        }}
+        popoverTarget={popoverTarget}
+        style={
+          {
+            background: color,
+            borderWidth: 4,
+            anchorName: anchorTarget
+          } as React.CSSProperties
+        }
         className="btn btn-circle btn-outline"
         onClick={handleClickPicker}
       />
       <div
-        className={`
-          absolute
-          bg-base-100
-          shadow-md
-          p-4
-          outline
-          rounded-lg
-          right-0
-          z-10
-          ${pickerOpen ? 'visible' : 'hidden'}
-        `}
+        popover="auto"
+        id={popoverTarget}
+        ref={popoverRef}
+        style={{ positionAnchor: anchorTarget } as React.CSSProperties}
+        className="card dropdown grid grid-cols-3 gap-2 rounded-box bg-base-200 shadow-sm p-2"
       >
-        <CirclePicker colors={ColorOptionsHexes} onChange={handleSelectColor} />
+        {ColorOptionsHexes.map((hex) => (
+          <button
+            key={hex}
+            onClick={() => {
+              popoverRef.current?.hidePopover()
+              onColorChange(hex)
+            }}
+            className="btn-circle w-8 h-8 btn-outline hover:brightness-150 transition-all cursor-pointer"
+            style={{ background: hex }}
+          />
+        ))}
       </div>
     </div>
   )

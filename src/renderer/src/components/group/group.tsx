@@ -225,15 +225,15 @@ export default function Group(props: GroupProps) {
             before:-bottom-0
             `
           }
-          before:[transition-property:_all]
-          before:[transition-timing-function:_cubic-bezier(0.4,_0,_0.2,_1)]
-          before:[transition-duration:_150ms]
+          before:[transition-property:all]
+          before:[transition-timing-function:cubic-bezier(0.4,0,0.2,1)]
+          before:[transition-duration:150ms]
           before:-z-10
           before:absolute
           
           before:rounded-xl
           before:animate-radialspin
-          before:bg-[radial-gradient(circle_at_center,lightgreen,_rebeccapurple)]
+          before:bg-[radial-gradient(circle_at_center,lightgreen,rebeccapurple)]
           `}
         >
           <IconEffect icon={sourceGroup.icon} />
