@@ -10,6 +10,7 @@ import { IconEffect } from '@renderer/components/effect/icon-effect'
 import { useAudioStore } from '@renderer/stores/audio/audioStore'
 import BarsIcon from '@renderer/assets/icons/bars'
 import DeleteIcon from '@renderer/assets/icons/delete'
+import { produce } from 'immer'
 
 type SequenceItemProps = {
   sequence: SoundGroupSequenceElement
@@ -75,6 +76,26 @@ type SequenceItemDelayProps = {
 export function SequenceItemDelay(props: SequenceItemDelayProps) {
   const { sequence } = props
 
+  const updateSequenceElements = useAudioStore((state) => state.updateSequenceElements)
+  const sequenceElements = useAudioStore((state) => state.editingSequence)
+
+  const updateThisTiming: React.ChangeEventHandler<HTMLInputElement> = (e) => {
+    const newSequence = produce(sequenceElements, (draft) => {
+      const thisElement = draft?.sequence.find((s) => s.id === sequence.id && s.type)
+      if (!thisElement || thisElement.type !== 'delay') {
+        return
+      }
+
+      thisElement.msToDelay = e.target.valueAsNumber
+    })
+
+    if (newSequence === undefined) {
+      return
+    }
+
+    updateSequenceElements(newSequence.sequence)
+  }
+
   return (
     <input
       type="number"
@@ -84,6 +105,7 @@ export function SequenceItemDelay(props: SequenceItemDelayProps) {
       min="-10000"
       max="10000"
       title="Must be between -10000 and 10000"
+      onChange={updateThisTiming}
     />
   )
 }

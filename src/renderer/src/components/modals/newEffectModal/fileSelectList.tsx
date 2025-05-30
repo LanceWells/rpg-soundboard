@@ -179,6 +179,7 @@ function FileEntry(props: FileEntryProps) {
           }
         ],
         loadedHandler: {
+          id: undefined,
           handler: handleLoaded
         },
         stopHandler: {

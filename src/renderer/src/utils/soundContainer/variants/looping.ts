@@ -1,14 +1,11 @@
 import { SoundVariants } from 'src/apis/audio/types/soundVariants'
 import { AbstractSoundContainer } from '../abstract'
-import { GroupID } from 'src/apis/audio/types/groups'
 import { SoundContainerSetup } from '../interface'
 
-export class LoopingSoundContainer<
-  TID extends GroupID | undefined = GroupID
-> extends AbstractSoundContainer<TID> {
+export class LoopingSoundContainer extends AbstractSoundContainer {
   Variant: SoundVariants = 'Looping'
 
-  constructor(setup: SoundContainerSetup<TID>) {
+  constructor(setup: SoundContainerSetup) {
     super(setup, true)
   }
 

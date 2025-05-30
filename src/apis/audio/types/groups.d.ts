@@ -164,12 +164,6 @@ export type GetSoundResponse = {
 }
 
 export type SoundEffectWithPlayerDetails = SoundEffect & {
-  // /**
-  //  * The base64 data URL for the file. This can be handed off directly to an audio player to load
-  //  * the sound effect.
-  //  */
-  // soundB64: string
-
   /**
    * If true, this provided sound effect should utilize HTML5 audio. This should be "false" in
    * general. The Web Audio API is preferable in most aspects, but at time of writing our

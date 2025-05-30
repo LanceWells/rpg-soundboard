@@ -1,15 +1,18 @@
 import { Howl } from 'howler'
-import { GroupID, SoundEffectWithPlayerDetails } from 'src/apis/audio/types/groups'
+import { SoundEffectWithPlayerDetails } from 'src/apis/audio/types/groups'
 import { SoundVariants } from 'src/apis/audio/types/soundVariants'
-import { ISoundContainer, LoadedHandler, SoundContainerSetup, StopHandler } from './interface'
+import { Handler, ISoundContainer, SoundContainerSetup, StopHandler } from './interface'
 import { EffectID } from 'src/apis/audio/types/effects'
 import { getRandomInt } from '../random'
 
-export abstract class AbstractSoundContainer<TID extends GroupID | undefined = GroupID>
-  implements ISoundContainer
+export abstract class AbstractSoundContainer<
+  TLoaded extends string = string,
+  TPlaying extends string = string
+> implements ISoundContainer
 {
-  private _stopHandler: StopHandler<TID> | undefined
-  private _loadedHandler: LoadedHandler | undefined
+  private _stopHandler: StopHandler | undefined
+  private _loadedHandler: Handler<TLoaded> | undefined
+  private _playingHandler: Handler<TPlaying> | undefined
 
   protected _lastEffectID: EffectID | undefined
   protected duration: number | undefined
@@ -28,12 +31,20 @@ export abstract class AbstractSoundContainer<TID extends GroupID | undefined = G
     return this._loadedEffect.id
   }
 
+  public get Duration(): number | undefined {
+    return this.duration
+  }
+
   protected SelectEffect(effects: SoundEffectWithPlayerDetails[]): SoundEffectWithPlayerDetails {
     const effectIndex = getRandomInt(0, effects.length - 1)
     return this.effects[effectIndex]
   }
 
-  protected constructor(setup: SoundContainerSetup<TID>, loop: boolean, lastEffectID?: EffectID) {
+  protected constructor(
+    setup: SoundContainerSetup<TLoaded, TPlaying>,
+    loop: boolean,
+    lastEffectID?: EffectID
+  ) {
     const { effects, stopHandler, loadedHandler } = setup
 
     this.effects = effects
@@ -62,6 +73,12 @@ export abstract class AbstractSoundContainer<TID extends GroupID | undefined = G
         html5: this._loadedEffect.useHtml5
       })
     }
+
+    if (this.howl.duration() ?? 0 > 0) {
+      this.duration = this.howl.duration() * 1000
+    }
+
+    this.howl.load()
 
     this._loadedHandler = loadedHandler
     this._stopHandler = stopHandler
@@ -116,7 +133,13 @@ export abstract class AbstractSoundContainer<TID extends GroupID | undefined = G
 
   protected HandleHowlLoaded() {
     if (this._loadedHandler) {
-      this._loadedHandler.handler()
+      this._loadedHandler.handler(this._loadedHandler.id, this)
+    }
+  }
+
+  protected HandleHowlPlaying() {
+    if (this._playingHandler) {
+      this._playingHandler.handler(this._playingHandler.id, this)
     }
   }
 

@@ -1,12 +1,9 @@
 import { SoundVariants } from 'src/apis/audio/types/soundVariants'
 import { AbstractSoundContainer } from '../abstract'
-import { GroupID } from 'src/apis/audio/types/groups'
 import { SoundContainerSetup } from '../interface'
 import dayjs from 'dayjs'
 
-export class SoundtrackSoundContainer<
-  TID extends GroupID | undefined = GroupID
-> extends AbstractSoundContainer<TID> {
+export class SoundtrackSoundContainer extends AbstractSoundContainer {
   Variant: SoundVariants = 'Soundtrack'
 
   private _interval: NodeJS.Timeout | undefined
@@ -43,7 +40,7 @@ export class SoundtrackSoundContainer<
     return 2500
   }
 
-  constructor(setup: SoundContainerSetup<TID>) {
+  constructor(setup: SoundContainerSetup) {
     super(setup, false)
   }
 

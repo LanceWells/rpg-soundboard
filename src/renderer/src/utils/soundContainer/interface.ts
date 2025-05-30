@@ -11,29 +11,40 @@ import { SoundVariants } from 'src/apis/audio/types/soundVariants'
  * If undefined, this implies that there should be no item ID provided in the callback. This is
  * useful for situations in which this container is considered to be a disposiable one-use object.
  */
-export type StopHandler<TID extends GroupID | undefined> = {
+export type StopHandler = {
   /**
    * The ID that is associated with the given effect stopping. This will be undefined if TID is
    * undefined.
    */
-  id: TID
+  id: string
 
   /**
    * The handler to invoke once the sound has stopped playing.
    *
    * @param groupID The group ID that will be provided to the callback method.
    */
-  handler: (groupID: TID) => void
+  handler: (groupID: string) => void
 }
 
-/**
- * Defines the callback handler that will be invoked when the sound is loaded.
- */
-export type LoadedHandler = {
-  /**
-   * The handler to invoke once the sound has loaded.
-   */
-  handler: () => void
+// /**
+//  * Defines the callback handler that will be invoked when the sound is loaded.
+//  */
+// export type LoadedHandler = {
+//   /**
+//    * The ID that is associated with the given effect stopping. This will be undefined if TID is
+//    * undefined.
+//    */
+//   id: string
+
+//   /**
+//    * The handler to invoke once the sound has loaded.
+//    */
+//   handler: (groupID: string, container: ISoundContainer) => void
+// }
+
+export type Handler<T extends string> = {
+  id: T | undefined
+  handler: (groupID: T, container: ISoundContainer) => void
 }
 
 /**
@@ -45,45 +56,23 @@ export type LoadedHandler = {
  * If undefined, this implies that there should be no item ID provided in the callback. This is
  * useful for situations in which this container is considered to be a disposiable one-use object.
  */
-export type SoundContainerSetup<T extends GroupID | undefined> = {
-  // /**
-  //  * The source for the sound that should be played. May either use the `aud://` protocol, or be a
-  //  * direct file path reference.
-  //  */
-  // src: string
-
+export type SoundContainerSetup<
+  TLoaded extends string = string,
+  TPlaying extends string = string
+> = {
   effects: SoundEffectWithPlayerDetails[]
-
-  // /**
-  //  * The volume that the sound should be played at.
-  //  *
-  //  * This value ranges from 0 - 400; 100 implying "full volume".
-  //  */
-  // volume: number
-
-  // /**
-  //  * The file format used with the given sound effect.
-  //  *
-  //  * This is only necessary for base64 data URLs. This value may either include the `.` for a file
-  //  * prefix, or omit it. For example, either `.mp3` or `mp3` are valid.
-  //  */
-  // format?: string
-
-  // /**
-  //  * If true, use HTML5 audio for streaming, as opposed to web audio API. This should typically be
-  //  * true only for large files.
-  //  */
-  // useHtml5: boolean
 
   /**
    * A callback handler that will be invoked when the sound has stopped playing.
    */
-  stopHandler?: StopHandler<T>
+  stopHandler?: StopHandler
 
   /**
    * A callback handler that will be invoked when the sound has loaded.
    */
-  loadedHandler?: LoadedHandler
+  loadedHandler?: Handler<TLoaded>
+
+  playingHandler?: Handler<TPlaying>
 }
 
 export interface ISoundContainer {
@@ -92,5 +81,6 @@ export interface ISoundContainer {
   Stop(): void
   ChangeVolume(volume: number): void
   Fade(ratio: number): void
-  readonly LoadedEffectID: EffectID
+  readonly LoadedEffectID: EffectID | undefined
+  readonly Duration: number | undefined
 }

@@ -5,9 +5,7 @@ import { getRandomArbitrary, getRandomInt } from '@renderer/utils/random'
 import { SoundContainerSetup } from '../interface'
 import { EffectID } from 'src/apis/audio/types/effects'
 
-export class RapidSoundContainer<
-  TID extends GroupID | undefined = GroupID
-> extends AbstractSoundContainer<TID> {
+export class RapidSoundContainer extends AbstractSoundContainer {
   Variant: SoundVariants = 'Rapid'
 
   protected override SelectEffect(effects: SoundEffectWithPlayerDetails[]) {
@@ -20,7 +18,7 @@ export class RapidSoundContainer<
     return effects[effectIndex]
   }
 
-  constructor(setup: SoundContainerSetup<TID>, lastEffectID: EffectID | undefined) {
+  constructor(setup: SoundContainerSetup, lastEffectID: EffectID | undefined) {
     super(setup, false, lastEffectID)
   }
 

@@ -12,6 +12,11 @@ import { IdIsGroup } from '@renderer/utils/id'
 import SequenceEditingZone, { dropZoneScrollContainerID, EditingDropZoneID } from './editingZone'
 import { v4 as uuidv4 } from 'uuid'
 import { usePrevious } from '@dnd-kit/utilities'
+import SoundIcon from '@renderer/assets/icons/sound'
+import {
+  EffectGroup,
+  SequenceSoundContainer
+} from '@renderer/utils/soundContainer/variants/sequence'
 
 export type SequenceModalProps = {
   id: string
@@ -24,14 +29,17 @@ export type SequenceModalProps = {
 export default function SequenceModal(props: SequenceModalProps) {
   const { actionName, handleSubmit, id, modalTitle, handleClose } = props
 
-  const { editingSequence, updateSequenceName, updateSequenceOrder, boards } = useAudioStore(
-    useShallow((state) => ({
-      editingSequence: state.editingSequence,
-      updateSequenceName: state.updateSequenceName,
-      updateSequenceOrder: state.updateSequenceElements,
-      boards: state.boards
-    }))
-  )
+  const { editingSequence, updateSequenceName, updateSequenceOrder, boards, getGroup, getSounds } =
+    useAudioStore(
+      useShallow((state) => ({
+        editingSequence: state.editingSequence,
+        updateSequenceName: state.updateSequenceName,
+        updateSequenceOrder: state.updateSequenceElements,
+        boards: state.boards,
+        getGroup: state.getGroup,
+        getSounds: state.getSounds
+      }))
+    )
 
   const groupSet = useMemo(
     () =>
@@ -46,9 +54,41 @@ export default function SequenceModal(props: SequenceModalProps) {
 
   const newBlankElement = () =>
     updateSequenceOrder([
-      { type: 'delay', id: `seq-${crypto.randomUUID()}`, msToDelay: 0 },
-      ...(editingSequence?.sequence ?? [])
+      ...(editingSequence?.sequence ?? []),
+      { type: 'delay', id: `seq-${crypto.randomUUID()}`, msToDelay: 0 }
     ])
+
+  const previewSound = async () => {
+    const effectPromises =
+      editingSequence?.sequence.map<Promise<EffectGroup>>(async (e) => {
+        if (e.type === 'delay') {
+          return {
+            type: 'delay',
+            delayInMs: e.msToDelay,
+            id: e.id
+          }
+        }
+
+        const s = await getSounds(e.groupID)
+
+        return {
+          type: 'group',
+          effects: s.sounds,
+          groupID: e.groupID,
+          id: e.id
+        }
+      }) ?? []
+
+    const effects = await Promise.all(effectPromises)
+
+    const newContainer = new SequenceSoundContainer({
+      effectGroups: effects
+    })
+
+    await newContainer.Init()
+
+    newContainer.Play()
+  }
 
   const [effectNameErr, setEffectNameErr] = useState('')
 
@@ -146,6 +186,10 @@ export default function SequenceModal(props: SequenceModalProps) {
             <div>
               <button className="[grid-area:newbutton] btn btn-secondary" onClick={newBlankElement}>
                 New Element
+              </button>
+              <button className="[grid-area:newbutton] btn btn-primary" onClick={previewSound}>
+                Preview
+                <SoundIcon />
               </button>
             </div>
           </div>

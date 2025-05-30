@@ -1,4 +1,3 @@
-import { GroupID } from 'src/apis/audio/types/groups'
 import { SoundVariants } from 'src/apis/audio/types/soundVariants'
 import { DefaultSoundContainer } from './variants/default'
 import { ISoundContainer, SoundContainerSetup } from './interface'
@@ -7,10 +6,10 @@ import { RapidSoundContainer } from './variants/rapid'
 import { SoundtrackSoundContainer } from './variants/soundtrack'
 import { EffectID } from 'src/apis/audio/types/effects'
 
-export function NewSoundContainer<T extends GroupID | undefined = GroupID>(
+export function NewSoundContainer(
   variant: SoundVariants,
   lastEffectID: EffectID | undefined,
-  setup: SoundContainerSetup<T>
+  setup: SoundContainerSetup
 ): ISoundContainer {
   switch (variant) {
     case 'Looping':
