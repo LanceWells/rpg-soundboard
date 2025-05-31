@@ -43,7 +43,7 @@ export type StopHandler = {
 // }
 
 export type Handler<T extends string> = {
-  id: T | undefined
+  id: T
   handler: (groupID: T, container: ISoundContainer) => void
 }
 
@@ -57,6 +57,7 @@ export type Handler<T extends string> = {
  * useful for situations in which this container is considered to be a disposiable one-use object.
  */
 export type SoundContainerSetup<
+  TStopped extends string = string,
   TLoaded extends string = string,
   TPlaying extends string = string
 > = {
@@ -65,7 +66,7 @@ export type SoundContainerSetup<
   /**
    * A callback handler that will be invoked when the sound has stopped playing.
    */
-  stopHandler?: StopHandler
+  stopHandler?: Handler<TStopped>
 
   /**
    * A callback handler that will be invoked when the sound has loaded.

@@ -21,6 +21,7 @@ export default function SequenceItem(props: SequenceItemProps) {
 
   const updateSequenceElements = useAudioStore((state) => state.updateSequenceElements)
   const editingSequence = useAudioStore((state) => state.editingSequence)
+  const playingSounds = useAudioStore((state) => state.playingSequenceSounds)
 
   const { attributes, listeners, setNodeRef, transition, transform } = useSortable({
     id: sequence.id
@@ -41,6 +42,8 @@ export default function SequenceItem(props: SequenceItemProps) {
     transition
   }
 
+  const thisSoundPlaying = playingSounds.has(sequence.id)
+
   const getElement = () => {
     if (sequence.type === 'delay') {
       return <SequenceItemDelay sequence={sequence} />
@@ -56,7 +59,18 @@ export default function SequenceItem(props: SequenceItemProps) {
       ref={setNodeRef}
       style={style}
       {...attributes}
-      className="grid grid-cols-[min-content_1fr_min-content] items-center w-full gap-2 p-2 bg-base-200 rounded-md"
+      className={`
+        grid
+        grid-cols-[min-content_1fr_min-content]
+        items-center
+        w-full
+        gap-2
+        p-2
+        bg-base-200
+        rounded-md
+        transition
+        ${thisSoundPlaying && 'ring-2 ring-green-700 ring-offset-2'}
+      `}
     >
       <button {...listeners}>
         <BarsIcon className="w-4 h-4 stroke-0" />

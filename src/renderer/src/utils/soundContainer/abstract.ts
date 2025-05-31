@@ -1,16 +1,17 @@
 import { Howl } from 'howler'
 import { SoundEffectWithPlayerDetails } from 'src/apis/audio/types/groups'
 import { SoundVariants } from 'src/apis/audio/types/soundVariants'
-import { Handler, ISoundContainer, SoundContainerSetup, StopHandler } from './interface'
+import { Handler, ISoundContainer, SoundContainerSetup } from './interface'
 import { EffectID } from 'src/apis/audio/types/effects'
 import { getRandomInt } from '../random'
 
 export abstract class AbstractSoundContainer<
+  TStopped extends string = string,
   TLoaded extends string = string,
   TPlaying extends string = string
 > implements ISoundContainer
 {
-  private _stopHandler: StopHandler | undefined
+  private _stopHandler: Handler<TStopped> | undefined
   private _loadedHandler: Handler<TLoaded> | undefined
   private _playingHandler: Handler<TPlaying> | undefined
 
@@ -41,7 +42,7 @@ export abstract class AbstractSoundContainer<
   }
 
   protected constructor(
-    setup: SoundContainerSetup<TLoaded, TPlaying>,
+    setup: SoundContainerSetup<TStopped, TLoaded, TPlaying>,
     loop: boolean,
     lastEffectID?: EffectID
   ) {
@@ -123,7 +124,7 @@ export abstract class AbstractSoundContainer<
   protected HandleHowlStop() {
     this.howl.off()
     if (this._stopHandler) {
-      this._stopHandler.handler(this._stopHandler.id)
+      this._stopHandler.handler(this._stopHandler.id, this)
     }
   }
 

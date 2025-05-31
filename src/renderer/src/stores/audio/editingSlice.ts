@@ -10,16 +10,19 @@ import {
   SoundBoard,
   SoundGroupReference,
   SoundGroupSequenceElement,
-  SoundGroupSequenceEditableFields
+  SoundGroupSequenceEditableFields,
+  SequenceElementID
 } from 'src/apis/audio/types/items'
 import { SoundVariants } from 'src/apis/audio/types/soundVariants'
 import { StateCreator } from 'zustand'
 import { BoardSlice } from './boardSlice'
-import { produce } from 'immer'
+import { enableMapSet, produce } from 'immer'
 import { getDefaultGroup } from './groupSlice'
 import { ColorOptions } from '@renderer/components/modals/newEffectModal/colorPicker'
 
 export type SoundBoardFields = Pick<SoundBoard, 'name'> & { referenceGroups: SoundGroupReference[] }
+
+enableMapSet()
 
 /**
  * A set of editing modes that the view might exist in.
@@ -83,6 +86,7 @@ export interface EditingSlice {
   sequenceDraggingID: GroupID | null
 
   editingSequence: SoundGroupSequenceEditableFields | undefined
+  playingSequenceSounds: Set<SequenceElementID>
 
   resetEditingGroup: () => void
   resetEditingBoard: () => void
@@ -107,6 +111,8 @@ export interface EditingSlice {
   updateBoardReference: IAudioApi['Groups']['UpdateLink']
   updateSequenceName: (newName: string) => void
   updateSequenceElements: (newSequence: SoundGroupSequenceElement[]) => void
+  markSequenceElementAsPlaying: (id: SequenceElementID) => void
+  markSequenceElementAsStopped: (id: SequenceElementID) => void
 }
 
 export const createEditingSlice: StateCreator<EditingSlice & BoardSlice, [], [], EditingSlice> = (
@@ -122,6 +128,7 @@ export const createEditingSlice: StateCreator<EditingSlice & BoardSlice, [], [],
   editingMode: 'Off' as EditingMode,
   editingSequence: undefined,
   sequenceDraggingID: null,
+  playingSequenceSounds: new Set(),
   addBoardReference(sourceBoard, sourceGroup) {
     const activeBoardID = get().activeBoardID
     const activeBoard = get().boards.find((b) => b.id === activeBoardID) ?? null
@@ -358,6 +365,20 @@ export const createEditingSlice: StateCreator<EditingSlice & BoardSlice, [], [],
         if (state.editingSequence) {
           state.editingSequence.sequence = newSequence
         }
+      })
+    )
+  },
+  markSequenceElementAsPlaying(id) {
+    set(
+      produce((state: EditingSlice) => {
+        state.playingSequenceSounds.add(id)
+      })
+    )
+  },
+  markSequenceElementAsStopped(id) {
+    set(
+      produce((state: EditingSlice) => {
+        state.playingSequenceSounds.delete(id)
       })
     )
   }

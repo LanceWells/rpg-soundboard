@@ -29,17 +29,27 @@ export type SequenceModalProps = {
 export default function SequenceModal(props: SequenceModalProps) {
   const { actionName, handleSubmit, id, modalTitle, handleClose } = props
 
-  const { editingSequence, updateSequenceName, updateSequenceOrder, boards, getGroup, getSounds } =
-    useAudioStore(
-      useShallow((state) => ({
-        editingSequence: state.editingSequence,
-        updateSequenceName: state.updateSequenceName,
-        updateSequenceOrder: state.updateSequenceElements,
-        boards: state.boards,
-        getGroup: state.getGroup,
-        getSounds: state.getSounds
-      }))
-    )
+  const {
+    editingSequence,
+    updateSequenceName,
+    updateSequenceOrder,
+    boards,
+    getGroup,
+    getSounds,
+    setPlaying,
+    setStopped
+  } = useAudioStore(
+    useShallow((state) => ({
+      editingSequence: state.editingSequence,
+      updateSequenceName: state.updateSequenceName,
+      updateSequenceOrder: state.updateSequenceElements,
+      boards: state.boards,
+      getGroup: state.getGroup,
+      getSounds: state.getSounds,
+      setPlaying: state.markSequenceElementAsPlaying,
+      setStopped: state.markSequenceElementAsStopped
+    }))
+  )
 
   const groupSet = useMemo(
     () =>
@@ -82,7 +92,13 @@ export default function SequenceModal(props: SequenceModalProps) {
     const effects = await Promise.all(effectPromises)
 
     const newContainer = new SequenceSoundContainer({
-      effectGroups: effects
+      effectGroups: effects,
+      playingHandler(sequence, container) {
+        setPlaying(sequence)
+      },
+      stoppedHandler(sequence, container) {
+        setStopped(sequence)
+      }
     })
 
     await newContainer.Init()

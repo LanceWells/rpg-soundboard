@@ -1,6 +1,6 @@
 import { SoundVariants } from 'src/apis/audio/types/soundVariants'
 import { GroupID, SoundEffectWithPlayerDetails } from 'src/apis/audio/types/groups'
-import { ISoundContainer } from '../interface'
+import { ISoundContainer, SoundContainerSetup } from '../interface'
 import { NewSoundContainer } from '../util'
 import { SequenceElementID } from 'src/apis/audio/types/items'
 
@@ -22,6 +22,7 @@ export type EffectGroup = Delay | Group
 export type SequenceSpecificSetup = {
   effectGroups: EffectGroup[]
   playingHandler?: (sequence: SequenceElementID, container: ISoundContainer) => void
+  stoppedHandler?: (sequence: SequenceElementID, container: ISoundContainer) => void
 }
 
 type EffectTiming = {
@@ -46,12 +47,17 @@ export class SequenceSoundContainer implements ISoundContainer {
     | ((sequence: SequenceElementID, container: ISoundContainer) => void)
     | undefined
 
+  private stoppedHandler:
+    | ((sequence: SequenceElementID, container: ISoundContainer) => void)
+    | undefined
+
   durationMap: Map<string, number> = new Map()
 
   constructor(setup: SequenceSpecificSetup) {
     this.setup = setup
     this.containers = new Map()
     this.playingHandler = setup.playingHandler
+    this.stoppedHandler = setup.stoppedHandler
   }
 
   async Init() {
@@ -68,11 +74,21 @@ export class SequenceSoundContainer implements ISoundContainer {
               })
             }
 
+            const isStopped = (gid: string, container: ISoundContainer) => {
+              if (this.stoppedHandler) {
+                this.stoppedHandler(gid as SequenceElementID, container)
+              }
+            }
+
             const container = NewSoundContainer('Default', undefined, {
               effects: e.effects,
               loadedHandler: {
                 id: e.id,
                 handler: isLoaded
+              },
+              stopHandler: {
+                id: e.id,
+                handler: isStopped
               }
             })
 
