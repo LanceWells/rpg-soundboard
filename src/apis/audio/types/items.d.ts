@@ -142,7 +142,7 @@ export type SoundGroupSequence = {
   icon: SoundIcon
   boardID: BoardID
   category: CategoryID
-  sequence: [SoundGroupSequenceElement, ...SoundGroupSequenceElement[]]
+  sequence: SoundGroupSequenceElement[]
 }
 
 export type SoundGroupSequenceEditableFields = Omit<

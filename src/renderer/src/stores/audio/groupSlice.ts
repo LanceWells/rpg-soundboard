@@ -5,7 +5,7 @@ import { SoundGroupSource, SoundGroupSourceEditableFields } from 'src/apis/audio
 import { StateCreator } from 'zustand'
 import { BoardSlice } from './boardSlice'
 import { produce } from 'immer'
-import { ColorOptions } from '@renderer/components/modals/newEffectModal/colorPicker'
+import { ColorOptions } from '@renderer/components/icon/colorPicker'
 import { CategoryID } from 'src/apis/audio/types/categories'
 import { EditingSlice } from './editingSlice'
 
@@ -17,6 +17,7 @@ export interface GroupSlice {
 
   getGroup: (groupID: GroupID) => SoundGroupSource
   addGroup: IAudioApi['Groups']['Create']
+  addSequence: IAudioApi['Groups']['CreateSequence']
   updateGroup: IAudioApi['Groups']['Update']
   updateGroupPartial: (
     boardID: BoardID,
@@ -47,6 +48,24 @@ export const createGroupSlice: StateCreator<
       boards: newBoards,
       editingGroup: getDefaultGroup(activeBoard.categories[0].id)
     })
+
+    return newGroup
+  },
+  addSequence(req) {
+    const activeBoardID = get().activeBoardID
+    const activeBoard = get().boards.find((b) => b.id === activeBoardID) ?? null
+    const newGroup = window.audio.Groups.CreateSequence(req)
+    const newBoards = window.audio.Boards.GetAll({}).boards
+
+    if (activeBoard === null) {
+      return newGroup
+    }
+
+    set({
+      boards: newBoards
+    })
+
+    get().resetEditingSequence()
 
     return newGroup
   },

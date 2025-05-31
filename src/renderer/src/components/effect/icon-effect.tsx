@@ -1,6 +1,5 @@
 import { soundboardIcons } from '@renderer/utils/fetchIcons'
 import { Parser, ProcessNodeDefinitions } from 'html-to-react'
-import { JSX } from 'react'
 import { SoundIcon } from 'src/apis/audio/types/items'
 import { twMerge } from 'tailwind-merge'
 

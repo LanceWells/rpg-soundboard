@@ -20,7 +20,7 @@ export type ColorPickerProps = {
   pickerID: string
   color: string
   onColorChange: (hex: string) => void
-  title: string
+  title?: string
   className?: string
 }
 
@@ -39,7 +39,7 @@ export default function ColorPicker(props: ColorPickerProps) {
   const popoverRef = useRef<HTMLDivElement | null>(null)
 
   return (
-    <div className={`relative flex items-center gap-4 mt-4 ${className}`}>
+    <div className={`relative flex items-center gap-4 m-2 ${className}`}>
       <span className="text-lg">{title}</span>
       <button
         popoverTarget={popoverTarget}

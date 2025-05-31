@@ -6,7 +6,14 @@ import { BoardsAudioAPI } from './boards'
 import crypto from 'node:crypto'
 import { SupportedFileTypes } from '../supportedFileTypes'
 import { GetAppDataPath } from '../../../utils/paths'
-import { SoundEffect, SoundGroup, SoundGroupSource } from '../types/items'
+import {
+  SequenceElementID,
+  SoundEffect,
+  SoundGroup,
+  SoundGroupSequence,
+  SoundGroupSequenceElement,
+  SoundGroupSource
+} from '../types/items'
 import { CategoryID } from '../types/categories'
 import { EffectID } from '../types/effects'
 import {
@@ -92,8 +99,60 @@ export const GroupsAudioAPI: IGroups = {
       group: newGroup
     }
   },
+  /**
+   * @inheritdoc
+   */
   CreateSequence(request: CreateSequenceRequest) {
-    throw new Error('NYI')
+    const matchingBoard = AudioConfig.getBoard(request.boardID)
+    if (!matchingBoard) {
+      throw new Error(`Could not find matching board with ID ${request.boardID}.`)
+    }
+
+    const newSequenceGroupID: GroupID = `grp-${crypto.randomUUID()}`
+
+    const newElements = request.sequence.map<SoundGroupSequenceElement>((e) => {
+      const newID: SequenceElementID = `seq-${crypto.randomUUID()}`
+      switch (e.type) {
+        case 'delay': {
+          return {
+            id: newID,
+            type: 'delay',
+            msToDelay: e.msToDelay
+          }
+        }
+        case 'group': {
+          return {
+            id: newID,
+            type: 'group',
+            groupID: e.groupID
+          }
+        }
+        default: {
+          throw new Error(`Unknown type in request ${JSON.stringify(e)}`)
+        }
+      }
+    })
+
+    const newGroup: SoundGroupSequence = {
+      type: 'sequence',
+      boardID: request.boardID,
+      category: matchingBoard.categories[0].id,
+      icon: request.icon,
+      id: newSequenceGroupID,
+      name: request.name,
+      sequence: newElements
+    }
+
+    const newConfig = produce(AudioConfig.Config, (draft) => {
+      const matchingBoard = draft.boards.find((b) => b.id === request.boardID)
+      matchingBoard?.groups.push(newGroup)
+    })
+
+    AudioConfig.Config = newConfig
+
+    return {
+      sequence: newGroup
+    }
   },
   /**
    * @inheritdoc

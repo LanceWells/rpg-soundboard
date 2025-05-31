@@ -18,7 +18,7 @@ import { StateCreator } from 'zustand'
 import { BoardSlice } from './boardSlice'
 import { enableMapSet, produce } from 'immer'
 import { getDefaultGroup } from './groupSlice'
-import { ColorOptions } from '@renderer/components/modals/newEffectModal/colorPicker'
+import { ColorOptions } from '@renderer/components/icon/colorPicker'
 
 export type SoundBoardFields = Pick<SoundBoard, 'name'> & { referenceGroups: SoundGroupReference[] }
 
@@ -85,7 +85,7 @@ export interface EditingSlice {
   draggingID: string | null
   sequenceDraggingID: GroupID | null
 
-  editingSequence: SoundGroupSequenceEditableFields | undefined
+  editingSequence: SoundGroupSequenceEditableFields | null
   playingSequenceSounds: Set<SequenceElementID>
 
   resetEditingGroup: () => void
@@ -126,7 +126,7 @@ export const createEditingSlice: StateCreator<EditingSlice & BoardSlice, [], [],
   editingGroup: null,
   editingGroupID: undefined,
   editingMode: 'Off' as EditingMode,
-  editingSequence: undefined,
+  editingSequence: null,
   sequenceDraggingID: null,
   playingSequenceSounds: new Set(),
   addBoardReference(sourceBoard, sourceGroup) {
@@ -299,9 +299,14 @@ export const createEditingSlice: StateCreator<EditingSlice & BoardSlice, [], [],
   },
   setSelectedIcon(icon) {
     set(
+      // I don't like setting both regular and sequence group icons here, but it should work without
+      // being too intrusive.
       produce((state: EditingSlice) => {
         if (state.editingGroup !== null) {
           state.editingGroup.icon = icon
+        }
+        if (state.editingSequence !== null) {
+          state.editingSequence.icon = icon
         }
       })
     )

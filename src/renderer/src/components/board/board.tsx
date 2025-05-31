@@ -68,11 +68,7 @@ export default function Board(props: BoardProps) {
 
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false)
 
-  const {
-    elements: categoryElements,
-    categoryIDs,
-    groupIDs
-  } = useMemo(() => {
+  const { elements: categoryElements, categoryIDs } = useMemo(() => {
     const categories = board.categories ?? []
     const categoryIDs = categories.map((c) => c.id)
     const groupIDs = new Set(board.groups.map((g) => g.id))

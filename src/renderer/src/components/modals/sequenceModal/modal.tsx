@@ -18,6 +18,10 @@ import {
   SequenceSoundContainer
 } from '@renderer/utils/soundContainer/variants/sequence'
 import StopIcon from '@renderer/assets/icons/stop'
+import IconLookup from '@renderer/components/effect/iconLookup'
+import { IconEffect } from '@renderer/components/effect/icon-effect'
+import ForegroundPicker from '@renderer/components/icon/foregroundPicker'
+import BackgroundPicker from '@renderer/components/icon/backgroundPicker'
 
 export type SequenceModalProps = {
   id: string
@@ -135,8 +139,6 @@ export default function SequenceModal(props: SequenceModalProps) {
 
   const onDragEnd = (event: DragEndEvent) => {
     const { active, over } = event
-    console.debug(active)
-    console.debug(over)
 
     if (over?.id !== EditingDropZoneID) {
       return
@@ -178,62 +180,76 @@ export default function SequenceModal(props: SequenceModalProps) {
     <dialog id={id} className="modal">
       <div className="modal-box min-w-fit overflow-visible relative">
         <h3 className="font-bold text-lg">{modalTitle}</h3>
-        <div className='[grid-template-areas:""]'>
-          <TextField
-            required
-            className="[grid-area:name]"
-            fieldName="Name"
-            value={editingSequence?.name}
-            error={effectNameErr}
-            placeholder="My Sequence"
-            onChange={(e) => updateSequenceName(e.target.value)}
-          />
+
+        <div
+          className={`
+            grid
+            py-2
+            [grid-template-areas:"iconpreview_iconlookup"_"sequence_picker"_"controls_controls"]
+            grid-cols-[2fr_1fr]
+            grid-rows-[1fr_1fr_min-content]
+            w-[640px]
+            gap-2
+          `}
+        >
           <div
-            id="drag-test"
             className={`
               grid
-              py-2
-              [grid-template-areas:"sequence_picker"_"sequence_picker"_"controls_controls"]
-              grid-cols-[2fr_1fr]
-              grid-rows-[1fr_min-content]
-              w-[640px]
-              h-[360px]
-              max-h-[360px]
-              gap-2
+              [grid-area:iconpreview]
+              [grid-template-areas:"name_name"_"icon_foreground"_"icon_background"]
             `}
           >
-            <DndContext
-              modifiers={[snapCenterToCursor]}
-              onDragStart={onDragFromSelect}
-              onDragEnd={onDragEnd}
-            >
-              <SequenceEditingZone />
-              <SequenceGroupSelector />
-              <DragOverlay adjustScale={false}>{getOverlaidItem(draggingID)}</DragOverlay>
-            </DndContext>
-            <div className="join">
+            <TextField
+              required
+              className="[grid-area:name]"
+              fieldName="Name"
+              value={editingSequence?.name}
+              error={effectNameErr}
+              placeholder="My Sequence"
+              onChange={(e) => updateSequenceName(e.target.value)}
+            />
+            <IconEffect
+              className="[grid-area:icon] self-center justify-self-end"
+              icon={editingSequence?.icon}
+            />
+            <ForegroundPicker
+              className="[grid-area:icon_foreground] self-end"
+              pickerID="sequence-foreground"
+            />
+            <BackgroundPicker
+              className="[grid-area:icon_background] self-start"
+              pickerID="sequence-background"
+            />
+          </div>
+          <IconLookup className="[grid-area:iconlookup]" />
+          <DndContext
+            modifiers={[snapCenterToCursor]}
+            onDragStart={onDragFromSelect}
+            onDragEnd={onDragEnd}
+          >
+            <SequenceEditingZone />
+            <SequenceGroupSelector />
+            <DragOverlay adjustScale={false}>{getOverlaidItem(draggingID)}</DragOverlay>
+          </DndContext>
+          <div className="join [grid-area:controls]">
+            <button className="join-item btn btn-secondary" onClick={newBlankElement}>
+              New Element
+            </button>
+            <div className="relative">
               <button
-                className="[grid-area:newbutton] join-item btn btn-secondary"
-                onClick={newBlankElement}
+                className={`btn join-item btn-primary ${isPlaying ? 'hidden' : 'visible'}`}
+                onClick={previewSound}
               >
-                New Element
+                Preview
+                <SoundIcon />
               </button>
-              <div className="relative">
-                <button
-                  className={`btn join-item btn-primary ${isPlaying ? 'hidden' : 'visible'}`}
-                  onClick={previewSound}
-                >
-                  Preview
-                  <SoundIcon />
-                </button>
-                <button
-                  className={`btn btn-primary ${isPlaying ? 'visible' : 'hidden'}`}
-                  onClick={stopSound}
-                >
-                  Stop
-                  <StopIcon />
-                </button>
-              </div>
+              <button
+                className={`btn btn-primary ${isPlaying ? 'visible' : 'hidden'}`}
+                onClick={stopSound}
+              >
+                Stop
+                <StopIcon />
+              </button>
             </div>
           </div>
         </div>

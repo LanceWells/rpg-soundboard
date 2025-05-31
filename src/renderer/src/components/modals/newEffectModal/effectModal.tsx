@@ -9,7 +9,6 @@ import {
 } from 'react'
 import IconLookup from '../../effect/iconLookup'
 import { IconEffect } from '../../effect/icon-effect'
-import ColorPicker from './colorPicker'
 import TextField from '../../generic/textField'
 import FileSelectList, { FileSelectInput } from './fileSelectList'
 import CloseIcon from '@renderer/assets/icons/close'
@@ -17,6 +16,8 @@ import { useShallow } from 'zustand/react/shallow'
 import { SoundVariant } from '@renderer/utils/soundVariants'
 import { CreateRequest } from 'src/apis/audio/types/groups'
 import { SoundVariants } from 'src/apis/audio/types/soundVariants'
+import BackgroundPicker from '@renderer/components/icon/backgroundPicker'
+import ForegroundPicker from '@renderer/components/icon/foregroundPicker'
 
 export type EffectModalProps = {
   id: string
@@ -34,7 +35,6 @@ export default function EffectModal(props: PropsWithChildren<EffectModalProps>) 
     editingGroup,
     setGroupName,
     addGroup,
-    setSelectedIcon,
     resetEditingGroup,
     setGroupVariant
   } = useAudioStore(
@@ -43,7 +43,6 @@ export default function EffectModal(props: PropsWithChildren<EffectModalProps>) 
       editingGroup: state.editingGroup,
       setGroupName: state.setGroupName,
       addGroup: state.addGroup,
-      setSelectedIcon: state.setSelectedIcon,
       resetEditingGroup: state.resetEditingGroup,
       setGroupVariant: state.setGroupVariant
     }))
@@ -51,32 +50,6 @@ export default function EffectModal(props: PropsWithChildren<EffectModalProps>) 
 
   const [effectNameErr, setEffectNameErr] = useState('')
   const [fileListErr, setFileListErr] = useState('')
-
-  const handleForegroundSelect = useCallback(
-    (hex: string) => {
-      if (editingGroup !== null) {
-        setSelectedIcon({
-          backgroundColor: editingGroup.icon.backgroundColor,
-          foregroundColor: hex,
-          name: editingGroup.icon.name
-        })
-      }
-    },
-    [editingGroup, setSelectedIcon]
-  )
-
-  const handleBackgroundSelect = useCallback(
-    (hex: string) => {
-      if (editingGroup !== null) {
-        setSelectedIcon({
-          backgroundColor: hex,
-          foregroundColor: editingGroup.icon.foregroundColor,
-          name: editingGroup.icon.name
-        })
-      }
-    },
-    [editingGroup?.icon, setSelectedIcon]
-  )
 
   const onClose = useCallback(() => {
     resetEditingGroup()
@@ -170,20 +143,8 @@ export default function EffectModal(props: PropsWithChildren<EffectModalProps>) 
           <FileSelectInput error={fileListErr} className="[grid-area:fileselect]" />
           <FileSelectList className="[grid-area:files]" />
           <IconLookup className="[grid-area:lookup] w-full" />
-          <ColorPicker
-            pickerID="foreground-icon"
-            title="Foreground"
-            color={editingGroup?.icon.foregroundColor ?? 'gray'}
-            onColorChange={handleForegroundSelect}
-            className="[grid-area:foreground]"
-          />
-          <ColorPicker
-            pickerID="background-icon"
-            title="Background"
-            color={editingGroup?.icon.backgroundColor ?? 'gray'}
-            onColorChange={handleBackgroundSelect}
-            className="[grid-area:background]"
-          />
+          <ForegroundPicker pickerID="default-icon-foreground" />
+          <BackgroundPicker pickerID="default-icon-background" />
           <label className="form-control w-full max-w-xs">
             <div className="label">
               <span className="label-text">Sound Variant</span>

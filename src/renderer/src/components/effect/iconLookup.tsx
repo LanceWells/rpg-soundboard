@@ -31,7 +31,7 @@ export default function IconLookup(props: IconLookupProps) {
       <input
         onChange={(e) => setSearch(e.target.value)}
         placeholder="Search"
-        className="input bg-slate-300 dark:bg-black rounded-b-none z-10"
+        className="input bg-slate-300 dark:bg-black w-full rounded-b-none z-10"
         value={search}
       />
       <div className="min-h-72 max-h-72 overflow-y-scroll bg-base-300 p-6 rounded-md rounded-t-none">

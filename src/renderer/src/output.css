@@ -2523,8 +2523,14 @@
   .grid-cols-\[minmax\(0\,1fr\)_min-content\] {
     grid-template-columns: minmax(0,1fr) min-content;
   }
+  .grid-rows-\[1fr_1fr_min-content\] {
+    grid-template-rows: 1fr 1fr min-content;
+  }
   .grid-rows-\[1fr_min-content\] {
     grid-template-rows: 1fr min-content;
+  }
+  .grid-rows-\[1fr_min-content_min-content\] {
+    grid-template-rows: 1fr min-content min-content;
   }
   .grid-rows-\[max-content_1fr_80px\] {
     grid-template-rows: max-content 1fr 80px;
@@ -2550,8 +2556,14 @@
   .justify-center {
     justify-content: center;
   }
+  .justify-end {
+    justify-content: flex-end;
+  }
   .justify-items-center {
     justify-items: center;
+  }
+  .justify-items-stretch {
+    justify-items: stretch;
   }
   .gap-2 {
     gap: calc(var(--spacing) * 2);
@@ -2573,6 +2585,24 @@
   }
   .gap-y-4 {
     row-gap: calc(var(--spacing) * 4);
+  }
+  .self-baseline {
+    align-self: baseline;
+  }
+  .self-center {
+    align-self: center;
+  }
+  .self-end {
+    align-self: flex-end;
+  }
+  .self-start {
+    align-self: flex-start;
+  }
+  .self-stretch {
+    align-self: stretch;
+  }
+  .justify-self-end {
+    justify-self: flex-end;
   }
   .justify-self-start {
     justify-self: flex-start;
@@ -3037,6 +3067,12 @@
   .\[grid-area\:categories\] {
     grid-area: categories;
   }
+  .\[grid-area\:colorpickers\] {
+    grid-area: colorpickers;
+  }
+  .\[grid-area\:controls\] {
+    grid-area: controls;
+  }
   .\[grid-area\:delete\] {
     grid-area: delete;
   }
@@ -3057,6 +3093,21 @@
   }
   .\[grid-area\:icon\] {
     grid-area: icon;
+  }
+  .\[grid-area\:icon_background\] {
+    grid-area: icon background;
+  }
+  .\[grid-area\:icon_foreground\] {
+    grid-area: icon foreground;
+  }
+  .\[grid-area\:iconlookup\] {
+    grid-area: iconlookup;
+  }
+  .\[grid-area\:iconpreview\] {
+    grid-area: iconpreview;
+  }
+  .\[grid-area\:icons\] {
+    grid-area: icons;
   }
   .\[grid-area\:lookup\] {
     grid-area: lookup;
@@ -3087,6 +3138,24 @@
   }
   .\[grid-template-areas\:\"icon_form_fileselect\"_\"lookup_lookup_files\"_\"foreground_background_toggles\"\] {
     grid-template-areas: "icon form fileselect" "lookup lookup files" "foreground background toggles";
+  }
+  .\[grid-template-areas\:\"iconlookup_iconpreview\"_\"sequence_picker\"_\"controls_controls\"\] {
+    grid-template-areas: "iconlookup iconpreview" "sequence picker" "controls controls";
+  }
+  .\[grid-template-areas\:\"iconpreview_iconlookup\"_\"colorpickers_iconlookup\"_\"sequence_picker\"_\"controls_controls\"\] {
+    grid-template-areas: "iconpreview iconlookup" "colorpickers iconlookup" "sequence picker" "controls controls";
+  }
+  .\[grid-template-areas\:\"iconpreview_iconlookup\"_\"sequence_picker\"_\"controls_controls\"\] {
+    grid-template-areas: "iconpreview iconlookup" "sequence picker" "controls controls";
+  }
+  .\[grid-template-areas\:\"icons_icons\"_\"sequence_picker\"_\"controls_controls\"\] {
+    grid-template-areas: "icons icons" "sequence picker" "controls controls";
+  }
+  .\[grid-template-areas\:\"name_name\"_\"icon_foreground\"_\"icon_background\"\] {
+    grid-template-areas: "name name" "icon foreground" "icon background";
+  }
+  .\[grid-template-areas\:\"sequence_picker\"_\"controls_controls\"\] {
+    grid-template-areas: "sequence picker" "controls controls";
   }
   .\[grid-template-areas\:\"sequence_picker\"_\"sequence_picker\"_\"controls_controls\"\] {
     grid-template-areas: "sequence picker" "sequence picker" "controls controls";

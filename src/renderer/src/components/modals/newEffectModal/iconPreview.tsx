@@ -2,7 +2,7 @@ import { useAudioStore } from '@renderer/stores/audio/audioStore'
 import { IconBody } from '@renderer/utils/fetchIcons'
 import { useCallback } from 'react'
 import { IconEffect } from '../../effect/icon-effect'
-import { ColorOptions } from './colorPicker'
+import { ColorOptions } from '../../icon/colorPicker'
 import { useShallow } from 'zustand/react/shallow'
 
 export type IconPreviewProps = {
@@ -35,7 +35,6 @@ export function IconPreview(props: IconPreviewProps) {
   return (
     <button
       className={`
-        h-18
         mb-2
         grid
         items-center
