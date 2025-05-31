@@ -1711,6 +1711,12 @@
   .top-0 {
     top: calc(var(--spacing) * 0);
   }
+  .top-1 {
+    top: calc(var(--spacing) * 1);
+  }
+  .top-1\/2 {
+    top: calc(1/2 * 100%);
+  }
   .-right-2 {
     right: calc(var(--spacing) * -2);
   }
@@ -1728,6 +1734,12 @@
   }
   .left-0 {
     left: calc(var(--spacing) * 0);
+  }
+  .left-1 {
+    left: calc(var(--spacing) * 1);
+  }
+  .left-1\/2 {
+    left: calc(1/2 * 100%);
   }
   .file-input {
     cursor: pointer;
@@ -2010,6 +2022,9 @@
   }
   .mx-4 {
     margin-inline: calc(var(--spacing) * 4);
+  }
+  .my-2 {
+    margin-block: calc(var(--spacing) * 2);
   }
   .label {
     display: inline-flex;
@@ -2324,6 +2339,9 @@
   .h-full {
     height: 100%;
   }
+  .max-h-12 {
+    max-height: calc(var(--spacing) * 12);
+  }
   .max-h-72 {
     max-height: calc(var(--spacing) * 72);
   }
@@ -2434,6 +2452,16 @@
   }
   .border-collapse {
     border-collapse: collapse;
+  }
+  .-translate-1 {
+    --tw-translate-x: calc(var(--spacing) * -1);
+    --tw-translate-y: calc(var(--spacing) * -1);
+    translate: var(--tw-translate-x) var(--tw-translate-y);
+  }
+  .-translate-1\/2 {
+    --tw-translate-x: calc(calc(1/2 * 100%) * -1);
+    --tw-translate-y: calc(calc(1/2 * 100%) * -1);
+    translate: var(--tw-translate-x) var(--tw-translate-y);
   }
   .translate-0 {
     --tw-translate-x: calc(var(--spacing) * 0);

@@ -7,7 +7,6 @@ import { DndContext, DragEndEvent, DragOverlay, DragStartEvent } from '@dnd-kit/
 import { produce } from 'immer'
 import { SequenceElementID, SoundGroupSequenceElement } from 'src/apis/audio/types/items'
 import { snapCenterToCursor } from '@dnd-kit/modifiers'
-import SequenceGroupSelector, { SelectorElement } from './groupSelector'
 import { IdIsGroup } from '@renderer/utils/id'
 import SequenceEditingZone, { dropZoneScrollContainerID, EditingDropZoneID } from './editingZone'
 import { v4 as uuidv4 } from 'uuid'
@@ -22,6 +21,8 @@ import IconLookup from '@renderer/components/effect/iconLookup'
 import { IconEffect } from '@renderer/components/effect/icon-effect'
 import ForegroundPicker from '@renderer/components/icon/foregroundPicker'
 import BackgroundPicker from '@renderer/components/icon/backgroundPicker'
+import GroupLookup from '@renderer/components/group/groupLookup'
+import { SelectorElement } from './groupSelectorElement'
 
 export type SequenceModalProps = {
   id: string
@@ -228,7 +229,8 @@ export default function SequenceModal(props: SequenceModalProps) {
             onDragEnd={onDragEnd}
           >
             <SequenceEditingZone />
-            <SequenceGroupSelector />
+            <GroupLookup />
+            {/* <SequenceGroupSelector /> */}
             <DragOverlay adjustScale={false}>{getOverlaidItem(draggingID)}</DragOverlay>
           </DndContext>
           <div className="join [grid-area:controls]">
