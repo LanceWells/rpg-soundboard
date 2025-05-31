@@ -1,6 +1,6 @@
 import { SoundVariants } from 'src/apis/audio/types/soundVariants'
 import { GroupID, SoundEffectWithPlayerDetails } from 'src/apis/audio/types/groups'
-import { ISoundContainer, SoundContainerSetup } from '../interface'
+import { Handler, ISoundContainer } from '../interface'
 import { NewSoundContainer } from '../util'
 import { SequenceElementID } from 'src/apis/audio/types/items'
 
@@ -21,8 +21,9 @@ export type EffectGroup = Delay | Group
 
 export type SequenceSpecificSetup = {
   effectGroups: EffectGroup[]
-  playingHandler?: (sequence: SequenceElementID, container: ISoundContainer) => void
-  stoppedHandler?: (sequence: SequenceElementID, container: ISoundContainer) => void
+  elementPlayingHandler?: (sequence: SequenceElementID, container: ISoundContainer) => void
+  elementStoppedHandler?: (sequence: SequenceElementID, container: ISoundContainer) => void
+  stoppedHandler?: Handler<string>
 }
 
 type EffectTiming = {
@@ -39,24 +40,29 @@ export class SequenceSoundContainer implements ISoundContainer {
   Variant: SoundVariants = 'Sequence'
   LoadedEffectID: `eff-${string}-${string}-${string}-${string}-${string}` | undefined = undefined
 
-  // private containers: ISoundContainer[] = []
   private containers: Map<SequenceElementID, ISoundContainer>
   private setup: SequenceSpecificSetup
   private effectTiming: EffectTiming[] = []
-  private playingHandler:
+  private totalRuntime: number = 0
+  private activeTimeouts: NodeJS.Timeout[] = []
+
+  private elementPlayingHandler:
     | ((sequence: SequenceElementID, container: ISoundContainer) => void)
     | undefined
 
-  private stoppedHandler:
+  private elementStoppedHandler:
     | ((sequence: SequenceElementID, container: ISoundContainer) => void)
     | undefined
+
+  private stoppedHandler: Handler<string> | undefined
 
   durationMap: Map<string, number> = new Map()
 
   constructor(setup: SequenceSpecificSetup) {
     this.setup = setup
     this.containers = new Map()
-    this.playingHandler = setup.playingHandler
+    this.elementPlayingHandler = setup.elementPlayingHandler
+    this.elementStoppedHandler = setup.elementStoppedHandler
     this.stoppedHandler = setup.stoppedHandler
   }
 
@@ -75,12 +81,12 @@ export class SequenceSoundContainer implements ISoundContainer {
             }
 
             const isStopped = (gid: string, container: ISoundContainer) => {
-              if (this.stoppedHandler) {
-                this.stoppedHandler(gid as SequenceElementID, container)
+              if (this.elementStoppedHandler) {
+                this.elementStoppedHandler(gid as SequenceElementID, container)
               }
             }
 
-            const container = NewSoundContainer('Default', undefined, {
+            NewSoundContainer('Default', undefined, {
               effects: e.effects,
               loadedHandler: {
                 id: e.id,
@@ -91,14 +97,6 @@ export class SequenceSoundContainer implements ISoundContainer {
                 handler: isStopped
               }
             })
-
-            if (container.Duration !== undefined) {
-              this.durationMap.set(e.id, container.Duration ?? 0)
-              res({
-                container: container,
-                id: e.id
-              })
-            }
           }),
           new Promise<ContainerWithSequenceID>((_res, rej) =>
             setTimeout(() => rej(`Could not load ${e.groupID} in time`), 15000)
@@ -136,6 +134,7 @@ export class SequenceSoundContainer implements ISoundContainer {
       }
     )
 
+    this.totalRuntime = timing.runningTimer
     this.effectTiming = timing.effects
   }
 
@@ -150,32 +149,46 @@ export class SequenceSoundContainer implements ISoundContainer {
         return
       }
 
-      await new Promise((res) => setTimeout(res, e.delay))
+      await new Promise((res) => {
+        const t = setTimeout(res, e.delay)
+        this.activeTimeouts.push(t)
+      })
 
-      if (this.playingHandler) {
-        this.playingHandler(e.effect, effect)
+      if (this.elementPlayingHandler) {
+        this.elementPlayingHandler(e.effect, effect)
       }
 
       effect.Play()
       return
     })
 
-    async function playSequenceSounds() {
+    const runtimeElapsedPromise = new Promise<void>((res) => setTimeout(res, this.totalRuntime))
+
+    const playSequenceSounds = async (effects: Promise<void>[]) => {
       await Promise.all(effects)
+      ;(this as SequenceSoundContainer).HandleStopped()
     }
 
-    playSequenceSounds()
+    playSequenceSounds.bind(this)([...effects, runtimeElapsedPromise])
   }
 
   Stop(): void {
-    throw new Error('Method not implemented.')
+    this.containers.forEach((c) => c.Stop())
+    this.HandleStopped()
   }
 
-  ChangeVolume(volume: number): void {
+  ChangeVolume(_volume: number): void {
     // no-op
   }
 
-  Fade(ratio: number): void {
+  Fade(_ratio: number): void {
     // no-op
+  }
+
+  private HandleStopped() {
+    this.activeTimeouts.forEach((t) => clearTimeout(t))
+    if (this.stoppedHandler) {
+      this.stoppedHandler.handler(this.stoppedHandler.id, this)
+    }
   }
 }

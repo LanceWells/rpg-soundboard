@@ -75,12 +75,6 @@ export abstract class AbstractSoundContainer<
       })
     }
 
-    if (this.howl.duration() ?? 0 > 0) {
-      this.duration = this.howl.duration() * 1000
-    }
-
-    this.howl.load()
-
     this._loadedHandler = loadedHandler
     this._stopHandler = stopHandler
 
@@ -97,6 +91,11 @@ export abstract class AbstractSoundContainer<
         this.HandleHowlStop()
         this.HandleHowlEnded()
       })
+    }
+
+    if (this.howl.state() === 'loaded') {
+      this.duration = this.howl.duration() * 1000
+      this.HandleHowlLoaded()
     }
 
     this.howl

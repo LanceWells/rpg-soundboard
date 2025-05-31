@@ -1405,6 +1405,38 @@
       outline: 2px solid currentColor;
     }
   }
+  .swap {
+    position: relative;
+    display: inline-grid;
+    cursor: pointer;
+    place-content: center;
+    vertical-align: middle;
+    webkit-user-select: none;
+    user-select: none;
+    input {
+      appearance: none;
+      border: none;
+    }
+    > * {
+      grid-column-start: 1;
+      grid-row-start: 1;
+      transition-property: transform, rotate, opacity;
+      transition-duration: 0.2s;
+      transition-timing-function: cubic-bezier(0, 0, 0.2, 1);
+    }
+    .swap-on, .swap-indeterminate, input:indeterminate ~ .swap-on {
+      opacity: 0%;
+    }
+    input:is(:checked, :indeterminate) {
+      & ~ .swap-off {
+        opacity: 0%;
+      }
+    }
+    input:checked ~ .swap-on, input:indeterminate ~ .swap-indeterminate {
+      opacity: 100%;
+      backface-visibility: visible;
+    }
+  }
   .menu-horizontal {
     display: inline-flex;
     flex-direction: row;
@@ -2014,6 +2046,15 @@
           border-inline-start: var(--border) solid color-mix(in oklab, currentColor 10%, #0000);
         }
       }
+    }
+  }
+  .join-item {
+    &:where(*:not(:first-child, :disabled, [disabled], .btn-disabled)) {
+      margin-inline-start: calc(var(--border, 1px) * -1);
+      margin-block-start: 0;
+    }
+    &:where(*:is(:disabled, [disabled], .btn-disabled)) {
+      border-width: var(--border, 1px) 0 var(--border, 1px) var(--border, 1px);
     }
   }
   .modal-action {

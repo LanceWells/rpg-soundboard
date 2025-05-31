@@ -1,5 +1,5 @@
 import { useAudioStore } from '@renderer/stores/audio/audioStore'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { CreateSequenceRequest, GroupID } from 'src/apis/audio/types/groups'
 import { useShallow } from 'zustand/react/shallow'
 import TextField from '@renderer/components/generic/textField'
@@ -17,6 +17,7 @@ import {
   EffectGroup,
   SequenceSoundContainer
 } from '@renderer/utils/soundContainer/variants/sequence'
+import StopIcon from '@renderer/assets/icons/stop'
 
 export type SequenceModalProps = {
   id: string
@@ -34,7 +35,6 @@ export default function SequenceModal(props: SequenceModalProps) {
     updateSequenceName,
     updateSequenceOrder,
     boards,
-    getGroup,
     getSounds,
     setPlaying,
     setStopped
@@ -44,12 +44,14 @@ export default function SequenceModal(props: SequenceModalProps) {
       updateSequenceName: state.updateSequenceName,
       updateSequenceOrder: state.updateSequenceElements,
       boards: state.boards,
-      getGroup: state.getGroup,
       getSounds: state.getSounds,
       setPlaying: state.markSequenceElementAsPlaying,
       setStopped: state.markSequenceElementAsStopped
     }))
   )
+
+  const [isPlaying, setIsPlaying] = useState(false)
+  const previewContainerRef = useRef<SequenceSoundContainer | null>(null)
 
   const groupSet = useMemo(
     () =>
@@ -93,17 +95,27 @@ export default function SequenceModal(props: SequenceModalProps) {
 
     const newContainer = new SequenceSoundContainer({
       effectGroups: effects,
-      playingHandler(sequence, container) {
+      elementPlayingHandler(sequence) {
         setPlaying(sequence)
       },
-      stoppedHandler(sequence, container) {
+      elementStoppedHandler(sequence) {
         setStopped(sequence)
+      },
+      stoppedHandler: {
+        id: '',
+        handler: () => setIsPlaying(false)
       }
     })
 
     await newContainer.Init()
 
+    previewContainerRef.current = newContainer
     newContainer.Play()
+    setIsPlaying(true)
+  }
+
+  const stopSound = () => {
+    previewContainerRef.current?.Stop()
   }
 
   const [effectNameErr, setEffectNameErr] = useState('')
@@ -199,14 +211,29 @@ export default function SequenceModal(props: SequenceModalProps) {
               <SequenceGroupSelector />
               <DragOverlay adjustScale={false}>{getOverlaidItem(draggingID)}</DragOverlay>
             </DndContext>
-            <div>
-              <button className="[grid-area:newbutton] btn btn-secondary" onClick={newBlankElement}>
+            <div className="join">
+              <button
+                className="[grid-area:newbutton] join-item btn btn-secondary"
+                onClick={newBlankElement}
+              >
                 New Element
               </button>
-              <button className="[grid-area:newbutton] btn btn-primary" onClick={previewSound}>
-                Preview
-                <SoundIcon />
-              </button>
+              <div className="relative">
+                <button
+                  className={`btn join-item btn-primary ${isPlaying ? 'hidden' : 'visible'}`}
+                  onClick={previewSound}
+                >
+                  Preview
+                  <SoundIcon />
+                </button>
+                <button
+                  className={`btn btn-primary ${isPlaying ? 'visible' : 'hidden'}`}
+                  onClick={stopSound}
+                >
+                  Stop
+                  <StopIcon />
+                </button>
+              </div>
             </div>
           </div>
         </div>
