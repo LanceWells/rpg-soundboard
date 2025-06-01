@@ -2,6 +2,7 @@ import { IAudioApi } from 'src/apis/audio/interface'
 import { BoardID } from 'src/apis/audio/types/boards'
 import { GroupID } from 'src/apis/audio/types/groups'
 import {
+  ISoundGroup,
   SoundGroupSequence,
   SoundGroupSource,
   SoundGroupSourceEditableFields
@@ -18,8 +19,9 @@ export interface GroupSlice {
    * The set of IDs for groups that are actively playing a sound effect.
    */
   playingGroups: GroupID[]
-
-  getGroup: (groupID: GroupID) => SoundGroupSource | SoundGroupSequence
+  getGroup: (groupID: GroupID) => ISoundGroup
+  getGroupSource: (groupID: GroupID) => SoundGroupSource
+  getGroupSequence: (groupID: GroupID) => SoundGroupSequence
   addGroup: IAudioApi['Groups']['Create']
   addSequence: IAudioApi['Groups']['CreateSequence']
   updateGroup: IAudioApi['Groups']['Update']
@@ -94,6 +96,30 @@ export const createGroupSlice: StateCreator<
     const group = window.audio.Groups.Get({ groupID: request }).group
     if (!group) {
       throw new Error(`Could not find a group with id ${request}`)
+    }
+
+    return group
+  },
+  getGroupSequence(request) {
+    const group = window.audio.Groups.Get({ groupID: request }).group
+    if (!group) {
+      throw new Error(`Could not find a group with id ${request}`)
+    }
+
+    if (group.type !== 'sequence') {
+      throw new Error(`Found a group with id ${request}, but it isn't a sequence type`)
+    }
+
+    return group
+  },
+  getGroupSource(request) {
+    const group = window.audio.Groups.Get({ groupID: request }).group
+    if (!group) {
+      throw new Error(`Could not find a group with id ${request}`)
+    }
+
+    if (group.type !== 'source') {
+      throw new Error(`Found a group with id ${request}, but it isn't a sequence type`)
     }
 
     return group

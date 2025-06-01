@@ -120,6 +120,7 @@ export function SequenceItemDelay(props: SequenceItemDelayProps) {
       max="10000"
       title="Must be between -10000 and 10000"
       onChange={updateThisTiming}
+      value={sequence.msToDelay}
     />
   )
 }

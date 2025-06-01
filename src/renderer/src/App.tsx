@@ -7,6 +7,7 @@ import NewCategoryModal from './components/modals/newCategoryModal/newCategoryMo
 import EditEffectModal from './components/modals/newEffectModal/editEffectModal'
 import NewEffectModal from './components/modals/newEffectModal/newEffectModal'
 import NewGroupSelectModal from './components/modals/newGroupSelectModal/newGroupSelectModal'
+import EditSequenceModal from './components/modals/sequenceModal/editModal'
 import NewSequenceModal from './components/modals/sequenceModal/newModal'
 
 /**
@@ -16,6 +17,7 @@ export default function App() {
   return (
     <div className="flex flex-col h-full grow">
       <NewSequenceModal />
+      <EditSequenceModal />
       <NewGroupSelectModal />
       <NewEffectModal />
       <EditEffectModal />

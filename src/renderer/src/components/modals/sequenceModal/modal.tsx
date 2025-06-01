@@ -1,5 +1,5 @@
 import { useAudioStore } from '@renderer/stores/audio/audioStore'
-import { MouseEventHandler, useEffect, useMemo, useRef, useState } from 'react'
+import { MouseEventHandler, PropsWithChildren, useEffect, useMemo, useRef, useState } from 'react'
 import { CreateSequenceRequest, GroupID } from 'src/apis/audio/types/groups'
 import { useShallow } from 'zustand/react/shallow'
 import TextField from '@renderer/components/generic/textField'
@@ -12,10 +12,7 @@ import SequenceEditingZone, { dropZoneScrollContainerID, EditingDropZoneID } fro
 import { v4 as uuidv4 } from 'uuid'
 import { usePrevious } from '@dnd-kit/utilities'
 import SoundIcon from '@renderer/assets/icons/sound'
-import {
-  EffectGroup,
-  SequenceSoundContainer
-} from '@renderer/utils/soundContainer/variants/sequence'
+import { SequenceSoundContainer } from '@renderer/utils/soundContainer/variants/sequence'
 import StopIcon from '@renderer/assets/icons/stop'
 import IconLookup from '@renderer/components/effect/iconLookup'
 import { IconEffect } from '@renderer/components/effect/icon-effect'
@@ -32,8 +29,8 @@ export type SequenceModalProps = {
   modalTitle: string
 }
 
-export default function SequenceModal(props: SequenceModalProps) {
-  const { actionName, handleSubmit, id, modalTitle, handleClose } = props
+export default function SequenceModal(props: PropsWithChildren<SequenceModalProps>) {
+  const { actionName, handleSubmit, id, modalTitle, handleClose, children } = props
 
   const {
     editingSequence,
@@ -274,9 +271,12 @@ export default function SequenceModal(props: SequenceModalProps) {
         </div>
         <div className="modal-action">
           <form method="dialog">
-            <button className="btn btn-primary" onClick={onSubmit}>
-              {actionName}
-            </button>
+            <div className="flex justify-between">
+              <div className="flex flex-row gap-2">{children}</div>
+              <button className="btn btn-primary" onClick={onSubmit}>
+                {actionName}
+              </button>
+            </div>
           </form>
         </div>
       </div>
@@ -287,7 +287,7 @@ export default function SequenceModal(props: SequenceModalProps) {
 function getOverlaidItem(id: GroupID | null) {
   const { getGroup } = useAudioStore(
     useShallow((state) => ({
-      getGroup: state.getGroup
+      getGroup: state.getGroupSource
     }))
   )
 
@@ -296,9 +296,6 @@ function getOverlaidItem(id: GroupID | null) {
   }
 
   const group = getGroup(id)
-  if (group.type !== 'source') {
-    return null
-  }
 
   return <SelectorElement g={group} />
 }

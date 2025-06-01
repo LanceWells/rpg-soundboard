@@ -39,7 +39,7 @@ import {
   SoundEffectWithPlayerDetails,
   CreateSequenceRequest
 } from '../types/groups'
-import { isReferenceGroup, isSourceGroup } from './typePredicates'
+import { isReferenceGroup, isSequenceGroup, isSourceGroup } from './typePredicates'
 
 const html5ThresholdSizeMb = 2
 
@@ -141,7 +141,7 @@ export const GroupsAudioAPI: IGroups = {
       id: newSequenceGroupID,
       name: request.name,
       sequence: newElements,
-      variant: 'sequence'
+      variant: 'Sequence'
     }
 
     const newConfig = produce(AudioConfig.Config, (draft) => {
@@ -155,13 +155,77 @@ export const GroupsAudioAPI: IGroups = {
       sequence: newGroup
     }
   },
+  UpdateSequence(request) {
+    const matchingGroup = AudioConfig.getGroup(request.groupID)
+    if (!matchingGroup) {
+      throw new Error(`Could not find matching group with ID ${request.groupID}.`)
+    }
+
+    if (!isSequenceGroup(matchingGroup)) {
+      throw new Error('Cannot update non-sequence group')
+    }
+
+    const existingElementsMap = new Map(matchingGroup.sequence.map((e) => [e.id, e]))
+    const newElements = request.sequence.reduce((acc, curr) => {
+      if (existingElementsMap.has(curr.id)) {
+        const existingElement = existingElementsMap.get(curr.id)!
+        const updatedElement: SoundGroupSequenceElement = {
+          ...existingElement,
+          ...curr
+        }
+
+        acc.push(updatedElement)
+        return acc
+      }
+
+      const newElementID: SequenceElementID = `seq-${crypto.randomUUID()}`
+      const newElement: SoundGroupSequenceElement = {
+        ...curr,
+        id: newElementID
+      }
+
+      acc.push(newElement)
+      return acc
+    }, [] as SoundGroupSequenceElement[])
+
+    const updatedGroup: SoundGroupSequence = {
+      type: 'sequence',
+      boardID: request.boardID,
+      category: request.category,
+      icon: request.icon,
+      id: request.groupID,
+      name: request.name,
+      sequence: newElements,
+      variant: 'Sequence'
+    }
+
+    const newConfig = produce(AudioConfig.Config, (draft) => {
+      const matchingBoard = draft.boards.find((b) => b.id === request.boardID)
+      const newGroups =
+        matchingBoard?.groups.map<SoundGroup>((g) => {
+          if (g.id === request.groupID) {
+            return updatedGroup
+          }
+
+          return g
+        }) ?? []
+
+      if (matchingBoard) {
+        matchingBoard.groups = newGroups
+      }
+    })
+
+    AudioConfig.Config = newConfig
+
+    return { sequence: updatedGroup }
+  },
   /**
    * @inheritdoc
    */
   Update: function (request: UpdateRequest): UpdateResponse {
     const matchingGroup = AudioConfig.getGroup(request.groupID)
     if (!matchingGroup) {
-      throw new Error(`Could not find matching grup with ID ${request.groupID}.`)
+      throw new Error(`Could not find matching group with ID ${request.groupID}.`)
     }
 
     if (!isSourceGroup(matchingGroup)) {

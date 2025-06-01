@@ -40,6 +40,15 @@ export type CreateSequenceResponse = {
   sequence: SoundGroupSequence
 }
 
+export type UpdateSequenceRequest = {
+  boardID: BoardID
+  groupID: GroupID
+} & SoundGroupSequenceEditableFields
+
+export type UpdateSequenceResponse = {
+  sequence: SoundGroupSequence
+}
+
 export type LinkRequest = {
   destinationBoard: BoardID
   sourceGroup: GroupID
@@ -304,4 +313,6 @@ export interface IGroups {
   UpdateLink(request: UpdateLinkRequest): UpdateLinkResponse
 
   CreateSequence(request: CreateSequenceRequest): CreateSequenceResponse
+
+  UpdateSequence(request: UpdateSequenceRequest): UpdateSequenceResponse
 }

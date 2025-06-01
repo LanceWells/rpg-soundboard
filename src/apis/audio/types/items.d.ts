@@ -66,13 +66,8 @@ export type SoundGroup = SoundGroupSource | SoundGroupReference | SoundGroupSequ
 
 export type SequenceElementID = `seq-${string}-${string}-${string}-${string}-${string}`
 
-/**
- * Represents a group of independent sound effects. Note that this is represented by a series of
- * buttons on a soundboard. The effects contained by this group are meant to be a randomization of
- * possible sounds that the group might produce.
- */
-export type SoundGroupSource = {
-  type: 'source'
+export interface ISoundGroup {
+  type: string
 
   /**
    * The ID for the group.
@@ -86,15 +81,16 @@ export type SoundGroupSource = {
   name: string
 
   /**
-   * A series of sound effects represented by this group. These are a set of sounds that could
-   * evenly be played once the button is pressed.
-   */
-  effects: SoundEffect[]
-
-  /**
    * The icon that will be displayed as the button for the sound effect.
    */
   icon: SoundIcon
+
+  /**
+   * An optional identifier for a category for this particular sound group. Note that this is not a
+   * required field. If the field is not specified, it implies that the sound group is
+   * "uncategorized", and should not be rendered visibly within any category container.
+   */
+  category: CategoryID
 
   /**
    * A variant refers to the general behavior for a given sound group type. This will impact items
@@ -105,16 +101,24 @@ export type SoundGroupSource = {
    *  - how the associated button reacts when pressed
    */
   variant: SoundVariants
-
-  /**
-   * An optional identifier for a category for this particular sound group. Note that this is not a
-   * required field. If the field is not specified, it implies that the sound group is
-   * "uncategorized", and should not be rendered visibly within any category container.
-   */
-  category: CategoryID
 }
 
-export type SoundGroupReference = {
+/**
+ * Represents a group of independent sound effects. Note that this is represented by a series of
+ * buttons on a soundboard. The effects contained by this group are meant to be a randomization of
+ * possible sounds that the group might produce.
+ */
+export interface SoundGroupSource extends ISoundGroup {
+  type: 'source'
+
+  /**
+   * A series of sound effects represented by this group. These are a set of sounds that could
+   * evenly be played once the button is pressed.
+   */
+  effects: SoundEffect[]
+}
+
+export interface SoundGroupReference {
   type: 'reference'
   id: GroupID
   boardID: BoardID
@@ -135,14 +139,9 @@ export type SoundGroupSequenceGroup = {
 
 export type SoundGroupSequenceElement = SoundGroupSequenceGroup | SoundGroupSequenceDelay
 
-export type SoundGroupSequence = {
+export interface SoundGroupSequence extends ISoundGroup {
   type: 'sequence'
-  id: GroupID
-  variant: 'sequence'
-  name: string
-  icon: SoundIcon
   boardID: BoardID
-  category: CategoryID
   sequence: SoundGroupSequenceElement[]
 }
 

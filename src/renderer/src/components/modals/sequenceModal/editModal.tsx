@@ -1,13 +1,13 @@
 import SequenceModal from './modal'
 
-export const NewSequenceModalId = 'new-sequence-modal'
+export const EditSequenceModalId = 'edit-sequence-modal'
 
-export default function NewSequenceModal() {
+export default function EditSequenceModal() {
   return (
     <SequenceModal
       actionName="Edit"
       handleSubmit={() => {}}
-      id={NewSequenceModalId}
+      id={EditSequenceModalId}
       modalTitle="Edit Sequence"
       handleClose={() => {}}
     />

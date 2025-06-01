@@ -11,7 +11,9 @@ import {
   SoundGroupReference,
   SoundGroupSequenceElement,
   SoundGroupSequenceEditableFields,
-  SequenceElementID
+  SequenceElementID,
+  SoundGroupSource,
+  SoundGroupSequence
 } from 'src/apis/audio/types/items'
 import { SoundVariants } from 'src/apis/audio/types/soundVariants'
 import { StateCreator } from 'zustand'
@@ -88,9 +90,9 @@ export interface EditingSlice {
   editingSequence: SoundGroupSequenceEditableFields | null
   playingSequenceSounds: Set<SequenceElementID>
 
-  resetEditingGroup: () => void
+  resetEditingGroup: (soundGroup?: SoundGroupSource) => void
   resetEditingBoard: () => void
-  resetEditingSequence: () => void
+  resetEditingSequence: (soundGroup?: SoundGroupSequence) => void
   setEditingMode: (isEditing: EditingMode) => void
   setEditingGroupID: (id: GroupID) => void
   addWorkingFiles: (list: SoundEffectEditableFields | SoundEffectEditableFields[]) => void
@@ -212,7 +214,7 @@ export const createEditingSlice: StateCreator<EditingSlice & BoardSlice, [], [],
     })
     return
   },
-  resetEditingGroup() {
+  resetEditingGroup(soundGroup?: SoundGroupSource) {
     const activeBoardID = get().activeBoardID
     if (activeBoardID === null) {
       return
@@ -223,9 +225,18 @@ export const createEditingSlice: StateCreator<EditingSlice & BoardSlice, [], [],
       return
     }
 
-    set({
-      editingGroup: getDefaultGroup(activeBoard.categories[0].id)
-    })
+    set(
+      produce((state: EditingSlice) => {
+        if (soundGroup === undefined) {
+          state.editingGroup = getDefaultGroup(activeBoard.categories[0].id)
+        } else {
+          state.editingGroupID = soundGroup.id
+          state.editingGroup = {
+            ...soundGroup
+          }
+        }
+      })
+    )
   },
   resetWorkingFiles(list) {
     set(
@@ -331,7 +342,7 @@ export const createEditingSlice: StateCreator<EditingSlice & BoardSlice, [], [],
       })
     )
   },
-  resetEditingSequence() {
+  resetEditingSequence(soundGroup?: SoundGroupSequence) {
     const activeBoardID = get().activeBoardID
     const activeBoard = get().boards.find((b) => b.id === activeBoardID) ?? null
 
@@ -341,16 +352,22 @@ export const createEditingSlice: StateCreator<EditingSlice & BoardSlice, [], [],
 
     set(
       produce((state: EditingSlice) => {
-        state.editingSequence = {
-          boardID: activeBoardID,
-          category: activeBoard.categories[0].id,
-          name: '',
-          sequence: [],
-          icon: {
-            backgroundColor: ColorOptions.black,
-            foregroundColor: ColorOptions.white,
-            name: 'moon'
+        if (soundGroup === undefined) {
+          state.editingSequence = {
+            boardID: activeBoardID,
+            category: activeBoard.categories[0].id,
+            name: '',
+            sequence: [],
+            icon: {
+              backgroundColor: ColorOptions.black,
+              foregroundColor: ColorOptions.white,
+              name: 'moon'
+            },
+            variant: 'Default'
           }
+        } else {
+          state.editingGroupID = soundGroup.id
+          state.editingSequence = { ...soundGroup }
         }
       })
     )
