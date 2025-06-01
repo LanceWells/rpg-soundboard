@@ -138,6 +138,7 @@ export type SoundGroupSequenceElement = SoundGroupSequenceGroup | SoundGroupSequ
 export type SoundGroupSequence = {
   type: 'sequence'
   id: GroupID
+  variant: 'sequence'
   name: string
   icon: SoundIcon
   boardID: BoardID

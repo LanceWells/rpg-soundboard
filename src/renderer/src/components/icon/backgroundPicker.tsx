@@ -31,7 +31,6 @@ export default function BackgroundPicker(props: Partial<ColorPickerProps> & { pi
       pickerID={pickerID}
       color={editingGroup?.icon.backgroundColor ?? 'gray'}
       onColorChange={handleBackgroundSelect}
-      className="[grid-area:background]"
       {...otherProps}
     />
   )

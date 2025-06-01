@@ -4,8 +4,8 @@ import { AudioApiConfig } from '../interface'
 import { BoardID } from '../types/boards'
 import { CategoryID } from '../types/categories'
 import { GroupID } from '../types/groups'
-import { SoundBoard, SoundCategory, SoundGroupSource } from '../types/items'
-import { isSourceGroup } from '../methods/typePredicates'
+import { SoundBoard, SoundCategory, SoundGroupSequence, SoundGroupSource } from '../types/items'
+import { isSequenceGroup, isSourceGroup } from '../methods/typePredicates'
 
 /**
  * An instantiation of the config for information related to this audio API.
@@ -68,7 +68,7 @@ export class AudioConfigStorage extends MigratableConfigStorage<AudioApiConfig> 
   }
 
   private _boardMap: Map<BoardID, SoundBoard>
-  private _groupMap: Map<GroupID, SoundGroupSource>
+  private _groupMap: Map<GroupID, SoundGroupSource | SoundGroupSequence>
   private _categoryMap: Map<CategoryID, SoundCategory>
 
   /**
@@ -115,7 +115,7 @@ export class AudioConfigStorage extends MigratableConfigStorage<AudioApiConfig> 
    * @param boardID The ID for the group to fetch from the stored configuration object.
    * @returns The group whose ID matches, if one was found. Otherwise, `undefined`.
    */
-  getGroup(groupID: GroupID): SoundGroupSource | undefined {
+  getGroup(groupID: GroupID): SoundGroupSource | SoundGroupSequence | undefined {
     return this._groupMap.get(groupID)
   }
 
@@ -131,7 +131,7 @@ export class AudioConfigStorage extends MigratableConfigStorage<AudioApiConfig> 
     this.Config.boards.forEach((b: SoundBoard) => {
       this._boardMap.set(b.id, b)
       b.groups.forEach((g) => {
-        if (isSourceGroup(g)) {
+        if (isSourceGroup(g) || isSequenceGroup(g)) {
           this._groupMap.set(g.id, g)
         }
       })

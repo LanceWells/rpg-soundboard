@@ -1,6 +1,7 @@
 import { ComponentType, JSX, useMemo, useRef, useState } from 'react'
 import { useDebounce } from 'use-debounce'
 import { useVirtualizer } from '@tanstack/react-virtual'
+import { twMerge } from 'tailwind-merge'
 
 export type VirtualizedSearchProps<T extends JSX.IntrinsicAttributes> = {
   className?: string
@@ -30,14 +31,23 @@ export default function IconLookup<T extends JSX.IntrinsicAttributes>(
   })
 
   return (
-    <div className={`min-w-96 flex flex-col ${className}`}>
+    <div
+      className={twMerge(
+        className,
+        `
+      min-w-96
+      grid
+      grid-rows-[min-content_1fr]
+    `
+      )}
+    >
       <input
         onChange={(e) => setSearch(e.target.value)}
         placeholder="Search"
         className="input bg-slate-300 dark:bg-black w-full rounded-b-none z-10"
         value={search}
       />
-      <div className="min-h-72 max-h-72 overflow-y-scroll bg-base-300 p-6 rounded-md relative rounded-t-none">
+      <div className="overflow-y-scroll bg-base-300 p-6 rounded-md relative rounded-t-none">
         <div
           style={{
             height: `${rowVirtualizer.getTotalSize()}px`

@@ -1,5 +1,5 @@
 import { useAudioStore } from '@renderer/stores/audio/audioStore'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { MouseEventHandler, useEffect, useMemo, useRef, useState } from 'react'
 import { CreateSequenceRequest, GroupID } from 'src/apis/audio/types/groups'
 import { useShallow } from 'zustand/react/shallow'
 import TextField from '@renderer/components/generic/textField'
@@ -37,6 +37,7 @@ export default function SequenceModal(props: SequenceModalProps) {
 
   const {
     editingSequence,
+    editingBoardID,
     updateSequenceName,
     updateSequenceOrder,
     boards,
@@ -46,6 +47,7 @@ export default function SequenceModal(props: SequenceModalProps) {
   } = useAudioStore(
     useShallow((state) => ({
       editingSequence: state.editingSequence,
+      editingBoardID: state.editingBoardID,
       updateSequenceName: state.updateSequenceName,
       updateSequenceOrder: state.updateSequenceElements,
       boards: state.boards,
@@ -76,25 +78,10 @@ export default function SequenceModal(props: SequenceModalProps) {
     ])
 
   const previewSound = async () => {
-    const effectPromises =
-      editingSequence?.sequence.map<Promise<EffectGroup>>(async (e) => {
-        if (e.type === 'delay') {
-          return {
-            type: 'delay',
-            delayInMs: e.msToDelay,
-            id: e.id
-          }
-        }
-
-        const s = await getSounds(e.groupID)
-
-        return {
-          type: 'group',
-          effects: s.sounds,
-          groupID: e.groupID,
-          id: e.id
-        }
-      }) ?? []
+    const effectPromises = SequenceSoundContainer.ApiToSetupElements(
+      editingSequence?.sequence ?? [],
+      getSounds
+    )
 
     const effects = await Promise.all(effectPromises)
 
@@ -123,7 +110,40 @@ export default function SequenceModal(props: SequenceModalProps) {
     previewContainerRef.current?.Stop()
   }
 
+  const onSubmit: MouseEventHandler = (e) => {
+    let failToSubmit = false
+    if (editingSequence === null) {
+      failToSubmit = true
+      return
+    }
+
+    if (!editingSequence.name) {
+      failToSubmit = true
+      setEffectNameErr('This field is required')
+    } else {
+      setEffectNameErr('')
+    }
+
+    if (editingSequence.sequence.filter((s) => s.type === 'group').length <= 0) {
+      failToSubmit = true
+      setSequenceErr('A sequence needs at least one sound')
+    } else {
+      setSequenceErr('')
+    }
+
+    if (failToSubmit || editingBoardID === undefined) {
+      e.preventDefault()
+      return
+    }
+
+    handleSubmit({
+      ...editingSequence,
+      boardID: editingBoardID
+    })
+  }
+
   const [effectNameErr, setEffectNameErr] = useState('')
+  const [sequenceErr, setSequenceErr] = useState('')
 
   const seq = editingSequence?.sequence ?? []
   const [draggingID, setDraggingID] = useState<GroupID | null>(null)
@@ -179,17 +199,15 @@ export default function SequenceModal(props: SequenceModalProps) {
 
   return (
     <dialog id={id} className="modal">
-      <div className="modal-box min-w-fit overflow-visible relative">
+      <div className="modal-box min-w-4/5 max-h-2/3 h-2/3 overflow-visible relative grid grid-rows-[min-content_1fr_min-content]">
         <h3 className="font-bold text-lg">{modalTitle}</h3>
-
         <div
           className={`
             grid
             py-2
             [grid-template-areas:"iconpreview_iconlookup"_"sequence_picker"_"controls_controls"]
-            grid-cols-[2fr_1fr]
             grid-rows-[1fr_1fr_min-content]
-            w-[640px]
+            grid-cols-2
             gap-2
           `}
         >
@@ -197,7 +215,10 @@ export default function SequenceModal(props: SequenceModalProps) {
             className={`
               grid
               [grid-area:iconpreview]
-              [grid-template-areas:"name_name"_"icon_foreground"_"icon_background"]
+              [grid-template-areas:"icon_icon_name"_"foreground_background_."]
+              grid-cols-[min-content_max-content]
+              items-start
+              justify-items-center
             `}
           >
             <TextField
@@ -209,16 +230,13 @@ export default function SequenceModal(props: SequenceModalProps) {
               placeholder="My Sequence"
               onChange={(e) => updateSequenceName(e.target.value)}
             />
-            <IconEffect
-              className="[grid-area:icon] self-center justify-self-end"
-              icon={editingSequence?.icon}
-            />
+            <IconEffect className="[grid-area:icon] self-end" icon={editingSequence?.icon} />
             <ForegroundPicker
-              className="[grid-area:icon_foreground] self-end"
+              className="[grid-area:foreground] w-full justify-self-start"
               pickerID="sequence-foreground"
             />
             <BackgroundPicker
-              className="[grid-area:icon_background] self-start"
+              className="[grid-area:background] w-full justify-self-end"
               pickerID="sequence-background"
             />
           </div>
@@ -228,14 +246,13 @@ export default function SequenceModal(props: SequenceModalProps) {
             onDragStart={onDragFromSelect}
             onDragEnd={onDragEnd}
           >
-            <SequenceEditingZone />
+            <SequenceEditingZone errorText={sequenceErr} />
             <GroupLookup />
-            {/* <SequenceGroupSelector /> */}
             <DragOverlay adjustScale={false}>{getOverlaidItem(draggingID)}</DragOverlay>
           </DndContext>
           <div className="join [grid-area:controls]">
             <button className="join-item btn btn-secondary" onClick={newBlankElement}>
-              New Element
+              New Delay
             </button>
             <div className="relative">
               <button
@@ -255,6 +272,13 @@ export default function SequenceModal(props: SequenceModalProps) {
             </div>
           </div>
         </div>
+        <div className="modal-action">
+          <form method="dialog">
+            <button className="btn btn-primary" onClick={onSubmit}>
+              {actionName}
+            </button>
+          </form>
+        </div>
       </div>
     </dialog>
   )
@@ -271,5 +295,10 @@ function getOverlaidItem(id: GroupID | null) {
     return null
   }
 
-  return <SelectorElement g={getGroup(id)} />
+  const group = getGroup(id)
+  if (group.type !== 'source') {
+    return null
+  }
+
+  return <SelectorElement g={group} />
 }

@@ -1,7 +1,11 @@
 import { IAudioApi } from 'src/apis/audio/interface'
 import { BoardID } from 'src/apis/audio/types/boards'
 import { GroupID } from 'src/apis/audio/types/groups'
-import { SoundGroupSource, SoundGroupSourceEditableFields } from 'src/apis/audio/types/items'
+import {
+  SoundGroupSequence,
+  SoundGroupSource,
+  SoundGroupSourceEditableFields
+} from 'src/apis/audio/types/items'
 import { StateCreator } from 'zustand'
 import { BoardSlice } from './boardSlice'
 import { produce } from 'immer'
@@ -15,7 +19,7 @@ export interface GroupSlice {
    */
   playingGroups: GroupID[]
 
-  getGroup: (groupID: GroupID) => SoundGroupSource
+  getGroup: (groupID: GroupID) => SoundGroupSource | SoundGroupSequence
   addGroup: IAudioApi['Groups']['Create']
   addSequence: IAudioApi['Groups']['CreateSequence']
   updateGroup: IAudioApi['Groups']['Update']

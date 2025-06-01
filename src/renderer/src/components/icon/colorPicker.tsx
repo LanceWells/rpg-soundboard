@@ -1,4 +1,5 @@
 import { useCallback, useRef, useState } from 'react'
+import { twMerge } from 'tailwind-merge'
 
 export const ColorOptions = {
   cyan: '#16a085',
@@ -39,7 +40,7 @@ export default function ColorPicker(props: ColorPickerProps) {
   const popoverRef = useRef<HTMLDivElement | null>(null)
 
   return (
-    <div className={`relative flex items-center gap-4 m-2 ${className}`}>
+    <div className={twMerge(`relative flex items-center gap-4 m-2`, className)}>
       <span className="text-lg">{title}</span>
       <button
         popoverTarget={popoverTarget}

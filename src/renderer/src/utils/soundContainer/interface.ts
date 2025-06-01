@@ -1,5 +1,5 @@
 import { EffectID } from 'src/apis/audio/types/effects'
-import { GroupID, SoundEffectWithPlayerDetails } from 'src/apis/audio/types/groups'
+import { SoundEffectWithPlayerDetails } from 'src/apis/audio/types/groups'
 import { SoundVariants } from 'src/apis/audio/types/soundVariants'
 
 /**
@@ -25,22 +25,6 @@ export type StopHandler = {
    */
   handler: (groupID: string) => void
 }
-
-// /**
-//  * Defines the callback handler that will be invoked when the sound is loaded.
-//  */
-// export type LoadedHandler = {
-//   /**
-//    * The ID that is associated with the given effect stopping. This will be undefined if TID is
-//    * undefined.
-//    */
-//   id: string
-
-//   /**
-//    * The handler to invoke once the sound has loaded.
-//    */
-//   handler: (groupID: string, container: ISoundContainer) => void
-// }
 
 export type Handler<T extends string> = {
   id: T

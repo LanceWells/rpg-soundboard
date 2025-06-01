@@ -1,3 +1,5 @@
+import { JSX } from 'react'
+
 export type FileSelectorProps = JSX.IntrinsicElements['input'] & {
   className?: string
   formName: string

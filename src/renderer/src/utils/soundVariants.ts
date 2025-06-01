@@ -1,6 +1,6 @@
 import type {
   SoundVariants,
-  // @ts-ignore Import this import being unused so that intellisense works on the descriptions.
+  // @ts-expect-error Import this import being unused so that intellisense works on the descriptions.
   SoundVariantFields
 } from 'src/apis/audio/types/soundVariants'
 

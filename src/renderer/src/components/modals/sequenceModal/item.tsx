@@ -103,7 +103,7 @@ export function SequenceItemDelay(props: SequenceItemDelayProps) {
       thisElement.msToDelay = e.target.valueAsNumber
     })
 
-    if (newSequence === undefined) {
+    if (newSequence === null) {
       return
     }
 

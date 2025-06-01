@@ -140,7 +140,8 @@ export const GroupsAudioAPI: IGroups = {
       icon: request.icon,
       id: newSequenceGroupID,
       name: request.name,
-      sequence: newElements
+      sequence: newElements,
+      variant: 'sequence'
     }
 
     const newConfig = produce(AudioConfig.Config, (draft) => {
@@ -415,43 +416,52 @@ export const GroupsAudioAPI: IGroups = {
    * @inheritdoc
    */
   GetSound: async function (request: GetSoundRequest): Promise<GetSoundResponse> {
-    const group = AudioConfig.getGroup(request.groupID)
+    throw new Error('Deprecated')
+    // const group = AudioConfig.getGroup(request.groupID)
 
-    if (!group || group.effects.length === 0) {
-      throw new Error(`Could not find group with effects with id ${request.groupID}.`)
-    }
+    // if (!group || group.effects.length === 0) {
+    //   throw new Error(`Could not find group with effects with id ${request.groupID}.`)
+    // }
 
-    let idsToSkip: EffectID[] = []
-    if (request.idsToSkip && request.idsToSkip.length < group.effects.length) {
-      idsToSkip = request.idsToSkip
-    }
+    // let idsToSkip: EffectID[] = []
+    // if (request.idsToSkip && request.idsToSkip.length < group.effects.length) {
+    //   idsToSkip = request.idsToSkip
+    // }
 
-    let effect: SoundEffect
-    do {
-      const effectIndex = crypto.randomInt(0, group.effects.length)
-      effect = group.effects[effectIndex]
-    } while (idsToSkip.includes(effect.id))
+    // let effect: SoundEffect
+    // do {
+    //   const effectIndex = crypto.randomInt(0, group.effects.length)
+    //   effect = group.effects[effectIndex]
+    // } while (idsToSkip.includes(effect.id))
 
-    const appDataPath = GetAppDataPath() + '/'
-    const actualSystemPath = effect.path.replace('aud://', appDataPath)
+    // const appDataPath = GetAppDataPath() + '/'
+    // const actualSystemPath = effect.path.replace('aud://', appDataPath)
 
-    const srcFileSizeInMb = await getFileSize(actualSystemPath)
-    const useHtml5 = srcFileSizeInMb > html5ThresholdSizeMb
+    // const srcFileSizeInMb = await getFileSize(actualSystemPath)
+    // const useHtml5 = srcFileSizeInMb > html5ThresholdSizeMb
 
-    return {
-      src: effect.path,
-      format: effect.format as SupportedFileTypes,
-      volume: effect.volume,
-      effectID: effect.id,
-      variant: group.variant,
-      useHtml5
-    }
+    // return {
+    //   src: effect.path,
+    //   format: effect.format as SupportedFileTypes,
+    //   volume: effect.volume,
+    //   effectID: effect.id,
+    //   variant: group.variant,
+    //   useHtml5
+    // }
   },
   /**
    * @inheritdoc
    */
   GetSounds: async function (request: GetSoundRequest): Promise<GetSoundsResponse> {
     const group = AudioConfig.getGroup(request.groupID)
+
+    if (group?.type === 'sequence') {
+      console.error(`Attempt to get sounds from sequence group ${group.id}`)
+      return {
+        sounds: [],
+        variant: 'Default'
+      }
+    }
 
     if (!group || group.effects.length === 0) {
       throw new Error(`Could not find group with effects with id ${request.groupID}.`)

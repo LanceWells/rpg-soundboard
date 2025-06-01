@@ -1,6 +1,6 @@
 import { SoundVariants } from 'src/apis/audio/types/soundVariants'
 import { AbstractSoundContainer } from '../abstract'
-import { GroupID, SoundEffectWithPlayerDetails } from 'src/apis/audio/types/groups'
+import { SoundEffectWithPlayerDetails } from 'src/apis/audio/types/groups'
 import { getRandomArbitrary, getRandomInt } from '@renderer/utils/random'
 import { SoundContainerSetup } from '../interface'
 import { EffectID } from 'src/apis/audio/types/effects'

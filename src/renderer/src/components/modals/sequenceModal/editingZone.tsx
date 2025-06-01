@@ -5,12 +5,20 @@ import { DndContext, DragEndEvent, useDroppable } from '@dnd-kit/core'
 import { produce } from 'immer'
 import { SortableContext } from '@dnd-kit/sortable'
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers'
+import { twMerge } from 'tailwind-merge'
 
 export const EditingDropZoneID = 'sequence-edit-drop-zone'
 
 export const dropZoneScrollContainerID = 'drop-zone-scroll-container'
 
-export default function SequenceEditingZone() {
+type SequenceEditingZoneProps = {
+  className?: string
+  errorText?: string
+}
+
+export default function SequenceEditingZone(props: SequenceEditingZoneProps) {
+  const { className, errorText } = props
+
   const { editingSequence, updateSequenceOrder } = useAudioStore(
     useShallow((state) => ({
       editingSequence: state.editingSequence,
@@ -18,7 +26,7 @@ export default function SequenceEditingZone() {
     }))
   )
 
-  const { setNodeRef, isOver, active } = useDroppable({
+  const { setNodeRef, isOver } = useDroppable({
     id: EditingDropZoneID
   })
 
@@ -55,32 +63,33 @@ export default function SequenceEditingZone() {
     <DndContext modifiers={[restrictToVerticalAxis]} onDragEnd={onDragEnd}>
       <SortableContext items={editableItems}>
         <div
-          className={`
-          h-full
-          w-full
-          max-h-full
-          relative
-          overflow-hidden
-          bg-base-300
-          transition-shadow
-          border-dashed
-          rounded-md
-          ${
-            isOver &&
+          className={twMerge(
+            className,
             `
-              inset-ring
-              ring-offset-2
-              brightness-125
-              after:content-['+']
-              after:absolute
-              after:top-1/2
-              after:left-1/2
-              after:z-10
-              after:text-9xl
-              after:-translate-1/2
+              relative
+              overflow-hidden
+              transition-shadow
+              border-dashed
+              rounded-md
+              grid
+              grid-rows-[1fr_min-content]
+              ${
+                isOver &&
+                `
+                  inset-ring
+                  ring-offset-2
+                  brightness-125
+                  after:content-['+']
+                  after:absolute
+                  after:top-1/2
+                  after:left-1/2
+                  after:z-10
+                  after:text-9xl
+                  after:-translate-1/2
+                `
+              }
             `
-          }
-        `}
+          )}
         >
           <div
             ref={setNodeRef}
@@ -91,13 +100,16 @@ export default function SequenceEditingZone() {
             p-2
             flex-col
             h-full
+            min-h-full
             max-h-full
             overflow-y-scroll
             overflow-x-hidden
+            bg-base-300
           `}
           >
             {sortableElements}
           </div>
+          <label className="text-error">{errorText}</label>
         </div>
       </SortableContext>
     </DndContext>

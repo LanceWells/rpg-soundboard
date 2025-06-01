@@ -1,8 +1,12 @@
 import { SoundVariants } from 'src/apis/audio/types/soundVariants'
-import { GroupID, SoundEffectWithPlayerDetails } from 'src/apis/audio/types/groups'
+import {
+  GetSoundsResponse,
+  GroupID,
+  SoundEffectWithPlayerDetails
+} from 'src/apis/audio/types/groups'
 import { Handler, ISoundContainer } from '../interface'
 import { NewSoundContainer } from '../util'
-import { SequenceElementID } from 'src/apis/audio/types/items'
+import { SequenceElementID, SoundGroupSequenceElement } from 'src/apis/audio/types/items'
 
 export type Delay = {
   type: 'delay'
@@ -136,6 +140,8 @@ export class SequenceSoundContainer implements ISoundContainer {
 
     this.totalRuntime = timing.runningTimer
     this.effectTiming = timing.effects
+
+    return this
   }
 
   Duration: number | undefined
@@ -190,5 +196,29 @@ export class SequenceSoundContainer implements ISoundContainer {
     if (this.stoppedHandler) {
       this.stoppedHandler.handler(this.stoppedHandler.id, this)
     }
+  }
+
+  static ApiToSetupElements(
+    elements: SoundGroupSequenceElement[],
+    getSounds: (groupID: GroupID) => Promise<GetSoundsResponse>
+  ) {
+    return elements.map<Promise<EffectGroup>>(async (e) => {
+      if (e.type === 'delay') {
+        return {
+          type: 'delay',
+          delayInMs: e.msToDelay,
+          id: e.id
+        }
+      }
+
+      const s = await getSounds(e.groupID)
+
+      return {
+        type: 'group',
+        effects: s.sounds,
+        groupID: e.groupID,
+        id: e.id
+      }
+    })
   }
 }

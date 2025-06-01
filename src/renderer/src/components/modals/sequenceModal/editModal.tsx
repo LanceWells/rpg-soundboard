@@ -1,17 +1,14 @@
-import { useAudioStore } from '@renderer/stores/audio/audioStore'
 import SequenceModal from './modal'
 
 export const NewSequenceModalId = 'new-sequence-modal'
 
 export default function NewSequenceModal() {
-  const addGroup = useAudioStore((state) => state.addSequence)
-
   return (
     <SequenceModal
-      actionName="Create"
-      handleSubmit={addGroup}
+      actionName="Edit"
+      handleSubmit={() => {}}
       id={NewSequenceModalId}
-      modalTitle="Create New Sequence"
+      modalTitle="Edit Sequence"
       handleClose={() => {}}
     />
   )

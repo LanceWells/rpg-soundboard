@@ -119,7 +119,7 @@ export default function EffectModal(props: PropsWithChildren<EffectModalProps>) 
 
   return (
     <dialog id={id} className="modal">
-      <div className="modal-box min-w-fit overflow-visible relative">
+      <div className="modal-box max-h-2/3 min-w-fit overflow-visible relative">
         <h3 className="font-bold text-lg">{modalTitle}</h3>
         <div
           className={`
@@ -142,7 +142,7 @@ export default function EffectModal(props: PropsWithChildren<EffectModalProps>) 
           />
           <FileSelectInput error={fileListErr} className="[grid-area:fileselect]" />
           <FileSelectList className="[grid-area:files]" />
-          <IconLookup className="[grid-area:lookup] w-full" />
+          <IconLookup className="[grid-area:lookup] min-h-84 max-h-84 w-full" />
           <ForegroundPicker pickerID="default-icon-foreground" />
           <BackgroundPicker pickerID="default-icon-background" />
           <label className="form-control w-full max-w-xs">
