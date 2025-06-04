@@ -18,14 +18,14 @@ export default function IconLookup<T extends JSX.IntrinsicAttributes>(
   const [search, setSearch] = useState('')
   const [debouncedSearch] = useDebounce(search, 500)
 
-  const icons = useMemo(() => {
+  const searchItems = useMemo(() => {
     return onSearch(debouncedSearch)
   }, [debouncedSearch])
 
   const parentRef = useRef(null)
 
   const rowVirtualizer = useVirtualizer({
-    count: icons.length,
+    count: searchItems.length,
     getScrollElement: () => parentRef.current,
     estimateSize
   })
@@ -55,12 +55,12 @@ export default function IconLookup<T extends JSX.IntrinsicAttributes>(
           ref={parentRef}
         >
           {rowVirtualizer.getVirtualItems().map((virtualItem) => (
-            <RenderItem {...icons[virtualItem.index]} key={virtualItem.key} />
+            <RenderItem {...searchItems[virtualItem.index]} key={virtualItem.key} />
           ))}
         </div>
         <i
           className={`
-            ${debouncedSearch.length > 0 && icons.length === 0 ? 'visible' : 'hidden'}
+            ${debouncedSearch.length > 0 && searchItems.length === 0 ? 'visible' : 'hidden'}
             absolute
             top-1/2
             left-1/2

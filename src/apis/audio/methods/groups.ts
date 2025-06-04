@@ -7,9 +7,9 @@ import crypto from 'node:crypto'
 import { SupportedFileTypes } from '../supportedFileTypes'
 import { GetAppDataPath } from '../../../utils/paths'
 import {
+  ISoundGroup,
   SequenceElementID,
   SoundEffect,
-  SoundGroup,
   SoundGroupSequence,
   SoundGroupSequenceElement,
   SoundGroupSource
@@ -39,7 +39,7 @@ import {
   SoundEffectWithPlayerDetails,
   CreateSequenceRequest
 } from '../types/groups'
-import { isReferenceGroup, isSequenceGroup, isSourceGroup } from './typePredicates'
+import { isSequenceGroup, isSourceGroup } from './typePredicates'
 
 const html5ThresholdSizeMb = 2
 
@@ -202,7 +202,7 @@ export const GroupsAudioAPI: IGroups = {
     const newConfig = produce(AudioConfig.Config, (draft) => {
       const matchingBoard = draft.boards.find((b) => b.id === request.boardID)
       const newGroups =
-        matchingBoard?.groups.map<SoundGroup>((g) => {
+        matchingBoard?.groups.map<ISoundGroup>((g) => {
           if (g.id === request.groupID) {
             return updatedGroup
           }
@@ -283,7 +283,7 @@ export const GroupsAudioAPI: IGroups = {
     const newConfig = produce(AudioConfig.Config, (draft) => {
       const matchingBoard = draft.boards.find((b) => b.id === request.boardID)
       const newGroups =
-        matchingBoard?.groups.map<SoundGroup>((g) => {
+        matchingBoard?.groups.map<ISoundGroup>((g) => {
           if (!isSourceGroup(g)) {
             return g
           }
@@ -325,13 +325,7 @@ export const GroupsAudioAPI: IGroups = {
     const newConfig = produce(AudioConfig.Config, (draft) => {
       draft.boards.forEach((b) => {
         b.groups = b.groups.filter((g) => {
-          if (isSourceGroup(g)) {
-            return g.id !== request.groupID
-          }
-          if (isReferenceGroup(g)) {
-            return g.id !== request.groupID
-          }
-          throw new Error(`Tried to remove a group from ${b.id} that didn't have a known type`)
+          return g.id !== request.groupID
         })
       })
     })
@@ -432,7 +426,7 @@ export const GroupsAudioAPI: IGroups = {
 
       acc.get(curr.category)!.push(curr)
       return acc
-    }, new Map<CategoryID, SoundGroup[]>())
+    }, new Map<CategoryID, ISoundGroup[]>())
 
     const thisCategoryID = request['category']
     const thisCategoryGroups = groupsByCategory.get(thisCategoryID)
@@ -479,7 +473,7 @@ export const GroupsAudioAPI: IGroups = {
   /**
    * @inheritdoc
    */
-  GetSound: async function (request: GetSoundRequest): Promise<GetSoundResponse> {
+  GetSound: async function (_request: GetSoundRequest): Promise<GetSoundResponse> {
     throw new Error('Deprecated')
     // const group = AudioConfig.getGroup(request.groupID)
 
@@ -519,8 +513,8 @@ export const GroupsAudioAPI: IGroups = {
   GetSounds: async function (request: GetSoundRequest): Promise<GetSoundsResponse> {
     const group = AudioConfig.getGroup(request.groupID)
 
-    if (group?.type === 'sequence') {
-      console.error(`Attempt to get sounds from sequence group ${group.id}`)
+    if (group === undefined || !isSourceGroup(group)) {
+      console.error(`Attempt to get sounds from sequence group ${group?.id ?? 'undefined'}`)
       return {
         sounds: [],
         variant: 'Default'
@@ -590,7 +584,6 @@ export const GroupsAudioAPI: IGroups = {
 
       destinationBoard.groups.push({
         type: 'reference',
-        boardID: request.sourceBoard,
         category: destinationBoard.categories[0].id,
         id: request.sourceGroup
       })

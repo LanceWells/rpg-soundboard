@@ -62,7 +62,7 @@ export type SoundEffect = {
  */
 export type SoundEffectEditableFields = Omit<SoundEffect, 'id' | 'format'>
 
-export type SoundGroup = SoundGroupSource | SoundGroupReference | SoundGroupSequence
+// export type SoundGroup = SoundGroupSource | SoundGroupReference | SoundGroupSequence
 
 export type SequenceElementID = `seq-${string}-${string}-${string}-${string}-${string}`
 
@@ -75,23 +75,14 @@ export interface ISoundGroup {
   id: GroupID
 
   /**
-   * A name used to represent the group. Ideally this should be short, as it will be rendered in
-   * small text underneath a small-sized button.
-   */
-  name: string
-
-  /**
-   * The icon that will be displayed as the button for the sound effect.
-   */
-  icon: SoundIcon
-
-  /**
    * An optional identifier for a category for this particular sound group. Note that this is not a
    * required field. If the field is not specified, it implies that the sound group is
    * "uncategorized", and should not be rendered visibly within any category container.
    */
   category: CategoryID
+}
 
+export interface ISoundGroupSource extends ISoundGroup {
   /**
    * A variant refers to the general behavior for a given sound group type. This will impact items
    * such as:
@@ -101,6 +92,17 @@ export interface ISoundGroup {
    *  - how the associated button reacts when pressed
    */
   variant: SoundVariants
+
+  /**
+   * A name used to represent the group. Ideally this should be short, as it will be rendered in
+   * small text underneath a small-sized button.
+   */
+  name: string
+
+  /**
+   * The icon that will be displayed as the button for the sound effect.
+   */
+  icon: SoundIcon
 }
 
 /**
@@ -108,7 +110,7 @@ export interface ISoundGroup {
  * buttons on a soundboard. The effects contained by this group are meant to be a randomization of
  * possible sounds that the group might produce.
  */
-export interface SoundGroupSource extends ISoundGroup {
+export interface SoundGroupSource extends ISoundGroupSource {
   type: 'source'
 
   /**
@@ -118,10 +120,9 @@ export interface SoundGroupSource extends ISoundGroup {
   effects: SoundEffect[]
 }
 
-export interface SoundGroupReference {
+export interface SoundGroupReference extends ISoundGroup {
   type: 'reference'
   id: GroupID
-  boardID: BoardID
   category: CategoryID
 }
 
@@ -139,7 +140,7 @@ export type SoundGroupSequenceGroup = {
 
 export type SoundGroupSequenceElement = SoundGroupSequenceGroup | SoundGroupSequenceDelay
 
-export interface SoundGroupSequence extends ISoundGroup {
+export interface SoundGroupSequence extends ISoundGroupSource {
   type: 'sequence'
   boardID: BoardID
   sequence: SoundGroupSequenceElement[]
@@ -215,7 +216,7 @@ export type SoundBoard = {
    * The set of groups represented by this sound board. Each group should be represented as an
    * individual button on a given soundboard.
    */
-  groups: SoundGroup[]
+  groups: ISoundGroup[]
 
   /**
    * The set of sound categories that should be represented within this particular soundboard.

@@ -4,7 +4,8 @@ import type {
   SoundEffect,
   SoundGroupReferenceEditableFields,
   SoundGroupSequenceEditableFields,
-  SoundGroupSequence
+  SoundGroupSequence,
+  ISoundGroupSource
 } from './items'
 import type { BoardID } from './boards'
 import type { EffectID } from './effects'
@@ -115,7 +116,7 @@ export type GetResponse = {
   /**
    * The group that has been fetched, or undefined if the group was not found.
    */
-  group: SoundGroupSource | SoundGroupSequence | undefined
+  group: ISoundGroupSource | undefined
 }
 
 /**

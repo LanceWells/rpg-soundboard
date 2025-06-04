@@ -7,13 +7,12 @@ import {
   SoundGroupSourceEditableFields,
   SoundEffectEditableFields,
   SoundIcon,
-  SoundBoard,
-  SoundGroupReference,
   SoundGroupSequenceElement,
   SoundGroupSequenceEditableFields,
   SequenceElementID,
   SoundGroupSource,
-  SoundGroupSequence
+  SoundGroupSequence,
+  SoundBoardEditableFields
 } from 'src/apis/audio/types/items'
 import { SoundVariants } from 'src/apis/audio/types/soundVariants'
 import { StateCreator } from 'zustand'
@@ -22,7 +21,7 @@ import { enableMapSet, produce } from 'immer'
 import { getDefaultGroup } from './groupSlice'
 import { ColorOptions } from '@renderer/components/icon/colorPicker'
 
-export type SoundBoardFields = Pick<SoundBoard, 'name'> & { referenceGroups: SoundGroupReference[] }
+// export type SoundBoardFields = Pick<SoundBoard, 'name'> & { referenceGroups: SoundGroupReference[] }
 
 enableMapSet()
 
@@ -82,7 +81,7 @@ export interface EditingSlice {
    */
   editingGroup: SoundGroupSourceEditableFields | null
 
-  editingBoard: SoundBoardFields | null
+  editingBoard: SoundBoardEditableFields | null
 
   draggingID: string | null
   sequenceDraggingID: GroupID | null
@@ -406,7 +405,6 @@ export const createEditingSlice: StateCreator<EditingSlice & BoardSlice, [], [],
   }
 })
 
-export const getDefaultBoard = (): SoundBoardFields => ({
-  name: '',
-  referenceGroups: []
+export const getDefaultBoard = (): SoundBoardEditableFields => ({
+  name: ''
 })

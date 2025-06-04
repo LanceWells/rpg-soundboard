@@ -1,11 +1,17 @@
 import { BoardID } from 'src/apis/audio/types/boards'
-import { SoundGroup } from 'src/apis/audio/types/items'
+import {
+  ISoundGroup,
+  SoundGroupReference,
+  SoundGroupSequence,
+  SoundGroupSource
+} from 'src/apis/audio/types/items'
 import GroupSource from './groupSource'
 import GroupReference from './groupReference'
 import GroupSequence from './groupSequence'
+import { isReferenceGroup, isSequenceGroup, isSourceGroup } from '@renderer/utils/typePredicates'
 
 export type GroupProps = {
-  group: SoundGroup
+  group: ISoundGroup
   boardID: BoardID
   beingDragged?: boolean
 }
@@ -13,16 +19,19 @@ export type GroupProps = {
 export default function Group(props: GroupProps) {
   const { group } = props
 
-  switch (group.type) {
-    case 'source':
-      return <GroupSource {...props} group={group} />
-    case 'reference':
-      return <GroupReference {...props} group={group} />
-    case 'sequence':
-      return <GroupSequence {...props} group={group} />
-    default:
-      return <></>
+  if (isSourceGroup(group)) {
+    return <GroupSource {...props} group={group as SoundGroupSource} />
   }
+
+  if (isSequenceGroup(group)) {
+    return <GroupSequence {...props} group={group as SoundGroupSequence} />
+  }
+
+  if (isReferenceGroup(group)) {
+    return <GroupReference {...props} group={group as SoundGroupReference} />
+  }
+
+  return <></>
 }
 
 // import { IconEffect } from '../effect/icon-effect'

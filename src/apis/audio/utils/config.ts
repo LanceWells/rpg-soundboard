@@ -4,7 +4,7 @@ import { AudioApiConfig } from '../interface'
 import { BoardID } from '../types/boards'
 import { CategoryID } from '../types/categories'
 import { GroupID } from '../types/groups'
-import { SoundBoard, SoundCategory, SoundGroupSequence, SoundGroupSource } from '../types/items'
+import { ISoundGroupSource, SoundBoard, SoundCategory } from '../types/items'
 import { isSequenceGroup, isSourceGroup } from '../methods/typePredicates'
 
 /**
@@ -68,7 +68,7 @@ export class AudioConfigStorage extends MigratableConfigStorage<AudioApiConfig> 
   }
 
   private _boardMap: Map<BoardID, SoundBoard>
-  private _groupMap: Map<GroupID, SoundGroupSource | SoundGroupSequence>
+  private _groupMap: Map<GroupID, ISoundGroupSource>
   private _categoryMap: Map<CategoryID, SoundCategory>
 
   /**
@@ -115,7 +115,7 @@ export class AudioConfigStorage extends MigratableConfigStorage<AudioApiConfig> 
    * @param boardID The ID for the group to fetch from the stored configuration object.
    * @returns The group whose ID matches, if one was found. Otherwise, `undefined`.
    */
-  getGroup(groupID: GroupID): SoundGroupSource | SoundGroupSequence | undefined {
+  getGroup(groupID: GroupID): ISoundGroupSource | undefined {
     return this._groupMap.get(groupID)
   }
 

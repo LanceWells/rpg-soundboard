@@ -1,5 +1,5 @@
 import { BoardID } from 'src/apis/audio/types/boards'
-import { SoundBoard, SoundGroupSource } from 'src/apis/audio/types/items'
+import { ISoundGroup, SoundBoard } from 'src/apis/audio/types/items'
 import { IAudioApi } from 'src/apis/audio/interface'
 import { StateCreator } from 'zustand'
 import fuse from 'fuse.js'
@@ -20,7 +20,7 @@ export interface BoardSlice {
   updateBoard: IAudioApi['Boards']['Update']
   deleteBoard: (id: BoardID) => void
   setActiveBoardID: (id: BoardID) => void
-  searchForGroups: (searchText: string) => SoundGroupSource[]
+  searchForGroups: (searchText: string, types: string[]) => ISoundGroup[]
 }
 
 export const createBoardSlice: StateCreator<BoardSlice> = (set) => ({
@@ -71,9 +71,9 @@ export const createBoardSlice: StateCreator<BoardSlice> = (set) => ({
 
     return updatedBoard
   },
-  searchForGroups(searchText) {
+  searchForGroups(searchText, types: string[]) {
     const boards = window.audio.Boards.GetAll({})
-    const allGroups = boards.boards.flatMap((b) => b.groups).filter((g) => g.type === 'source')
+    const allGroups = boards.boards.flatMap((b) => b.groups).filter((g) => types.includes(g.type))
 
     const fuseSearch = new fuse(allGroups, {
       keys: ['name']

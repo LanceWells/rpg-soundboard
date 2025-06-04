@@ -2,7 +2,7 @@ import { IAudioApi } from 'src/apis/audio/interface'
 import { BoardID } from 'src/apis/audio/types/boards'
 import { GroupID } from 'src/apis/audio/types/groups'
 import {
-  ISoundGroup,
+  ISoundGroupSource,
   SoundGroupSequence,
   SoundGroupSource,
   SoundGroupSourceEditableFields
@@ -13,13 +13,14 @@ import { produce } from 'immer'
 import { ColorOptions } from '@renderer/components/icon/colorPicker'
 import { CategoryID } from 'src/apis/audio/types/categories'
 import { EditingSlice } from './editingSlice'
+import { isSequenceGroup, isSourceGroup } from '@renderer/utils/typePredicates'
 
 export interface GroupSlice {
   /**
    * The set of IDs for groups that are actively playing a sound effect.
    */
   playingGroups: GroupID[]
-  getGroup: (groupID: GroupID) => ISoundGroup
+  getGroup: (groupID: GroupID) => ISoundGroupSource
   getGroupSource: (groupID: GroupID) => SoundGroupSource
   getGroupSequence: (groupID: GroupID) => SoundGroupSequence
   addGroup: IAudioApi['Groups']['Create']
@@ -106,7 +107,7 @@ export const createGroupSlice: StateCreator<
       throw new Error(`Could not find a group with id ${request}`)
     }
 
-    if (group.type !== 'sequence') {
+    if (!isSequenceGroup(group)) {
       throw new Error(`Found a group with id ${request}, but it isn't a sequence type`)
     }
 
@@ -118,7 +119,7 @@ export const createGroupSlice: StateCreator<
       throw new Error(`Could not find a group with id ${request}`)
     }
 
-    if (group.type !== 'source') {
+    if (!isSourceGroup(group)) {
       throw new Error(`Found a group with id ${request}, but it isn't a sequence type`)
     }
 

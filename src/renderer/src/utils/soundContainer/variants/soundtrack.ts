@@ -1,14 +1,13 @@
 import { SoundVariants } from 'src/apis/audio/types/soundVariants'
 import { AbstractSoundContainer } from '../abstract'
 import { SoundContainerSetup } from '../interface'
-import dayjs from 'dayjs'
 
 export class SoundtrackSoundContainer extends AbstractSoundContainer {
   Variant: SoundVariants = 'Soundtrack'
 
   private _interval: NodeJS.Timeout | undefined
 
-  private readonly CROSSFADE_TIME = 10000
+  public static readonly CROSSFADE_TIME = 10000
   private soundIDs: [number, number] = [0, 0]
   private activeSoundIndex: number = 0
 
@@ -64,7 +63,7 @@ export class SoundtrackSoundContainer extends AbstractSoundContainer {
   }
 
   private Crossfade(): void {
-    console.debug(`Crossfade at ${dayjs().format('HH:mm:ss.SSS')}`)
+    // console.debug(`Crossfade at ${dayjs().format('HH:mm:ss.SSS')}`)
 
     // Not yet initialized.
     if (this.inactiveSoundId === 0) {
@@ -73,21 +72,31 @@ export class SoundtrackSoundContainer extends AbstractSoundContainer {
       this.howl.play(this.inactiveSoundId)
     }
 
-    this.howl.fade(this.targetVolume, 0, this.CROSSFADE_TIME / 2, this.activeSoundId)
-    this.howl.fade(0, this.targetVolume, this.CROSSFADE_TIME, this.inactiveSoundId)
+    this.howl.fade(
+      this.targetVolume,
+      0,
+      SoundtrackSoundContainer.CROSSFADE_TIME * 0.75,
+      this.activeSoundId
+    )
+    this.howl.fade(
+      0,
+      this.targetVolume,
+      SoundtrackSoundContainer.CROSSFADE_TIME,
+      this.inactiveSoundId
+    )
     this.flipActiveSoundIndex()
 
-    console.debug(`
-      Active ID: ${this.activeSoundId}
-      Inactv ID: ${this.inactiveSoundId}
-      Active Dx: ${this.activeSoundIndex}
-      Inactv Dx: ${this.inactiveSoundIndex}
-    `)
+    // console.debug(`
+    //   Active ID: ${this.activeSoundId}
+    //   Inactv ID: ${this.inactiveSoundId}
+    //   Active Dx: ${this.activeSoundIndex}
+    //   Inactv Dx: ${this.inactiveSoundIndex}
+    // `)
 
     setTimeout(() => {
       this.howl.pause(this.inactiveSoundId)
       this.howl.seek(0, this.inactiveSoundId)
-    }, this.CROSSFADE_TIME)
+    }, SoundtrackSoundContainer.CROSSFADE_TIME)
   }
 
   protected override HandleHowlStop(): void {
@@ -102,9 +111,12 @@ export class SoundtrackSoundContainer extends AbstractSoundContainer {
       return
     }
 
-    const fadeInMs = this.duration - this.CROSSFADE_TIME
+    const fadeInMs = this.duration - SoundtrackSoundContainer.CROSSFADE_TIME
+    console.debug(
+      `fadeInMs: ${fadeInMs} || duration: ${this.duration} || Crossfade: ${SoundtrackSoundContainer.CROSSFADE_TIME}`
+    )
 
-    if (fadeInMs <= 0) {
+    if (Number.isNaN(fadeInMs) || fadeInMs <= 1000) {
       return
     }
 

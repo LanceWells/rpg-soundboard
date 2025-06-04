@@ -13,14 +13,12 @@ export default function GroupLookup(props: GroupLookupProps) {
   const searchForGroups = useAudioStore((store) => store.searchForGroups)
 
   const onSearch = (searchText: string) =>
-    searchForGroups(searchText).map(
+    searchForGroups(searchText, ['source']).map(
       (i) =>
         ({
           g: i
         }) as SelectorElementProps & JSX.IntrinsicAttributes
     )
-  // soundboardIcons.SearchIcons(searchText).map((i) => ({ icon: i })) as (SelectorElementProps &
-  //   JSX.IntrinsicAttributes)[]
 
   return (
     <VirtualizedSearch

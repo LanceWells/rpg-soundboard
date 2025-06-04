@@ -5,6 +5,7 @@ import { StateCreator, StoreApi } from 'zustand'
 import { GroupSlice } from './groupSlice'
 import { ISoundContainer } from '@renderer/utils/soundContainer/interface'
 import { SequenceSoundContainer } from '@renderer/utils/soundContainer/variants/sequence'
+import { isSequenceGroup } from '@renderer/utils/typePredicates'
 
 export interface SoundSlice {
   playGroup: (groupID: GroupID) => Promise<void>
@@ -31,7 +32,7 @@ export const createSoundSlice: StateCreator<SoundSlice & GroupSlice, [], [], Sou
     })
 
     let sound: ISoundContainer
-    if (group.group?.type === 'sequence') {
+    if (isSequenceGroup(group.group)) {
       const effectGroupPromises = SequenceSoundContainer.ApiToSetupElements(
         group.group.sequence,
         get().getSounds

@@ -3,7 +3,8 @@ import type {
   SoundCategoryEditableFields,
   SoundCategory,
   SoundGroupSource,
-  SoundCategory
+  SoundCategory,
+  ISoundGroup
 } from './items'
 
 export type GetRequest = {
@@ -73,7 +74,7 @@ export type GetCategorizedGroupsRequest = {
  * The response object for {@link ICategories.GetCategorizedGroups}.
  */
 export type GetCategorizedGroupsResponse = {
-  groups: SoundGroup[]
+  groups: ISoundGroup[]
 }
 
 /**
@@ -87,7 +88,7 @@ export type GetUncategorizedGroupsRequest = {
  * The response object for {@link ICategories.GetUncategorizedGroups}.
  */
 export type GetUncategorizedGroupsResponse = {
-  groups: SoundGroup[]
+  groups: ISoundGroup[]
 }
 
 /**

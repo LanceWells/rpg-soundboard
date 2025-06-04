@@ -1,14 +1,14 @@
 import { IAudioApi } from 'src/apis/audio/interface'
 import { CategoryID } from 'src/apis/audio/types/categories'
-import { SoundGroup } from 'src/apis/audio/types/items'
 import { StateCreator } from 'zustand'
 import { BoardSlice } from './boardSlice'
+import { ISoundGroup } from 'src/apis/audio/types/items'
 
 export interface CategorySlice {
   addCategory: IAudioApi['Categories']['Create']
   deleteCategory: IAudioApi['Categories']['Delete']
   updateCategory: IAudioApi['Categories']['Update']
-  getGroupsForCategory: (categoryID: CategoryID) => SoundGroup[]
+  getGroupsForCategory: (categoryID: CategoryID) => ISoundGroup[]
   getUncategorizedGroups: IAudioApi['Categories']['GetUncategorizedGroups']
   reorderCategories: IAudioApi['Categories']['Reorder']
   getCategory: IAudioApi['Categories']['Get']
@@ -48,9 +48,7 @@ export const createCategorySlice: StateCreator<
       categoryID
     })
 
-    const soundGroups = groups.groups as SoundGroup[]
-
-    return soundGroups
+    return groups.groups
   },
   getUncategorizedGroups(request) {
     const resp = window.audio.Categories.GetUncategorizedGroups(request)

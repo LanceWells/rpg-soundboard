@@ -1,13 +1,13 @@
 import { useSortable } from '@dnd-kit/sortable'
 import { useAudioStore } from '@renderer/stores/audio/audioStore'
-import { ISoundGroup } from 'src/apis/audio/types/items'
+import { ISoundGroupSource } from 'src/apis/audio/types/items'
 import { CSS } from '@dnd-kit/utilities'
 import { IconEffect } from '../effect/icon-effect'
 import GroupIcon from './groupIcon'
 import MoveIcon from '@renderer/assets/icons/move'
 
 export type GroupBaseProps = {
-  group: ISoundGroup
+  group: ISoundGroupSource
   beingDragged?: boolean
   onClickEdit: () => void
   onClickPlay: () => void
