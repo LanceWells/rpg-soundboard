@@ -69,6 +69,14 @@ export default function GroupBase(props: GroupBaseProps) {
               before:-right-2
               before:-left-2
               before:-bottom-2
+              before:[transition-property:all]
+              before:[transition-timing-function:cubic-bezier(0.4,0,0.2,1)]
+              before:[transition-duration:150ms]
+              before:-z-10
+              before:absolute
+              before:rounded-xl
+              before:animate-radialspin
+              before:bg-[radial-gradient(circle_at_center,lightgreen,rebeccapurple)]
               `
                 : `
               before:-top-0
@@ -77,15 +85,6 @@ export default function GroupBase(props: GroupBaseProps) {
               before:-bottom-0
               `
             }
-            before:[transition-property:all]
-            before:[transition-timing-function:cubic-bezier(0.4,0,0.2,1)]
-            before:[transition-duration:150ms]
-            before:-z-10
-            before:absolute
-            
-            before:rounded-xl
-            before:animate-radialspin
-            before:bg-[radial-gradient(circle_at_center,lightgreen,rebeccapurple)]
             `}
         >
           <IconEffect icon={group.icon} />

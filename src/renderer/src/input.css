@@ -12,3 +12,24 @@ body {
   height: 100%;
   width: 100%;
 }
+
+@theme {
+  --animate-radialspin: radialspin 2s linear infinite;
+
+  @keyframes radialspin {
+    0%,
+    100% {
+      background-position: top left;
+      background-size: 200% 200%;
+    }
+    25% {
+      background-position: top right;
+    }
+    50% {
+      background-position: bottom right;
+    }
+    75% {
+      background-position: bottom left;
+    }
+  }
+}
