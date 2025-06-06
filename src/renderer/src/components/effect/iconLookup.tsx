@@ -16,7 +16,7 @@ export default function IconLookup(props: IconLookupProps) {
 
   return (
     <VirtualizedSearch
-      estimateSize={() => 113}
+      estimateSize={() => 114}
       className={className}
       onSearch={onSearch}
       RenderItem={IconPreview}

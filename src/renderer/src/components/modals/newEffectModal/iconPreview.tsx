@@ -1,16 +1,17 @@
 import { useAudioStore } from '@renderer/stores/audio/audioStore'
 import { IconBody } from '@renderer/utils/fetchIcons'
-import { useCallback } from 'react'
+import { CSSProperties, useCallback } from 'react'
 import { IconEffect } from '../../effect/icon-effect'
 import { ColorOptions } from '../../icon/colorPicker'
 import { useShallow } from 'zustand/react/shallow'
 
 export type IconPreviewProps = {
   icon: IconBody
+  style: CSSProperties
 }
 
 export function IconPreview(props: IconPreviewProps) {
-  const { icon } = props
+  const { icon, style } = props
 
   const { editingGroup, setSelectedIcon } = useAudioStore(
     useShallow((state) => ({
@@ -34,7 +35,9 @@ export function IconPreview(props: IconPreviewProps) {
 
   return (
     <button
+      style={style}
       className={`
+        h-[114px]
         mb-2
         grid
         items-center
@@ -44,7 +47,7 @@ export function IconPreview(props: IconPreviewProps) {
         grid-cols-[min-content_1fr]
         w-full
         btn
-        h-fit
+        absolute
         ${editingGroup?.icon.name === icon.name ? 'bg-base-100' : ''}
       `}
       onClick={handlePickIcon}

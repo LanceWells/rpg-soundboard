@@ -196,16 +196,14 @@ export default function SequenceModal(props: PropsWithChildren<SequenceModalProp
 
   return (
     <dialog id={id} className="modal">
-      <div className="modal-box min-w-4/5 max-h-2/3 h-2/3 overflow-visible relative grid grid-rows-[min-content_1fr_min-content]">
+      <div className="modal-box min-w-fit overflow-visible relative">
         <h3 className="font-bold text-lg">{modalTitle}</h3>
         <div
           className={`
             grid
-            py-2
+            gap-4
             [grid-template-areas:"iconpreview_iconlookup"_"sequence_picker"_"controls_controls"]
             grid-rows-[1fr_1fr_min-content]
-            grid-cols-2
-            gap-2
           `}
         >
           <div
@@ -237,7 +235,7 @@ export default function SequenceModal(props: PropsWithChildren<SequenceModalProp
               pickerID="sequence-background"
             />
           </div>
-          <IconLookup className="[grid-area:iconlookup]" />
+          <IconLookup className="[grid-area:iconlookup] min-h-84 max-h-84" />
           <DndContext
             modifiers={[snapCenterToCursor]}
             onDragStart={onDragFromSelect}
