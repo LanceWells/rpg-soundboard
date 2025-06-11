@@ -5,7 +5,7 @@ import { useShallow } from 'zustand/react/shallow'
 import TextField from '@renderer/components/generic/textField'
 import { DndContext, DragEndEvent, DragOverlay, DragStartEvent } from '@dnd-kit/core'
 import { produce } from 'immer'
-import { SequenceElementID, SoundGroupSequenceElement } from 'src/apis/audio/types/items'
+import { SequenceElementID } from 'src/apis/audio/types/items'
 import { snapCenterToCursor } from '@dnd-kit/modifiers'
 import { IdIsGroup } from '@renderer/utils/id'
 import SequenceEditingZone, { dropZoneScrollContainerID, EditingDropZoneID } from './editingZone'
@@ -16,10 +16,10 @@ import { SequenceSoundContainer } from '@renderer/utils/soundContainer/variants/
 import StopIcon from '@renderer/assets/icons/stop'
 import IconLookup from '@renderer/components/effect/iconLookup'
 import { IconEffect } from '@renderer/components/effect/icon-effect'
-import ForegroundPicker from '@renderer/components/icon/foregroundPicker'
-import BackgroundPicker from '@renderer/components/icon/backgroundPicker'
 import GroupLookup from '@renderer/components/group/groupLookup'
 import { SelectorElement } from './groupSelectorElement'
+import CloseIcon from '@renderer/assets/icons/close'
+import ColorPicker from '@renderer/components/icon/colorPicker'
 
 export type SequenceModalProps = {
   id: string
@@ -34,23 +34,24 @@ export default function SequenceModal(props: PropsWithChildren<SequenceModalProp
 
   const {
     editingSequence,
-    editingBoardID,
-    updateSequenceName,
-    updateSequenceOrder,
+    editingBoard: editingBoardID,
+    editSequence,
     boards,
     getSounds,
     setPlaying,
-    setStopped
+    // setStopped,
+    activeBoardID
   } = useAudioStore(
     useShallow((state) => ({
-      editingSequence: state.editingSequence,
-      editingBoardID: state.editingBoardID,
-      updateSequenceName: state.updateSequenceName,
-      updateSequenceOrder: state.updateSequenceElements,
+      activeBoardID: state.activeBoardID,
+      editingSequence: state.editingElementsV2.sequence,
+      editingBoard: state.editingElementsV2.board,
+      editSequence: state.updateEditingSequenceV2,
       boards: state.boards,
       getSounds: state.getSounds,
-      setPlaying: state.markSequenceElementAsPlaying,
-      setStopped: state.markSequenceElementAsStopped
+      setPlaying: state.setSequenceElementPlayingStatusV2
+      // setPlaying: state.markSequenceElementAsPlaying,
+      // setStopped: state.markSequenceElementAsStopped
     }))
   )
 
@@ -69,14 +70,16 @@ export default function SequenceModal(props: PropsWithChildren<SequenceModalProp
   )
 
   const newBlankElement = () =>
-    updateSequenceOrder([
-      ...(editingSequence?.sequence ?? []),
-      { type: 'delay', id: `seq-${crypto.randomUUID()}`, msToDelay: 0 }
-    ])
+    editSequence({
+      sequence: [
+        ...(editingSequence?.element?.sequence ?? []),
+        { type: 'delay', id: `seq-${crypto.randomUUID()}`, msToDelay: 0 }
+      ]
+    })
 
   const previewSound = async () => {
     const effectPromises = SequenceSoundContainer.ApiToSetupElements(
-      editingSequence?.sequence ?? [],
+      editingSequence?.element?.sequence ?? [],
       getSounds
     )
 
@@ -85,10 +88,11 @@ export default function SequenceModal(props: PropsWithChildren<SequenceModalProp
     const newContainer = new SequenceSoundContainer({
       effectGroups: effects,
       elementPlayingHandler(sequence) {
-        setPlaying(sequence)
+        setPlaying(sequence, true)
       },
       elementStoppedHandler(sequence) {
-        setStopped(sequence)
+        setPlaying(sequence, false)
+        // setStopped(sequence)
       },
       stoppedHandler: {
         id: '',
@@ -108,20 +112,31 @@ export default function SequenceModal(props: PropsWithChildren<SequenceModalProp
   }
 
   const onSubmit: MouseEventHandler = (e) => {
+    if (!activeBoardID) {
+      console.error('Do not have an active board ID')
+      return
+    }
+
+    if (!editingSequence?.element) {
+      console.error('Do not have an editing sequence')
+      return
+    }
+
     let failToSubmit = false
     if (editingSequence === null) {
       failToSubmit = true
       return
     }
 
-    if (!editingSequence.name) {
+    if (!editingSequence?.element?.name) {
       failToSubmit = true
       setEffectNameErr('This field is required')
     } else {
       setEffectNameErr('')
     }
 
-    if (editingSequence.sequence.filter((s) => s.type === 'group').length <= 0) {
+    const editingSeq = editingSequence?.element?.sequence ?? []
+    if (editingSeq.filter((s) => s.type === 'group').length <= 0) {
       failToSubmit = true
       setSequenceErr('A sequence needs at least one sound')
     } else {
@@ -134,20 +149,20 @@ export default function SequenceModal(props: PropsWithChildren<SequenceModalProp
     }
 
     handleSubmit({
-      ...editingSequence,
-      boardID: editingBoardID
+      boardID: activeBoardID,
+      ...editingSequence?.element
     })
   }
 
   const [effectNameErr, setEffectNameErr] = useState('')
   const [sequenceErr, setSequenceErr] = useState('')
 
-  const seq = editingSequence?.sequence ?? []
+  const seq = editingSequence?.element?.sequence ?? []
   const [draggingID, setDraggingID] = useState<GroupID | null>(null)
-  const prevItemCount = usePrevious(editingSequence?.sequence.length)
+  const prevItemCount = usePrevious(editingSequence?.element?.sequence.length)
 
   useEffect(() => {
-    const itemCount = editingSequence?.sequence.length
+    const itemCount = editingSequence?.element?.sequence.length
     if (itemCount === (prevItemCount ?? 0) + 1) {
       const scrollContainer = document.getElementById(dropZoneScrollContainerID)
       const lastElement = scrollContainer?.children[scrollContainer.children.length - 1]
@@ -181,7 +196,9 @@ export default function SequenceModal(props: PropsWithChildren<SequenceModalProp
       })
     })
 
-    updateSequenceOrder(newSeq as [SoundGroupSequenceElement, ...[SoundGroupSequenceElement]])
+    editSequence({
+      sequence: newSeq
+    })
 
     return
   }
@@ -193,6 +210,10 @@ export default function SequenceModal(props: PropsWithChildren<SequenceModalProp
       setDraggingID(activeID)
     }
   }
+
+  const bgColor = editingSequence?.element?.icon.backgroundColor ?? 'grey'
+  const fgColor = editingSequence?.element?.icon.foregroundColor ?? 'grey'
+  const iconName = editingSequence?.element?.icon.name ?? 'moon'
 
   return (
     <dialog id={id} className="modal">
@@ -220,22 +241,64 @@ export default function SequenceModal(props: PropsWithChildren<SequenceModalProp
               required
               className="[grid-area:name]"
               fieldName="Name"
-              value={editingSequence?.name}
+              value={editingSequence?.element?.name}
               error={effectNameErr}
               placeholder="My Sequence"
-              onChange={(e) => updateSequenceName(e.target.value)}
+              onChange={(e) => editSequence({ name: e.target.value })}
             />
-            <IconEffect className="[grid-area:icon] self-end" icon={editingSequence?.icon} />
-            <ForegroundPicker
+            <IconEffect
+              className="[grid-area:icon] self-end"
+              icon={editingSequence?.element?.icon}
+            />
+            {/* <ForegroundPicker
               className="[grid-area:foreground] w-full justify-self-start"
-              pickerID="sequence-foreground"
+              pickerID={`sequence-foreground-${actionName}`}
             />
             <BackgroundPicker
               className="[grid-area:background] w-full justify-self-end"
-              pickerID="sequence-background"
+              pickerID={`sequence-background-${actionName}`}
+            /> */}
+            <ColorPicker
+              pickerID={`sequence-foreground-${actionName}`}
+              color={fgColor}
+              onColorChange={function (hex: string): void {
+                editSequence({
+                  icon: {
+                    backgroundColor: bgColor,
+                    foregroundColor: hex,
+                    name: iconName
+                  }
+                })
+              }}
+            />
+            <ColorPicker
+              pickerID={`sequence-background-${actionName}`}
+              color={bgColor}
+              onColorChange={function (hex: string): void {
+                editSequence({
+                  icon: {
+                    backgroundColor: hex,
+                    foregroundColor: fgColor,
+                    name: iconName
+                  }
+                })
+              }}
             />
           </div>
-          <IconLookup className="[grid-area:iconlookup] min-h-84 max-h-84" />
+          <IconLookup
+            bgColor={bgColor}
+            fgColor={fgColor}
+            onClick={(name) =>
+              editSequence({
+                icon: {
+                  backgroundColor: bgColor,
+                  foregroundColor: fgColor,
+                  name
+                }
+              })
+            }
+            className="[grid-area:iconlookup] min-h-84 max-h-84"
+          />
           <DndContext
             modifiers={[snapCenterToCursor]}
             onDragStart={onDragFromSelect}
@@ -275,6 +338,12 @@ export default function SequenceModal(props: PropsWithChildren<SequenceModalProp
                 {actionName}
               </button>
             </div>
+            <button
+              onClick={handleClose}
+              className="btn btn-circle absolute text-white font-bold -top-3 -right-3 bg-error"
+            >
+              <CloseIcon />
+            </button>
           </form>
         </div>
       </div>

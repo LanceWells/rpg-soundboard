@@ -16,8 +16,7 @@ import { useShallow } from 'zustand/react/shallow'
 import { SoundVariant } from '@renderer/utils/soundVariants'
 import { CreateRequest } from 'src/apis/audio/types/groups'
 import { SoundVariants } from 'src/apis/audio/types/soundVariants'
-import BackgroundPicker from '@renderer/components/icon/backgroundPicker'
-import ForegroundPicker from '@renderer/components/icon/foregroundPicker'
+import ColorPicker from '@renderer/components/icon/colorPicker'
 
 export type EffectModalProps = {
   id: string
@@ -31,50 +30,58 @@ export default function EffectModal(props: PropsWithChildren<EffectModalProps>) 
   const { id, handleSubmit, actionName, modalTitle, children, handleClose } = props
 
   const {
-    editingBoardID,
+    editingBoard,
+    // editingBoardID,
     editingGroup,
-    setGroupName,
+    // setGroupName,
     addGroup,
-    resetEditingGroup,
-    setGroupVariant
+    editGroup
+    // resetEditingGroup,
+    // setGroupVariant
   } = useAudioStore(
     useShallow((state) => ({
-      editingBoardID: state.editingBoardID,
-      editingGroup: state.editingGroup,
-      setGroupName: state.setGroupName,
+      // editingBoardID: state.editingBoardID,
+      editingBoard: state.editingElementsV2.board,
+      editingGroup: state.editingElementsV2.source,
+      // editingGroup: state.editingGroup,
+      // setGroupName: state.setGroupName,
       addGroup: state.addGroup,
-      resetEditingGroup: state.resetEditingGroup,
-      setGroupVariant: state.setGroupVariant
+      // resetEditingGroup: state.resetEditingGroup,
+      // setGroupVariant: state.setGroupVariant,
+      editGroup: state.updateEditingSourceV2
     }))
   )
+
+  const editingBoardID = editingBoard?.id
 
   const [effectNameErr, setEffectNameErr] = useState('')
   const [fileListErr, setFileListErr] = useState('')
 
   const onClose = useCallback(() => {
-    resetEditingGroup()
+    // resetEditingGroup()
+    editGroup({})
 
     if (handleClose) {
       handleClose()
     }
-  }, [resetEditingGroup, editingGroup, handleClose])
+  }, [editGroup, editingGroup, handleClose])
 
   const onSubmit = useCallback<MouseEventHandler>(
     (e) => {
       let failToSubmit = false
-      if (editingGroup === null) {
+      if (editingGroup?.element === undefined) {
         failToSubmit = true
         return
       }
 
-      if (editingGroup.effects.length === 0) {
+      if (editingGroup.element.effects.length === 0) {
         failToSubmit = true
         setFileListErr('This field is required')
       } else {
         setFileListErr('')
       }
 
-      if (!editingGroup.name) {
+      if (!editingGroup.element.name) {
         failToSubmit = true
         setEffectNameErr('This field is required')
       } else {
@@ -86,12 +93,16 @@ export default function EffectModal(props: PropsWithChildren<EffectModalProps>) 
         return
       }
 
-      if (editingGroup.icon && editingBoardID) {
+      if (editingGroup.element.icon && editingBoardID) {
+        // handleSubmit({
+        //   ...editingGroup,
+        //   boardID: editingBoardID,
+        //   variant: editingGroup.variant,
+        //   category: editingGroup.category
+        // })
         handleSubmit({
-          ...editingGroup,
           boardID: editingBoardID,
-          variant: editingGroup.variant,
-          category: editingGroup.category
+          ...editingGroup.element
         })
       }
 
@@ -102,9 +113,12 @@ export default function EffectModal(props: PropsWithChildren<EffectModalProps>) 
 
   const onChangeVariant = useCallback<ChangeEventHandler<HTMLSelectElement>>(
     (e) => {
-      setGroupVariant(e.target.value as SoundVariants)
+      editGroup({
+        variant: e.target.value as SoundVariants
+      })
+      // setGroupVariant(e.target.value as SoundVariants)
     },
-    [setGroupVariant]
+    [editGroup]
   )
 
   const selectOptions = useMemo(
@@ -116,6 +130,10 @@ export default function EffectModal(props: PropsWithChildren<EffectModalProps>) 
       )),
     [SoundVariant]
   )
+
+  const bgColor = editingGroup?.element?.icon.backgroundColor ?? 'grey'
+  const fgColor = editingGroup?.element?.icon.foregroundColor ?? 'grey'
+  const iconName = editingGroup?.element?.icon.name ?? 'moon'
 
   return (
     <dialog id={id} className="modal">
@@ -130,27 +148,66 @@ export default function EffectModal(props: PropsWithChildren<EffectModalProps>) 
             w-full
           `}
         >
-          <IconEffect className="[grid-area:icon]" icon={editingGroup?.icon} />
+          <IconEffect className="[grid-area:icon]" icon={editingGroup?.element?.icon} />
           <TextField
             required
             className="w-fit [grid-area:form]"
             fieldName="Name"
-            value={editingGroup?.name ?? ''}
+            value={editingGroup?.element?.name ?? ''}
             error={effectNameErr}
             placeholder="My Sound Effect"
-            onChange={(e) => setGroupName(e.target.value)}
+            onChange={(e) => editGroup({ name: e.target.value })}
           />
           <FileSelectInput error={fileListErr} className="[grid-area:fileselect]" />
           <FileSelectList className="[grid-area:files]" />
-          <IconLookup className="[grid-area:lookup] min-h-84 max-h-84 w-full" />
-          <ForegroundPicker pickerID="default-icon-foreground" />
-          <BackgroundPicker pickerID="default-icon-background" />
+          <IconLookup
+            className="[grid-area:lookup] min-h-84 max-h-84 w-full"
+            bgColor={bgColor}
+            fgColor={fgColor}
+            onClick={(name) =>
+              editGroup({
+                icon: {
+                  backgroundColor: bgColor,
+                  foregroundColor: fgColor,
+                  name
+                }
+              })
+            }
+          />
+          {/* <ForegroundPicker pickerID={`default-icon-foreground-${actionName}`} />
+          <BackgroundPicker pickerID={`default-icon-background-${actionName}`} /> */}
+          <ColorPicker
+            pickerID={`effect-foreground-${actionName}`}
+            color={fgColor}
+            onColorChange={function (hex: string): void {
+              editGroup({
+                icon: {
+                  backgroundColor: bgColor,
+                  foregroundColor: hex,
+                  name: iconName
+                }
+              })
+            }}
+          />
+          <ColorPicker
+            pickerID={`effect-background-${actionName}`}
+            color={bgColor}
+            onColorChange={function (hex: string): void {
+              editGroup({
+                icon: {
+                  backgroundColor: hex,
+                  foregroundColor: fgColor,
+                  name: iconName
+                }
+              })
+            }}
+          />
           <label className="form-control w-full max-w-xs">
             <div className="label">
               <span className="label-text">Sound Variant</span>
             </div>
             <select
-              value={editingGroup?.variant ?? 'Default'}
+              value={editingGroup?.element?.variant ?? 'Default'}
               onChange={onChangeVariant}
               className="select select-bordered"
             >

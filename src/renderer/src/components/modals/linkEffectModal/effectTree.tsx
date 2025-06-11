@@ -7,8 +7,7 @@ export default function EffectTree() {
   const { activeBoardID, boards } = useAudioStore(
     useShallow((state) => ({
       boards: state.boards,
-      activeBoardID: state.activeBoardID,
-      editingBoard: state.editingBoard
+      activeBoardID: state.activeBoardID
     }))
   )
 

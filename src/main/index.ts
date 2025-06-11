@@ -1,10 +1,13 @@
-import { app, shell, BrowserWindow, ipcMain, protocol, net } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, protocol, net, session } from 'electron'
 import { join } from 'path'
+import path from 'node:path'
+import os from 'node:os'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { AudProtocolPrefix } from '../apis/audProtocol/aud'
 import url from 'url'
 import { GetAppDataPath } from '../utils/paths'
+import { Extensions } from 'electron'
 
 function createWindow(): void {
   // Create the browser window.
@@ -48,6 +51,19 @@ protocol.registerSchemesAsPrivileged([
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
+  // installExtension(REACT_DEVELOPER_TOOLS)
+  //   .then((ext) => console.log(`Added extension ${ext.name}`))
+  //   .catch((err) => `Error loading extension: ${err}`)
+  // Electron.Extensions
+  // Extensions.loadExtension()
+  // C:\Users\lance\AppData\Local\Google\Chrome\User Data\Default\Extensions\fmkadmapgofadopljbjfkapdkoienihi
+  // C:\Users\lance\%LOCALAPPDATA%\Google\Chrome\User Data\Default\Extensions\fmkadmapgofadopljbjfkapdkoienihi\6.1.2_0
+  const reactDevToolsPath = path.join(
+    os.homedir(),
+    `AppData\\Local\\Google\\Chrome\\User Data\\Default\\Extensions\\fmkadmapgofadopljbjfkapdkoienihi\\6.1.2_0`
+  )
+  session.defaultSession.extensions.loadExtension(reactDevToolsPath)
+
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.electron')
 

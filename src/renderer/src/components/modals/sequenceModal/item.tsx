@@ -19,17 +19,20 @@ type SequenceItemProps = {
 export default function SequenceItem(props: SequenceItemProps) {
   const { sequence } = props
 
-  const updateSequenceElements = useAudioStore((state) => state.updateSequenceElements)
-  const editingSequence = useAudioStore((state) => state.editingSequence)
-  const playingSounds = useAudioStore((state) => state.playingSequenceSounds)
+  const updateSequenceElements = useAudioStore((state) => state.updateEditingSequenceV2)
+  // const updateSequenceElements = useAudioStore((state) => state.updateSequenceElements)
+  // const editingSequence = useAudioStore((state) => state.editingSequence)
+  const editingSequence = useAudioStore((state) => state.editingElementsV2.sequence)
+  // const playingSounds = useAudioStore((state) => state.playingSequenceSounds)
+  const playingSounds = useAudioStore((state) => state.playingSequenceSoundsV2)
 
   const { attributes, listeners, setNodeRef, transition, transform } = useSortable({
     id: sequence.id
   })
 
   const removeGroup = (sequenceID: SequenceElementID) => {
-    const newSequence = editingSequence?.sequence.filter((g) => g.id !== sequenceID) ?? []
-    updateSequenceElements(newSequence)
+    const newSequence = editingSequence?.element?.sequence.filter((g) => g.id !== sequenceID) ?? []
+    updateSequenceElements({ sequence: newSequence })
   }
 
   const style = {
@@ -90,12 +93,13 @@ type SequenceItemDelayProps = {
 export function SequenceItemDelay(props: SequenceItemDelayProps) {
   const { sequence } = props
 
-  const updateSequenceElements = useAudioStore((state) => state.updateSequenceElements)
-  const sequenceElements = useAudioStore((state) => state.editingSequence)
+  // const updateSequenceElements = useAudioStore((state) => state.updateSequenceElements)
+  const updateSequenceElements = useAudioStore((state) => state.updateEditingSequenceV2)
+  const sequenceElements = useAudioStore((state) => state?.editingElementsV2?.sequence)
 
   const updateThisTiming: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     const newSequence = produce(sequenceElements, (draft) => {
-      const thisElement = draft?.sequence.find((s) => s.id === sequence.id && s.type)
+      const thisElement = draft?.element?.sequence.find((s) => s.id === sequence.id && s.type)
       if (!thisElement || thisElement.type !== 'delay') {
         return
       }
@@ -107,7 +111,8 @@ export function SequenceItemDelay(props: SequenceItemDelayProps) {
       return
     }
 
-    updateSequenceElements(newSequence.sequence)
+    // updateSequenceElements(newSequence.sequence)
+    updateSequenceElements({ sequence: newSequence?.element?.sequence })
   }
 
   return (

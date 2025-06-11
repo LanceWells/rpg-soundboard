@@ -100,11 +100,11 @@ export abstract class AbstractSoundContainer<
 
     this.howl
       .once('loaderror', (id, err) => {
-        console.error(`Failed to load sound ${id}: ${err}`)
+        console.error(`Failed to load sound ${id}: ${err}\nsrc: ${src}`)
         this.HandleHowlStop()
       })
       .once('playerror', (id, err) => {
-        console.error(`Failed to play sound ${id}: ${err}`)
+        console.error(`Failed to play sound ${id}: ${err}\nsrc: ${src}`)
         this.HandleHowlStop()
       })
       .on('load', () => {

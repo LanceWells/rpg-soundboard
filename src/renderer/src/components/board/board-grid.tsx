@@ -25,49 +25,61 @@ export default function BoardGrid() {
     activeBoardID,
     editingMode,
     setActiveBoardID,
-    setEditingBoardID,
-    resetEditingGroup,
-    resetEditingBoard,
+    // setEditingBoardID,
+    // resetEditingGroup,
+    // resetEditingBoard,
     setEditingMode,
-    setBoardName
+    // setBoardName,
+    editBoard,
+    editSource
   } = useAudioStore(
     useShallow((state) => ({
       boards: state.boards,
       activeBoardID: state.activeBoardID,
-      resetEditingGroup: state.resetEditingGroup,
-      resetEditingBoard: state.resetEditingBoard,
+      // resetEditingGroup: state.resetEditingGroup,
+      // resetEditingBoard: state.resetEditingBoard,
+      // resetEditingGroup: state.resetEditingSourceV2,
       setActiveBoardID: state.setActiveBoardID,
-      setEditingBoardID: state.setEditingBoardID,
+      // setEditingBoardID: state.setEditingBoardID,
+      // resetEditingBoard: state.resetEditingBoardV2,
+      editBoard: state.updateEditingBoardV2,
+      editSource: state.updateEditingSourceV2,
       editingMode: state.editingMode,
-      setEditingMode: state.setEditingMode,
-      setBoardName: state.setBoardName
+      setEditingMode: state.setEditingMode
+      // setBoardName: state.setBoardName
     }))
   )
 
   const onNewBoard = useCallback(() => {
-    resetEditingGroup()
-    resetEditingBoard()
+    // resetEditingGroup()
+    // resetEditingBoard()
+    editBoard()
+    editSource()
     ;(document.getElementById(NewBoardModalId) as HTMLDialogElement).showModal()
   }, [])
 
   const onNewGroup = useCallback(() => {
     if (activeBoardID) {
-      setEditingBoardID(activeBoardID)
-      resetEditingGroup()
+      // setEditingBoardID(activeBoardID)
+      editSource()
+      // resetEditingGroup()
+      editBoard({}, activeBoardID)
       ;(document.getElementById(NewGroupSelectModalId) as HTMLDialogElement).showModal()
     }
   }, [activeBoardID])
 
   const onLinkGroup = useCallback(() => {
     if (activeBoardID) {
-      setEditingBoardID(activeBoardID)
+      // setEditingBoardID(activeBoardID)
+      editBoard({}, activeBoardID)
       ;(document.getElementById(LinkEffectModalId) as HTMLDialogElement).showModal()
     }
   }, [activeBoardID])
 
   const onNewCategory = useCallback(() => {
     if (activeBoardID) {
-      setEditingBoardID(activeBoardID)
+      // setEditingBoardID(activeBoardID)
+      editBoard({}, activeBoardID)
       ;(document.getElementById(NewCategoryModalId) as HTMLDialogElement).showModal()
     }
   }, [activeBoardID])
@@ -79,9 +91,11 @@ export default function BoardGrid() {
 
   const onBoardEdit = useCallback(
     (board: SoundBoard) => {
-      resetEditingBoard()
-      setEditingBoardID(board.id)
-      setBoardName(board.name)
+      editBoard()
+      // resetEditingBoard()
+      editBoard(board, board.id)
+      // setEditingBoardID(board.id)
+      // setBoardName(board.name)
       ;(document.getElementById(EditBoardModalId) as HTMLDialogElement).showModal()
     },
     [EditBoardModalId]

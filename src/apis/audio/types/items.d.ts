@@ -62,8 +62,6 @@ export type SoundEffect = {
  */
 export type SoundEffectEditableFields = Omit<SoundEffect, 'id' | 'format'>
 
-// export type SoundGroup = SoundGroupSource | SoundGroupReference | SoundGroupSequence
-
 export type SequenceElementID = `seq-${string}-${string}-${string}-${string}-${string}`
 
 export interface ISoundGroup {
@@ -142,16 +140,10 @@ export type SoundGroupSequenceElement = SoundGroupSequenceGroup | SoundGroupSequ
 
 export interface SoundGroupSequence extends ISoundGroupSource {
   type: 'sequence'
-  boardID: BoardID
   sequence: SoundGroupSequenceElement[]
 }
 
-export type SoundGroupSequenceEditableFields = Omit<
-  SoundGroupSequence,
-  'id' | 'type' | 'sequence'
-> & {
-  sequence: SoundGroupSequenceElement[]
-}
+export type SoundGroupSequenceEditableFields = Omit<SoundGroupSequence, 'id'>
 
 /**
  * An extraction of editable fields for {@link SoundGroupSource}.

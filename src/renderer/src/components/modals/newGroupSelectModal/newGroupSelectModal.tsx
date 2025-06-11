@@ -8,7 +8,9 @@ import { NewEffectModalId } from '../newEffectModal/newEffectModal'
 export const NewGroupSelectModalId = 'NewGroupSelectModal'
 
 export default function NewGroupSelectModal() {
-  const resetEditingSequence = useAudioStore((store) => store.resetEditingSequence)
+  // const resetEditingSequence = useAudioStore((store) => store.resetEditingSequence)
+  const resetEditingSequence = useAudioStore((store) => store.updateEditingSequenceV2)
+  const resetEditingSource = useAudioStore((store) => store.updateEditingSourceV2)
 
   return (
     <dialog id={NewGroupSelectModalId} className="modal">
@@ -21,7 +23,7 @@ export default function NewGroupSelectModal() {
               <button
                 className="btn btn-square h-24 w-24 p-4"
                 onClick={() => {
-                  resetEditingSequence()
+                  resetEditingSequence({})
                   ;(document.getElementById(NewSequenceModalId) as HTMLDialogElement).showModal()
                 }}
               >
@@ -33,7 +35,7 @@ export default function NewGroupSelectModal() {
               <button
                 className="btn btn-square h-24 w-24 p-4"
                 onClick={() => {
-                  resetEditingSequence()
+                  resetEditingSource({})
                   ;(document.getElementById(NewEffectModalId) as HTMLDialogElement).showModal()
                 }}
               >

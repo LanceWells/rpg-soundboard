@@ -5,13 +5,18 @@ import { JSX } from 'react'
 
 export type IconLookupProps = {
   className?: string
+  bgColor: string
+  fgColor: string
+  onClick: (name: string) => void
 }
 
 export default function IconLookup(props: IconLookupProps) {
-  const { className } = props
+  const { className, bgColor, fgColor, onClick } = props
 
   const onSearch = (searchText: string) =>
-    soundboardIcons.SearchIcons(searchText).map((i) => ({ icon: i })) as (IconPreviewProps &
+    soundboardIcons
+      .SearchIcons(searchText)
+      .map((i) => ({ icon: i, bgColor, fgColor, onClick })) as (IconPreviewProps &
       JSX.IntrinsicAttributes)[]
 
   return (

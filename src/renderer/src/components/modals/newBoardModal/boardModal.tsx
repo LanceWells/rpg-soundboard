@@ -3,7 +3,6 @@ import TextField from '@renderer/components/generic/textField'
 import { useAudioStore } from '@renderer/stores/audio/audioStore'
 import { MouseEventHandler, useCallback } from 'react'
 import { CreateRequest } from 'src/apis/audio/types/boards'
-import { useShallow } from 'zustand/react/shallow'
 
 export const NewBoardModalId = 'new-board-modal'
 
@@ -18,18 +17,22 @@ export type BoardModalProps = {
 export default function BoardModal(props: BoardModalProps) {
   const { id, actionName, handleSubmit, modalTitle, handleClose } = props
 
-  const { setBoardName, editingBoard } = useAudioStore(
-    useShallow((state) => ({
-      setBoardName: state.setBoardName,
-      editingBoard: state.editingBoard
-    }))
-  )
+  // const { setBoardName, editingBoard } = useAudioStore(
+  //   useShallow((state) => ({
+  //     setBoardName: state.setBoardName,
+  //     editingBoard: state.editingBoard
+  //   }))
+  // )
+
+  const { board: editingBoard } = useAudioStore((state) => state.editingElementsV2)
+  const editBoard = useAudioStore((state) => state.updateEditingBoardV2)
 
   const onSubmit = useCallback<MouseEventHandler>(
     (e) => {
       let failToSubmit = false
+      const name = editingBoard?.element?.name
 
-      if (!editingBoard?.name) {
+      if (name === undefined) {
         failToSubmit = true
       }
 
@@ -43,7 +46,7 @@ export default function BoardModal(props: BoardModalProps) {
       }
 
       handleSubmit({
-        name: editingBoard.name
+        name: name!
       })
       ;(document.getElementById(id) as HTMLDialogElement).close()
     },
@@ -66,10 +69,13 @@ export default function BoardModal(props: BoardModalProps) {
               required
               className="w-fit"
               fieldName="Name"
-              value={editingBoard?.name}
+              value={editingBoard?.element?.name}
               placeholder="My Soundboard"
               onChange={(e) => {
-                setBoardName(e.target.value)
+                // setBoardName(e.target.value)
+                editBoard({
+                  name: e.target.value
+                })
               }}
             />
           </div>

@@ -7,12 +7,15 @@ import { useShallow } from 'zustand/react/shallow'
 export const NewCategoryModalId = 'new-category-modal'
 
 export default function NewCategoryModal() {
-  const { addCategory, editingBoardID } = useAudioStore(
+  const { addCategory, editingBoard } = useAudioStore(
     useShallow((state) => ({
       addCategory: state.addCategory,
-      editingBoardID: state.editingBoardID
+      // editingBoardID: state.editingBoardID
+      editingBoard: state.editingElementsV2.board
     }))
   )
+
+  const editingBoardID = editingBoard?.id
 
   const [name, setName] = useState('')
   const [nameErr, setNameErr] = useState('')

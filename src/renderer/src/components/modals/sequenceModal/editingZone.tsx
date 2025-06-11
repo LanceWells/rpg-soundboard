@@ -21,8 +21,9 @@ export default function SequenceEditingZone(props: SequenceEditingZoneProps) {
 
   const { editingSequence, updateSequenceOrder } = useAudioStore(
     useShallow((state) => ({
-      editingSequence: state.editingSequence,
-      updateSequenceOrder: state.updateSequenceElements
+      editingSequence: state.editingElementsV2.sequence,
+      updateSequenceOrder: state.updateEditingSequenceV2
+      // updateSequenceOrder: state.updateSequenceElements
     }))
   )
 
@@ -52,10 +53,12 @@ export default function SequenceEditingZone(props: SequenceEditingZoneProps) {
       return
     }
 
-    updateSequenceOrder(newOrder)
+    updateSequenceOrder({
+      sequence: newOrder
+    })
   }
 
-  const seq = editingSequence?.sequence ?? []
+  const seq = editingSequence?.element?.sequence ?? []
   const editableItems = seq.map((e) => e.id) ?? []
   const sortableElements = seq.map((s) => <SequenceItem sequence={s} key={s.id} />)
 

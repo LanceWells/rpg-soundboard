@@ -7,12 +7,15 @@ import { useShallow } from 'zustand/react/shallow'
 export const EditBoardModalId = 'edit-board-modal'
 
 export default function EditBoardModal() {
-  const { editingBoardID, updateBoard } = useAudioStore(
+  const { editingBoard, updateBoard } = useAudioStore(
     useShallow((state) => ({
-      editingBoardID: state.editingBoardID,
+      // editingBoardID: state.editingBoardID,
+      editingBoard: state.editingElementsV2.board,
       updateBoard: state.updateBoard
     }))
   )
+
+  const editingBoardID = editingBoard?.id
 
   const handleSubmit = useCallback(
     (req: CreateRequest) => {

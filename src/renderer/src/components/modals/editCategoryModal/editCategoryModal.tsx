@@ -9,22 +9,26 @@ import { useShallow } from 'zustand/react/shallow'
 export const EditCategoryModalId = 'edit-category-modal'
 
 export default function EditCategoryModal() {
-  const { updateCategory, deleteCategory, editingBoardID, editingCategory } = useAudioStore(
+  const { updateCategory, deleteCategory, editingBoard, editingCategory } = useAudioStore(
     useShallow((state) => ({
       updateCategory: state.updateCategory,
       deleteCategory: state.deleteCategory,
-      editingBoardID: state.editingBoardID,
-      editingCategory: state.editingCategory
+      // editingBoardID: state.editingBoardID,
+      // editingCategory: state.editingCategory
+      editingBoard: state.editingElementsV2.board,
+      editingCategory: state.editingElementsV2.category
     }))
   )
+
+  const editingBoardID = editingBoard?.id
 
   const [name, setName] = useState('')
   const [nameErr, setNameErr] = useState('')
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false)
 
   useEffect(() => {
-    if (editingCategory) {
-      setName(editingCategory.name)
+    if (editingCategory?.element) {
+      setName(editingCategory?.element.name)
     }
   }, [editingCategory])
 
@@ -51,6 +55,11 @@ export default function EditCategoryModal() {
         return
       }
 
+      if (!editingCategory?.id) {
+        console.error('Editing category ID is not set!')
+        return
+      }
+
       if (editingBoardID && editingCategory) {
         updateCategory({
           boardID: editingBoardID,
@@ -64,6 +73,11 @@ export default function EditCategoryModal() {
   )
 
   const onDelete = useCallback(() => {
+    if (!editingCategory?.id) {
+      console.error('Editing category ID is not set! (del)')
+      return
+    }
+
     if (editingBoardID && editingCategory) {
       deleteCategory({ boardID: editingBoardID, categoryID: editingCategory.id })
     }

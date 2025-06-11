@@ -1,32 +1,31 @@
-import { useAudioStore } from '@renderer/stores/audio/audioStore'
 import { IconBody } from '@renderer/utils/fetchIcons'
-import { CSSProperties, useCallback } from 'react'
+import { CSSProperties } from 'react'
 import { IconEffect } from '../../effect/icon-effect'
-import { ColorOptions } from '../../icon/colorPicker'
-import { useShallow } from 'zustand/react/shallow'
 
 export type IconPreviewProps = {
   icon: IconBody
+  bgColor: string
+  fgColor: string
   style: CSSProperties
+  onClick: (iconName: string) => void
 }
 
 export function IconPreview(props: IconPreviewProps) {
-  const { icon, style } = props
+  const { icon, style, onClick, bgColor, fgColor } = props
 
-  const { editingGroup, setSelectedIcon } = useAudioStore(
-    useShallow((state) => ({
-      editingGroup: state.editingGroup,
-      setSelectedIcon: state.setSelectedIcon
-    }))
-  )
+  // const { editingGroup, setSelectedIcon } = useAudioStore(
+  //   useShallow((state) => ({
+  //     editingGroup: state.editingGroup,
+  //     setSelectedIcon: state.setSelectedIcon
+  //   }))
+  // )
 
-  const handlePickIcon = useCallback(() => {
-    setSelectedIcon({
-      name: icon.name,
-      backgroundColor: editingGroup?.icon.backgroundColor ?? ColorOptions.black,
-      foregroundColor: editingGroup?.icon.foregroundColor ?? ColorOptions.white
-    })
-  }, [icon.name, editingGroup?.icon, setSelectedIcon])
+  // const handlePickIcon = () => {
+  //   onClick({
+  //     name: icon.name,
+  //     backgroundColor: editingGroup?.icon.backgroundColor ?? ColorOptions.black,
+  //     foregroundColor: editingGroup?.icon.foregroundColor ?? ColorOptions.white
+  //   })
 
   const readableName = icon.name
     .split('-')
@@ -48,18 +47,18 @@ export function IconPreview(props: IconPreviewProps) {
         w-full
         btn
         absolute
-        ${editingGroup?.icon.name === icon.name ? 'bg-base-100' : ''}
       `}
-      onClick={handlePickIcon}
+      onClick={() => onClick(icon.name)}
     >
       <IconEffect
         icon={{
           name: icon.name,
-          backgroundColor: editingGroup?.icon.backgroundColor ?? 'grey',
-          foregroundColor: editingGroup?.icon.foregroundColor ?? 'grey'
+          backgroundColor: bgColor,
+          foregroundColor: fgColor
         }}
       />
       <span>{readableName}</span>
     </button>
   )
 }
+// ${editingGroup?.icon.name === icon.name ? 'bg-base-100' : ''}

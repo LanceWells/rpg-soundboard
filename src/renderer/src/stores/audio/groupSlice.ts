@@ -4,6 +4,7 @@ import { GroupID } from 'src/apis/audio/types/groups'
 import {
   ISoundGroupSource,
   SoundGroupSequence,
+  SoundGroupSequenceEditableFields,
   SoundGroupSource,
   SoundGroupSourceEditableFields
 } from 'src/apis/audio/types/items'
@@ -14,6 +15,7 @@ import { ColorOptions } from '@renderer/components/icon/colorPicker'
 import { CategoryID } from 'src/apis/audio/types/categories'
 import { EditingSlice } from './editingSlice'
 import { isSequenceGroup, isSourceGroup } from '@renderer/utils/typePredicates'
+import { EditingSliceV2 } from './editingSliceV2'
 
 export interface GroupSlice {
   /**
@@ -31,12 +33,16 @@ export interface GroupSlice {
     groupID: GroupID,
     updatedFields: Partial<SoundGroupSourceEditableFields>
   ) => void
+  updateSequencePartial: (
+    groupID: GroupID,
+    updatedFields: Partial<SoundGroupSequenceEditableFields>
+  ) => void
   moveGroup: (groupID: GroupID, newBoardID: BoardID) => void
   deleteGroup: (id: GroupID) => void
 }
 
 export const createGroupSlice: StateCreator<
-  GroupSlice & BoardSlice & EditingSlice,
+  GroupSlice & BoardSlice & EditingSlice & EditingSliceV2,
   [],
   [],
   GroupSlice
@@ -52,8 +58,7 @@ export const createGroupSlice: StateCreator<
     }
 
     set({
-      boards: newBoards,
-      editingGroup: getDefaultGroup(activeBoard.categories[0].id)
+      boards: newBoards
     })
 
     return newGroup
@@ -72,7 +77,8 @@ export const createGroupSlice: StateCreator<
       boards: newBoards
     })
 
-    get().resetEditingSequence()
+    // get().resetEditingSequence()
+    get().updateEditingSequenceV2({})
 
     return newGroup
   },
@@ -89,8 +95,7 @@ export const createGroupSlice: StateCreator<
     }
 
     set({
-      boards: newBoards,
-      editingGroup: getDefaultGroup(activeBoard.categories[0].id)
+      boards: newBoards
     })
   },
   getGroup(request) {
@@ -143,9 +148,7 @@ export const createGroupSlice: StateCreator<
     const newBoards = window.audio.Boards.GetAll({}).boards
 
     set({
-      boards: newBoards,
-      editingGroup: getDefaultGroup(activeBoard.categories[0].id),
-      editingGroupID: undefined
+      boards: newBoards
     })
   },
   updateGroup(req) {
@@ -159,8 +162,7 @@ export const createGroupSlice: StateCreator<
     }
 
     set({
-      boards: newBoards,
-      editingGroup: getDefaultGroup(activeBoard.categories[0].id)
+      boards: newBoards
     })
 
     return updatedGroup
@@ -193,8 +195,42 @@ export const createGroupSlice: StateCreator<
     }
 
     set({
-      boards: newBoards,
-      editingGroup: getDefaultGroup(activeBoard.categories[0].id)
+      boards: newBoards
+    })
+  },
+  updateSequencePartial(groupID, updatedFields) {
+    const activeBoardID = get().activeBoardID
+    if (!activeBoardID) {
+      throw new Error('Cannot update sequence without an active board ID')
+    }
+
+    const activeBoard = get().boards.find((b) => b.id === activeBoardID) ?? null
+    const currentGroup = window.audio.Groups.Get({
+      groupID
+    }).group
+
+    if (!currentGroup) {
+      return
+    }
+
+    const newGroup = produce(currentGroup, (draft) => {
+      Object.assign(draft, updatedFields)
+    }) as SoundGroupSequence
+
+    window.audio.Groups.UpdateSequence({
+      groupID,
+      boardID: activeBoardID,
+      ...newGroup
+    })
+
+    const newBoards = window.audio.Boards.GetAll({}).boards
+
+    if (activeBoard === null) {
+      return
+    }
+
+    set({
+      boards: newBoards
     })
   },
   editingGroup: null,
@@ -202,7 +238,20 @@ export const createGroupSlice: StateCreator<
   playingGroups: []
 })
 
-export const getDefaultGroup = (categoryID: CategoryID): SoundGroupSourceEditableFields => ({
+// export const getDefaultGroup = (categoryID: CategoryID): SoundGroupSourceEditableFields => ({
+//   type: 'source',
+//   effects: [],
+//   icon: {
+//     backgroundColor: ColorOptions.black,
+//     foregroundColor: ColorOptions.white,
+//     name: 'moon'
+//   },
+//   name: '',
+//   variant: 'Default',
+//   category: categoryID
+// })
+
+export const getDefaultGroup = (categoryID: CategoryID): Omit<SoundGroupSource, 'id'> => ({
   type: 'source',
   effects: [],
   icon: {
@@ -213,4 +262,17 @@ export const getDefaultGroup = (categoryID: CategoryID): SoundGroupSourceEditabl
   name: '',
   variant: 'Default',
   category: categoryID
+})
+
+export const getDefaultSequence = (categoryID: CategoryID): SoundGroupSequenceEditableFields => ({
+  type: 'sequence',
+  category: categoryID,
+  icon: {
+    backgroundColor: ColorOptions.black,
+    foregroundColor: ColorOptions.white,
+    name: 'moon'
+  },
+  name: '',
+  sequence: [],
+  variant: 'Sequence'
 })

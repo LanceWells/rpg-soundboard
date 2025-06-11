@@ -37,16 +37,17 @@ export type CategorizedProps = {
 export default function Categorized(props: CategorizedProps) {
   const { category, boardID, beingDragged } = props
 
-  const { getGroupsForCategory, setEditingBoardID, prepEditingCategory, editingMode, draggingID } =
-    useAudioStore(
-      useShallow((state) => ({
-        getGroupsForCategory: state.getGroupsForCategory,
-        editingMode: state.editingMode,
-        setEditingBoardID: state.setEditingBoardID,
-        prepEditingCategory: state.prepEditingCategory,
-        draggingID: state.draggingID
-      }))
-    )
+  const { getGroupsForCategory, editBoard, editCategory, editingMode, draggingID } = useAudioStore(
+    useShallow((state) => ({
+      getGroupsForCategory: state.getGroupsForCategory,
+      editingMode: state.editingMode,
+      editBoard: state.updateEditingBoardV2,
+      // setEditingBoardID: state.setEditingBoardID,
+      // prepEditingCategory: state.prepEditingCategory,
+      editCategory: state.updateEditingCategoryV2,
+      draggingID: state.draggingID
+    }))
+  )
 
   const groups = getGroupsForCategory(category.id)
 
@@ -67,8 +68,10 @@ export default function Categorized(props: CategorizedProps) {
   }
 
   const onClickEdit = useCallback(() => {
-    prepEditingCategory(boardID, category.id)
-    setEditingBoardID(boardID)
+    // prepEditingCategory(boardID, category.id)
+    editCategory(category, category.id)
+    // setEditingBoardID(boardID)
+    editBoard({}, boardID)
     ;(document.getElementById(EditCategoryModalId) as HTMLDialogElement).showModal()
   }, [category, boardID])
 

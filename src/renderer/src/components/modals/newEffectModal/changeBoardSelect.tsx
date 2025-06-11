@@ -17,7 +17,9 @@ export default function ChangeBoardSelect(props: ChangeBoardSelectProps) {
       boards: state.boards,
       activeBoardID: state.activeBoardID ?? '',
       moveGroup: state.moveGroup,
-      resetEditingGroup: state.resetEditingGroup
+      // resetEditingGroup: state.resetEditingGroup
+      // resetEditingGroup: state.resetEditingSourceV2
+      resetEditingGroup: state.updateEditingSourceV2
     }))
   )
 

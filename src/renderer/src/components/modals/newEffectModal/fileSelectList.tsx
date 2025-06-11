@@ -6,6 +6,7 @@ import StopIcon from '@renderer/assets/icons/stop'
 import { useShallow } from 'zustand/react/shallow'
 import { SoundEffectEditableFields } from 'src/apis/audio/types/items'
 import { NewSoundContainer } from '@renderer/utils/soundContainer/util'
+import { produce } from 'immer'
 
 export type FileSelectInputProps = {
   className?: string
@@ -15,32 +16,40 @@ export type FileSelectInputProps = {
 export function FileSelectInput(props: FileSelectInputProps) {
   const { className, error } = props
 
-  const { addWorkingFiles } = useAudioStore(
-    useShallow((state) => ({
-      addWorkingFiles: state.addWorkingFiles
-    }))
-  )
+  // const { addWorkingFiles } = useAudioStore(
+  //   useShallow((state) => ({
+  //     addWorkingFiles: state.addWorkingFiles
+  //   }))
+  // )
 
+  const updateEditingSource = useAudioStore((store) => store.updateEditingSourceV2)
+  const editingSource = useAudioStore((store) => store.editingElementsV2)
   const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const onAddFile = useCallback<ChangeEventHandler<HTMLInputElement>>(
-    (e) => {
-      if (!e.target.files || e.target.files.length === 0) {
-        return
-      }
+  const onAddFile: ChangeEventHandler<HTMLInputElement> = (e) => {
+    if (!e.target.files || e.target.files.length === 0) {
+      return
+    }
 
-      const newFile = e.target.files.item(0)!
-      const { webUtils } = require('electron')
-      const newPath = webUtils.getPathForFile(newFile)
+    const newFile = e.target.files.item(0)!
+    const { webUtils } = require('electron')
+    const newPath = webUtils.getPathForFile(newFile)
 
-      addWorkingFiles({
+    const existingEffects = editingSource.source?.element?.effects ?? []
+
+    updateEditingSource({
+      effects: existingEffects.concat({
         path: newPath,
         volume: 100,
         name: newFile.name
       })
-    },
-    [fileInputRef, addWorkingFiles]
-  )
+    })
+    // updateEditingSource({
+    //   path: newPath,
+    //   volume: 100,
+    //   name: newFile.name
+    // })
+  }
 
   return (
     <div className={`form-control max-w-80 ${className}`}>
@@ -71,20 +80,24 @@ export type FileSelectListProps = {
 
 export default function FileSelectList(props: FileSelectListProps) {
   const { className } = props
-  const { editingGroup, removeWorkingFile } = useAudioStore(
+
+  const { editingGroup, updateEditingSource } = useAudioStore(
     useShallow((state) => ({
-      editingGroup: state.editingGroup,
-      removeWorkingFile: state.removeWorkingFile
+      editingGroup: state.editingElementsV2,
+      updateEditingSource: state.updateEditingSourceV2
     }))
   )
 
-  const onRemoveFile = useCallback((i: number) => {
-    removeWorkingFile(i)
-  }, [])
+  const onRemoveFile = (i: number) => {
+    const existingEffects = editingGroup.source?.element?.effects
+    updateEditingSource({
+      effects: existingEffects?.toSpliced(i, 1)
+    })
+  }
 
   const fileEntries = useMemo(
     () =>
-      editingGroup?.effects.map((f, i) => (
+      editingGroup?.source?.element?.effects.map((f, i) => (
         <FileEntry name={f.name} onClick={onRemoveFile} index={i} file={f} key={`file-${f.path}`} />
       )) ?? [],
     [editingGroup]
@@ -124,11 +137,14 @@ function FileEntry(props: FileEntryProps) {
 
   const [playState, setPlayState] = useState<'Loading' | 'Playing' | 'Stopped'>('Loading')
 
-  const { updateWorkingFile } = useAudioStore(
-    useShallow((state) => ({
-      updateWorkingFile: state.updateWorkingFile
-    }))
-  )
+  const updateWorkingFile = useAudioStore((store) => store.updateEditingSourceV2)
+  const { source: editingSource } = useAudioStore((store) => store.editingElementsV2)
+
+  // const { updateWorkingFile } = useAudioStore(
+  //   useShallow((state) => ({
+  //     updateWorkingFile: state.updateWorkingFile
+  //   }))
+  // )
 
   const stopHandler = useRef<() => void>(null)
   const volumeHandler = useRef<(volume: number) => void>(null)
@@ -233,8 +249,20 @@ function FileEntry(props: FileEntryProps) {
     (e) => {
       const parsedVol = parseInt(e.target.value)
       const volToSet = isNaN(parsedVol) ? 100 : parsedVol
+      const existingEffects = editingSource?.element?.effects ?? []
+      const updatedEffects = produce(existingEffects, (draft) => {
+        if (!draft[index]) {
+          console.error('ERROR: Cannot update volume for effect.')
+          return
+        }
+        draft[index].volume = volToSet
+        return
+      })
 
-      updateWorkingFile(index, volToSet)
+      updateWorkingFile({
+        effects: updatedEffects
+      })
+      // updateWorkingFile(index, volToSet)
 
       if (playState === 'Playing' && volumeHandler.current) {
         volumeHandler.current(volToSet)

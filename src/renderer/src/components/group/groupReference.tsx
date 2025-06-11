@@ -23,16 +23,18 @@ export default function GroupReference(props: GroupReferenceProps) {
     playingGroups,
     resetEditingGroup,
     resetSequence,
-    setEditingBoardID
+    editBoard
   } = useAudioStore(
     useShallow((state) => ({
       getGroup: state.getGroup,
       playGroup: state.playGroup,
       stopGroup: state.stopGroup,
       playingGroups: state.playingGroups,
-      resetEditingGroup: state.resetEditingGroup,
-      resetSequence: state.resetEditingSequence,
-      setEditingBoardID: state.setEditingBoardID
+      // resetEditingGroup: state.resetEditingGroup,
+      resetEditingGroup: state.updateEditingSourceV2,
+      resetSequence: state.updateEditingSequenceV2,
+      // setEditingBoardID: state.setEditingBoardID
+      editBoard: state.updateEditingBoardV2
     }))
   )
 
@@ -55,7 +57,7 @@ export default function GroupReference(props: GroupReferenceProps) {
 
   const onClickEdit = useCallback(() => {
     stopGroup(group.id)
-    setEditingBoardID(boardID)
+    editBoard({}, boardID)
     if (isSourceGroup(sourceGroup)) {
       resetEditingGroup(sourceGroup)
       ;(document.getElementById(EditEffectModalId) as HTMLDialogElement).showModal()

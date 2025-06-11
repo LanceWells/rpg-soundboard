@@ -2,7 +2,7 @@ import { IAudioApi } from 'src/apis/audio/interface'
 import { CategoryID } from 'src/apis/audio/types/categories'
 import { StateCreator } from 'zustand'
 import { BoardSlice } from './boardSlice'
-import { ISoundGroup } from 'src/apis/audio/types/items'
+import { ISoundGroup, SoundCategory } from 'src/apis/audio/types/items'
 
 export interface CategorySlice {
   addCategory: IAudioApi['Categories']['Create']
@@ -12,6 +12,7 @@ export interface CategorySlice {
   getUncategorizedGroups: IAudioApi['Categories']['GetUncategorizedGroups']
   reorderCategories: IAudioApi['Categories']['Reorder']
   getCategory: IAudioApi['Categories']['Get']
+  getDefaultCategory: () => SoundCategory
 }
 
 export const createCategorySlice: StateCreator<
@@ -19,7 +20,7 @@ export const createCategorySlice: StateCreator<
   [],
   [],
   CategorySlice
-> = (set) => ({
+> = (set, get) => ({
   addCategory(request) {
     const resp = window.audio.Categories.Create(request)
     const newBoards = window.audio.Boards.GetAll({}).boards
@@ -74,5 +75,16 @@ export const createCategorySlice: StateCreator<
     })
 
     return resp
+  },
+  getDefaultCategory() {
+    const activeBoardID = get().activeBoardID
+    const activeBoard = get().boards.find((b) => b.id === activeBoardID)
+
+    if (!activeBoard) {
+      throw new Error(`WARNING: Could not find a board with ID: ${activeBoardID}`)
+    }
+
+    const defaultCategory = activeBoard.categories[0]
+    return defaultCategory
   }
 })
