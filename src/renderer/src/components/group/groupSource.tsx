@@ -15,19 +15,15 @@ export type GroupProps = {
 export default function Group(props: GroupProps) {
   const { group, boardID, beingDragged } = props
 
-  const { playGroup, stopGroup, playingGroups, resetEditingGroup, editBoard } = useAudioStore(
+  const { playGroup, stopGroup, isPlaying, resetEditingGroup, editBoard } = useAudioStore(
     useShallow((state) => ({
       playGroup: state.playGroup,
       stopGroup: state.stopGroup,
-      playingGroups: state.playingGroups,
-      // resetEditingGroup: state.resetEditingGroup,
+      isPlaying: state.playingGroups.some((g) => g === group.id),
       resetEditingGroup: state.updateEditingSourceV2,
-      // setEditingBoardID: state.setEditingBoardID
       editBoard: state.updateEditingBoardV2
     }))
   )
-
-  const isPlaying = playingGroups.includes(group.id)
 
   const onClickPlay = useCallback(() => {
     if (group.variant !== 'Rapid' && isPlaying) {
@@ -40,7 +36,6 @@ export default function Group(props: GroupProps) {
   const onClickEdit = useCallback(() => {
     resetEditingGroup(group, group.id)
     stopGroup(group.id)
-    // setEditingBoardID(boardID)
     editBoard({}, boardID)
     ;(document.getElementById(EditEffectModalId) as HTMLDialogElement).showModal()
   }, [group, group, boardID])

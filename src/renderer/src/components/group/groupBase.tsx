@@ -5,6 +5,7 @@ import { CSS } from '@dnd-kit/utilities'
 import { IconEffect } from '../effect/icon-effect'
 import GroupIcon from './groupIcon'
 import MoveIcon from '@renderer/assets/icons/move'
+import { useShallow } from 'zustand/shallow'
 
 export type GroupBaseProps = {
   group: ISoundGroupSource
@@ -21,10 +22,12 @@ export default function GroupBase(props: GroupBaseProps) {
   })
 
   const draggingID = useAudioStore((store) => store.draggingID)
-  const playingGroups = useAudioStore((store) => store.playingGroups)
   const editingMode = useAudioStore((store) => store.editingMode)
+  const isPlaying = useAudioStore(
+    useShallow((store) => store.playingGroups.some((g) => g === group.id))
+  )
 
-  const isPlaying = playingGroups.includes(group.id)
+  // const isPlaying = playingGroups.includes(group.id)
 
   const onClick = editingMode === 'Editing' ? onClickEdit : onClickPlay
 

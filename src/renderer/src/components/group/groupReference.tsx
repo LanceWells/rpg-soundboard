@@ -16,36 +16,23 @@ export type GroupReferenceProps = {
 export default function GroupReference(props: GroupReferenceProps) {
   const { group, boardID, beingDragged } = props
 
-  const {
-    getGroup,
-    playGroup,
-    stopGroup,
-    playingGroups,
-    resetEditingGroup,
-    resetSequence,
-    editBoard
-  } = useAudioStore(
-    useShallow((state) => ({
-      getGroup: state.getGroup,
-      playGroup: state.playGroup,
-      stopGroup: state.stopGroup,
-      playingGroups: state.playingGroups,
-      // resetEditingGroup: state.resetEditingGroup,
-      resetEditingGroup: state.updateEditingSourceV2,
-      resetSequence: state.updateEditingSequenceV2,
-      // setEditingBoardID: state.setEditingBoardID
-      editBoard: state.updateEditingBoardV2
-    }))
-  )
+  const { getGroup, playGroup, stopGroup, isPlaying, resetEditingGroup, resetSequence, editBoard } =
+    useAudioStore(
+      useShallow((state) => ({
+        getGroup: state.getGroup,
+        playGroup: state.playGroup,
+        stopGroup: state.stopGroup,
+        isPlaying: state.playingGroups.some((g) => g === group.id),
+        resetEditingGroup: state.updateEditingSourceV2,
+        resetSequence: state.updateEditingSequenceV2,
+        editBoard: state.updateEditingBoardV2
+      }))
+    )
 
   const sourceGroup = useMemo(() => {
     const out = getGroup(group.id)
     return out
   }, [group])
-
-  const isPlaying = useMemo(() => {
-    return playingGroups.includes(group.id)
-  }, [playingGroups, group.id])
 
   const onClickPlay = useCallback(() => {
     if (isSourceGroup(sourceGroup) && sourceGroup.variant !== 'Rapid' && isPlaying) {

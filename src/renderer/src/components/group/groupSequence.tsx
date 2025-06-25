@@ -15,20 +15,16 @@ export type GroupSequenceProps = {
 export default function GroupSequence(props: GroupSequenceProps) {
   const { group, boardID, beingDragged } = props
 
-  const { playGroup, stopGroup, playingGroups, resetSequence, editBoard } = useAudioStore(
+  const { playGroup, stopGroup, isPlaying, resetSequence, editBoard } = useAudioStore(
     useShallow((state) => ({
       playGroup: state.playGroup,
       stopGroup: state.stopGroup,
-      playingGroups: state.playingGroups,
-      // resetSequence: state.resetEditingSequence,
+      isPlaying: state.playingGroups.some((g) => g === group.id),
       resetSequence: state.updateEditingSequenceV2,
-      // setEditingBoardID: state.setEditingBoardID
       editBoard: state.updateEditingBoardV2,
       editingSequence: state.editingElementsV2
     }))
   )
-
-  const isPlaying = playingGroups.includes(group.id)
 
   const onClickPlay = useCallback(() => {
     if (isPlaying) {
