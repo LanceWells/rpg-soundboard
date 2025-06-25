@@ -1,12 +1,9 @@
 import { useAudioStore } from '@renderer/stores/audio/audioStore'
 import { useShallow } from 'zustand/react/shallow'
 import GenericCategoryContainer from './genericCategoryContainer'
-import { CSS } from '@dnd-kit/utilities'
-import { useCallback } from 'react'
+import { memo, useCallback } from 'react'
 import { EditCategoryModalId } from '../modals/editCategoryModal/editCategoryModal'
 import PencilIcon from '@renderer/assets/icons/pencil'
-import MoveIcon from '@renderer/assets/icons/move'
-import { useSortable } from '@dnd-kit/sortable'
 import { BoardID } from 'src/apis/audio/types/boards'
 import { SoundCategory } from 'src/apis/audio/types/items'
 import { useDndContext } from '@dnd-kit/core'
@@ -35,15 +32,13 @@ export type CategorizedProps = {
  * @param props See {@link CategorizedProps}.
  */
 export default function Categorized(props: CategorizedProps) {
-  const { category, boardID, beingDragged } = props
+  const { category, boardID } = props
 
   const { getGroupsForCategory, editBoard, editCategory, editingMode, draggingID } = useAudioStore(
     useShallow((state) => ({
       getGroupsForCategory: state.getGroupsForCategory,
       editingMode: state.editingMode,
       editBoard: state.updateEditingBoardV2,
-      // setEditingBoardID: state.setEditingBoardID,
-      // prepEditingCategory: state.prepEditingCategory,
       editCategory: state.updateEditingCategoryV2,
       draggingID: state.draggingID
     }))
@@ -51,41 +46,17 @@ export default function Categorized(props: CategorizedProps) {
 
   const groups = getGroupsForCategory(category.id)
 
-  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
-    id: category.id
-  })
-
   const { over } = useDndContext()
 
-  const style = {
-    transform: CSS.Transform.toString({
-      scaleX: 1.0,
-      scaleY: 1.0,
-      x: transform?.x ?? 0,
-      y: transform?.y ?? 0
-    }),
-    transition
-  }
-
   const onClickEdit = useCallback(() => {
-    // prepEditingCategory(boardID, category.id)
     editCategory(category, category.id)
-    // setEditingBoardID(boardID)
     editBoard({}, boardID)
     ;(document.getElementById(EditCategoryModalId) as HTMLDialogElement).showModal()
   }, [category, boardID])
 
   return (
     <div
-      {...attributes}
-      ref={setNodeRef}
-      style={style}
       className={`
-        ${draggingID === category.id && !beingDragged ? 'opacity-0' : 'opacity-100'}
-      `}
-    >
-      <div
-        className={`
         relative
         rounded-lg
         p-6
@@ -94,25 +65,12 @@ export default function Categorized(props: CategorizedProps) {
         justify-center
         ${editingMode === 'Editing' ? 'outline' : ''}
     `}
-      >
-        <h2 className="text-2xl absolute top-0 left-0 w-full max-w-full text-center">
-          {category.name}
-        </h2>
-        <div
-          {...listeners}
-          className={`
-            ${editingMode === 'Off' ? 'hidden' : 'visible'}
-            rounded-full
-            absolute
-            -top-2
-            -left-2
-            bg-primary
-        `}
-        >
-          <MoveIcon />
-        </div>
-        <div
-          className={`
+    >
+      <h2 className="text-2xl absolute top-0 left-0 w-full max-w-full text-center">
+        {category.name}
+      </h2>
+      <div
+        className={`
             justify-items-center
             gap-6
             z-0
@@ -120,11 +78,11 @@ export default function Categorized(props: CategorizedProps) {
             flex
             flex-wrap
           `}
-        >
-          <GenericCategoryContainer boardID={boardID} groups={groups} />
-        </div>
-        <div
-          className={`
+      >
+        <GenericCategoryContainer boardID={boardID} groups={groups} />
+      </div>
+      <div
+        className={`
           bg-[rgb(255_255_255/10%)]
           absolute w-full
           h-full
@@ -139,9 +97,9 @@ export default function Categorized(props: CategorizedProps) {
           pointer-events-none
           ${IdIsGroup(draggingID) && over?.id === category.id ? 'opacity-100' : 'opacity-0'}
           `}
-        >
-          <span
-            className={`
+      >
+        <span
+          className={`
             text-2xl
             text-white
             font-bold
@@ -151,13 +109,13 @@ export default function Categorized(props: CategorizedProps) {
             outline-white
             rounded-lg
           `}
-          >
-            <AddIcon />
-          </span>
-        </div>
-        <button
-          onClick={editingMode ? onClickEdit : undefined}
-          className={`
+        >
+          <AddIcon />
+        </span>
+      </div>
+      <button
+        onClick={editingMode ? onClickEdit : undefined}
+        className={`
           absolute
           -top-2
           -right-2
@@ -168,10 +126,11 @@ export default function Categorized(props: CategorizedProps) {
           ${editingMode === 'Off' ? 'hidden' : 'visible'}
           ${editingMode === 'Editing' ? 'opacity-100' : 'opacity-0'}
         `}
-        >
-          <PencilIcon />
-        </button>
-      </div>
+      >
+        <PencilIcon />
+      </button>
     </div>
   )
 }
+
+export const MemoizedCategorized = memo(Categorized)

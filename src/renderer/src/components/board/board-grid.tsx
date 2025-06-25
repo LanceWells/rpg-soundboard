@@ -2,7 +2,6 @@ import { useAudioStore } from '@renderer/stores/audio/audioStore'
 import { useCallback, useMemo } from 'react'
 import Board from './board'
 import { NewBoardModalId } from '../modals/newBoardModal/newBoardModal'
-import { useShallow } from 'zustand/react/shallow'
 import BoardIcon from '@renderer/assets/icons/board'
 import GroupIcon from '@renderer/assets/icons/group'
 import CategoryIcon from '@renderer/assets/icons/category'
@@ -20,86 +19,52 @@ import { NewGroupSelectModalId } from '../modals/newGroupSelectModal/newGroupSel
  * switch between boards.
  */
 export default function BoardGrid() {
-  const {
-    boards,
-    activeBoardID,
-    editingMode,
-    setActiveBoardID,
-    // setEditingBoardID,
-    // resetEditingGroup,
-    // resetEditingBoard,
-    setEditingMode,
-    // setBoardName,
-    editBoard,
-    editSource
-  } = useAudioStore(
-    useShallow((state) => ({
-      boards: state.boards,
-      activeBoardID: state.activeBoardID,
-      // resetEditingGroup: state.resetEditingGroup,
-      // resetEditingBoard: state.resetEditingBoard,
-      // resetEditingGroup: state.resetEditingSourceV2,
-      setActiveBoardID: state.setActiveBoardID,
-      // setEditingBoardID: state.setEditingBoardID,
-      // resetEditingBoard: state.resetEditingBoardV2,
-      editBoard: state.updateEditingBoardV2,
-      editSource: state.updateEditingSourceV2,
-      editingMode: state.editingMode,
-      setEditingMode: state.setEditingMode
-      // setBoardName: state.setBoardName
-    }))
-  )
+  const boards = useAudioStore((store) => store.boards)
+  const activeBoardID = useAudioStore((store) => store.activeBoardID)
+  const editingMode = useAudioStore((store) => store.editingMode)
+  const setActiveBoardID = useAudioStore((store) => store.setActiveBoardID)
+  const setEditingMode = useAudioStore((store) => store.setEditingMode)
+  const editBoard = useAudioStore((store) => store.updateEditingBoardV2)
+  const editSource = useAudioStore((store) => store.updateEditingSourceV2)
 
-  const onNewBoard = useCallback(() => {
-    // resetEditingGroup()
-    // resetEditingBoard()
+  const onNewBoard = () => {
     editBoard()
     editSource()
     ;(document.getElementById(NewBoardModalId) as HTMLDialogElement).showModal()
-  }, [])
+  }
 
-  const onNewGroup = useCallback(() => {
+  const onNewGroup = () => {
     if (activeBoardID) {
-      // setEditingBoardID(activeBoardID)
       editSource()
-      // resetEditingGroup()
       editBoard({}, activeBoardID)
       ;(document.getElementById(NewGroupSelectModalId) as HTMLDialogElement).showModal()
     }
-  }, [activeBoardID])
+  }
 
-  const onLinkGroup = useCallback(() => {
+  const onLinkGroup = () => {
     if (activeBoardID) {
-      // setEditingBoardID(activeBoardID)
       editBoard({}, activeBoardID)
       ;(document.getElementById(LinkEffectModalId) as HTMLDialogElement).showModal()
     }
-  }, [activeBoardID])
+  }
 
-  const onNewCategory = useCallback(() => {
+  const onNewCategory = () => {
     if (activeBoardID) {
-      // setEditingBoardID(activeBoardID)
       editBoard({}, activeBoardID)
       ;(document.getElementById(NewCategoryModalId) as HTMLDialogElement).showModal()
     }
-  }, [activeBoardID])
+  }
 
-  const onClickEdit = useCallback(() => {
+  const onClickEdit = () => {
     const newEditingMode: EditingMode = editingMode === 'Off' ? 'Editing' : 'Off'
     setEditingMode(newEditingMode)
-  }, [editingMode])
+  }
 
-  const onBoardEdit = useCallback(
-    (board: SoundBoard) => {
-      editBoard()
-      // resetEditingBoard()
-      editBoard(board, board.id)
-      // setEditingBoardID(board.id)
-      // setBoardName(board.name)
-      ;(document.getElementById(EditBoardModalId) as HTMLDialogElement).showModal()
-    },
-    [EditBoardModalId]
-  )
+  const onBoardEdit = (board: SoundBoard) => {
+    editBoard()
+    editBoard(board, board.id)
+    ;(document.getElementById(EditBoardModalId) as HTMLDialogElement).showModal()
+  }
 
   const { boardNodes, boardTabs } = useMemo(() => {
     const boardNodes = boards.map((b) => {

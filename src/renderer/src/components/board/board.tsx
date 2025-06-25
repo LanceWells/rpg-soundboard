@@ -11,7 +11,7 @@ import {
 } from '@dnd-kit/core'
 import DeleteButton from '../generic/deleteButton'
 import { useShallow } from 'zustand/react/shallow'
-import Category from '../category/categorized'
+import Category, { MemoizedCategorized } from '../category/categorized'
 import { IdIsCategory, IdIsGroup } from '@renderer/utils/id'
 import { SortableContext } from '@dnd-kit/sortable'
 import { SoundBoard } from 'src/apis/audio/types/items'
@@ -19,6 +19,7 @@ import { BoardID } from 'src/apis/audio/types/boards'
 import Group from '../group/group'
 import { CategoryID } from 'src/apis/audio/types/categories'
 import { GroupID } from 'src/apis/audio/types/groups'
+import { DragContainer } from '../category/dragContainer'
 
 /**
  * Props for {@link Board}.
@@ -38,33 +39,18 @@ export type BoardProps = {
  */
 export default function Board(props: BoardProps) {
   const { board } = props
-  const {
-    editingMode,
-    setEditingMode,
-    reorderGroups,
-    deleteBoard,
-    updateGroupPartial,
-    updateBoardReference,
-    getGroupsForCategory,
-    getUncategorizedGroups,
-    reorderCategories,
-    draggingID,
-    setDraggingID
-  } = useAudioStore(
-    useShallow((state) => ({
-      editingMode: state.editingMode,
-      setEditingMode: state.setEditingMode,
-      reorderGroups: state.reorderGroups,
-      deleteBoard: state.deleteBoard,
-      updateGroupPartial: state.updateGroupPartial,
-      updateBoardReference: state.updateBoardReference,
-      getGroupsForCategory: state.getGroupsForCategory,
-      getUncategorizedGroups: state.getUncategorizedGroups,
-      reorderCategories: state.reorderCategories,
-      draggingID: state.draggingID,
-      setDraggingID: state.setDraggingID
-    }))
-  )
+
+  const editingMode = useAudioStore((store) => store.editingMode)
+  const setEditingMode = useAudioStore((store) => store.setEditingMode)
+  const reorderGroups = useAudioStore((store) => store.reorderGroups)
+  const deleteBoard = useAudioStore((store) => store.deleteBoard)
+  const updateGroupPartial = useAudioStore((store) => store.updateGroupPartial)
+  const updateBoardReference = useAudioStore((store) => store.updateBoardReference)
+  const getGroupsForCategory = useAudioStore((store) => store.getGroupsForCategory)
+  const getUncategorizedGroups = useAudioStore((store) => store.getUncategorizedGroups)
+  const reorderCategories = useAudioStore((store) => store.reorderCategories)
+  const draggingID = useAudioStore((store) => store.draggingID)
+  const setDraggingID = useAudioStore((store) => store.setDraggingID)
 
   const [isConfirmingDelete, setIsConfirmingDelete] = useState(false)
 
@@ -72,7 +58,11 @@ export default function Board(props: BoardProps) {
     const categories = board.categories ?? []
     const categoryIDs = categories.map((c) => c.id)
     const groupIDs = new Set(board.groups.map((g) => g.id))
-    const elements = categories.map((c) => <Category boardID={board.id} category={c} key={c.id} />)
+    const elements = categories.map((c) => (
+      <DragContainer id={c.id}>
+        <MemoizedCategorized boardID={board.id} category={c} key={c.id} />
+      </DragContainer>
+    ))
 
     return {
       categoryIDs,
@@ -80,8 +70,6 @@ export default function Board(props: BoardProps) {
       elements
     }
   }, [board.categories, board.groups, board.id])
-
-  // const groupCategories = board.groups.map((g) => g.category)
 
   const collisionDetectionStrategy: CollisionDetection = (args) => {
     if (IdIsCategory(draggingID)) {

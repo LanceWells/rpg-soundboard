@@ -1,11 +1,12 @@
 import { SortableContext } from '@dnd-kit/sortable'
 import { useMemo } from 'react'
-import Group from '../group/group'
+import { MemoizedGroup } from '../group/group'
 import { useAudioStore } from '@renderer/stores/audio/audioStore'
 import { BoardID } from 'src/apis/audio/types/boards'
 import { CategoryID } from 'src/apis/audio/types/categories'
 import { useShallow } from 'zustand/react/shallow'
 import { ISoundGroup } from 'src/apis/audio/types/items'
+import { DragContainer } from '../group/dragContainer'
 
 export type GenericCategoryContainerProps = {
   groups: ISoundGroup[]
@@ -28,7 +29,11 @@ export default function GenericCategoryContainer(props: GenericCategoryContainer
   }, [groups])
 
   const groupElements = useMemo(() => {
-    return groups.map((g) => <Group boardID={boardID} group={g} key={g.id} />)
+    return groups.map((g) => (
+      <DragContainer id={g.id}>
+        <MemoizedGroup boardID={boardID} group={g} key={g.id} />
+      </DragContainer>
+    ))
   }, [groups])
 
   return (

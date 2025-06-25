@@ -9,6 +9,7 @@ import GroupSource from './groupSource'
 import GroupReference from './groupReference'
 import GroupSequence from './groupSequence'
 import { isReferenceGroup, isSequenceGroup, isSourceGroup } from '@renderer/utils/typePredicates'
+import { memo } from 'react'
 
 export type GroupProps = {
   group: ISoundGroup
@@ -33,3 +34,5 @@ export default function Group(props: GroupProps) {
 
   return <></>
 }
+
+export const MemoizedGroup = memo(Group)

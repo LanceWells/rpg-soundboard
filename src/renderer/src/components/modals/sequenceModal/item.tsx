@@ -20,10 +20,7 @@ export default function SequenceItem(props: SequenceItemProps) {
   const { sequence } = props
 
   const updateSequenceElements = useAudioStore((state) => state.updateEditingSequenceV2)
-  // const updateSequenceElements = useAudioStore((state) => state.updateSequenceElements)
-  // const editingSequence = useAudioStore((state) => state.editingSequence)
   const editingSequence = useAudioStore((state) => state.editingElementsV2.sequence)
-  // const playingSounds = useAudioStore((state) => state.playingSequenceSounds)
   const playingSounds = useAudioStore((state) => state.playingSequenceSoundsV2)
 
   const { attributes, listeners, setNodeRef, transition, transform } = useSortable({
@@ -93,7 +90,6 @@ type SequenceItemDelayProps = {
 export function SequenceItemDelay(props: SequenceItemDelayProps) {
   const { sequence } = props
 
-  // const updateSequenceElements = useAudioStore((state) => state.updateSequenceElements)
   const updateSequenceElements = useAudioStore((state) => state.updateEditingSequenceV2)
   const sequenceElements = useAudioStore((state) => state?.editingElementsV2?.sequence)
 
@@ -111,7 +107,6 @@ export function SequenceItemDelay(props: SequenceItemDelayProps) {
       return
     }
 
-    // updateSequenceElements(newSequence.sequence)
     updateSequenceElements({ sequence: newSequence?.element?.sequence })
   }
 
