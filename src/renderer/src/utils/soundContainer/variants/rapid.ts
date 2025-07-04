@@ -11,8 +11,10 @@ export class RapidSoundContainer extends AbstractSoundContainer {
   protected override SelectEffect(effects: SoundEffectWithPlayerDetails[]) {
     let effectIndex = 0
 
-    while (effects[effectIndex]?.id === this._lastEffectID) {
-      effectIndex = getRandomInt(0, effects.length - 1)
+    if (effects.length > 2) {
+      while (effects[effectIndex]?.id === this._lastEffectID) {
+        effectIndex = getRandomInt(0, effects.length - 1)
+      }
     }
 
     return effects[effectIndex]

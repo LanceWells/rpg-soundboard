@@ -26,6 +26,7 @@ export default function NewCategoryModal() {
 
   const onSubmit = useCallback<MouseEventHandler>(
     (e) => {
+      e.preventDefault()
       let failToSubmit = false
 
       if (!name || name.length === 0) {

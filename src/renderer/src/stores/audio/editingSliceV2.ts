@@ -154,6 +154,10 @@ export const createEditingSliceV2: StateCreator<
             element: defaultCategory,
             id: undefined
           }
+
+          // Object.defineProperty(state.editingElementsV2.category.element, 'id', {
+          //   writable: true
+          // })
         }
 
         Object.assign(state.editingElementsV2.category.element!, newValue)

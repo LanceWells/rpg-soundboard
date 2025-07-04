@@ -45,7 +45,6 @@ export const saveSoundEffect = (
   }
 
   const contents = new Set(fs.readdirSync(dstFileDir))
-  console.log(contents)
 
   let fNameID = 1
   while (contents.has(`${fNameID}${srcFileData.ext}`)) {

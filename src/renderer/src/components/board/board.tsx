@@ -20,6 +20,7 @@ import Group from '../group/group'
 import { CategoryID } from 'src/apis/audio/types/categories'
 import { GroupID } from 'src/apis/audio/types/groups'
 import { DragContainer } from '../category/dragContainer'
+import Categorized from '../category/categorized'
 
 /**
  * Props for {@link Board}.
@@ -60,7 +61,7 @@ export default function Board(props: BoardProps) {
     const groupIDs = new Set(board.groups.map((g) => g.id))
     const elements = categories.map((c) => (
       <DragContainer id={c.id}>
-        <MemoizedCategorized boardID={board.id} category={c} key={c.id} />
+        <Categorized boardID={board.id} category={c} key={c.id} />
       </DragContainer>
     ))
 

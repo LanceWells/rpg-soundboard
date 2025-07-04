@@ -38,7 +38,7 @@ export default function Group(props: GroupProps) {
     stopGroup(group.id)
     editBoard({}, boardID)
     ;(document.getElementById(EditEffectModalId) as HTMLDialogElement).showModal()
-  }, [group, group, boardID])
+  }, [group, boardID])
 
   return (
     <GroupBase

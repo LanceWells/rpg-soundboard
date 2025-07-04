@@ -85,6 +85,13 @@ export const createCategorySlice: StateCreator<
     }
 
     const defaultCategory = activeBoard.categories[0]
-    return defaultCategory
+
+    // The category from the board has several of its values' writable states set to false. This is
+    // generally only an issue when editing this category as a temp object to use when editing a
+    // cateogry. Rather than attempt to edit this object (which has generally lead to errors in that
+    // assignment), create a copy of the object and return that copy instead.
+    const catCopy = Object.assign({}, defaultCategory)
+
+    return catCopy
   }
 })
