@@ -364,5 +364,5 @@ function getOverlaidItem(id: GroupID | null) {
 
   const group = getGroup(id)
 
-  return <SelectorElement g={group} />
+  return <SelectorElement g={group} style={{}} />
 }

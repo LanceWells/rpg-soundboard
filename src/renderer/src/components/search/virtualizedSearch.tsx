@@ -27,7 +27,9 @@ export default function VirtualizedSearch<
   const rowVirtualizer = useVirtualizer({
     count: searchItems.length,
     getScrollElement: () => parentRef.current,
-    estimateSize
+    estimateSize,
+    overscan: 20,
+    gap: 10
   })
 
   return (
@@ -36,6 +38,8 @@ export default function VirtualizedSearch<
         className,
         `
       min-w-96
+      h-[340px]
+      max-h-[340px]
       grid
       grid-rows-[min-content_1fr]
     `
