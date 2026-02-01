@@ -50,7 +50,7 @@ protocol.registerSchemesAsPrivileged([
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.whenReady().then(() => {
+app.whenReady().then(async () => {
   // installExtension(REACT_DEVELOPER_TOOLS)
   //   .then((ext) => console.log(`Added extension ${ext.name}`))
   //   .catch((err) => `Error loading extension: ${err}`)
@@ -58,11 +58,6 @@ app.whenReady().then(() => {
   // Extensions.loadExtension()
   // C:\Users\lance\AppData\Local\Google\Chrome\User Data\Default\Extensions\fmkadmapgofadopljbjfkapdkoienihi
   // C:\Users\lance\%LOCALAPPDATA%\Google\Chrome\User Data\Default\Extensions\fmkadmapgofadopljbjfkapdkoienihi\6.1.2_0
-  const reactDevToolsPath = path.join(
-    os.homedir(),
-    `AppData\\Local\\Google\\Chrome\\User Data\\Default\\Extensions\\fmkadmapgofadopljbjfkapdkoienihi\\6.1.2_0`
-  )
-  session.defaultSession.extensions.loadExtension(reactDevToolsPath)
 
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.electron')
@@ -88,6 +83,14 @@ app.whenReady().then(() => {
   ipcMain.on('ping', () => console.log('pong'))
 
   createWindow()
+
+  const reactDevToolsPath = path.join(
+    os.homedir(),
+    `AppData\\Local\\Google\\Chrome\\User Data\\Default\\Extensions\\fmkadmapgofadopljbjfkapdkoienihi\\7.0.0_0`
+  )
+
+  const ext = await session.defaultSession.extensions.loadExtension(reactDevToolsPath)
+  console.log(ext.id)
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the

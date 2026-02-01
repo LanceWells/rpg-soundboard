@@ -11,7 +11,7 @@ import {
 } from '@dnd-kit/core'
 import DeleteButton from '../generic/deleteButton'
 import { useShallow } from 'zustand/react/shallow'
-import Category, { MemoizedCategorized } from '../category/categorized'
+import Category from '../category/categorized'
 import { IdIsCategory, IdIsGroup } from '@renderer/utils/id'
 import { SortableContext } from '@dnd-kit/sortable'
 import { SoundBoard } from 'src/apis/audio/types/items'
@@ -19,8 +19,8 @@ import { BoardID } from 'src/apis/audio/types/boards'
 import Group from '../group/group'
 import { CategoryID } from 'src/apis/audio/types/categories'
 import { GroupID } from 'src/apis/audio/types/groups'
-import { DragContainer } from '../category/dragContainer'
 import Categorized from '../category/categorized'
+import { DragContainer } from '@renderer/utils/dragContainer'
 
 /**
  * Props for {@link Board}.

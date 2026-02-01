@@ -118,7 +118,7 @@ export default function Categorized(props: CategorizedProps) {
         className={`
           absolute
           -top-2
-          -right-2
+          -left-2
           btn
           btn-circle
           btn-accent

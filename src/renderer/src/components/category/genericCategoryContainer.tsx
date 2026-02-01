@@ -6,7 +6,7 @@ import { BoardID } from 'src/apis/audio/types/boards'
 import { CategoryID } from 'src/apis/audio/types/categories'
 import { useShallow } from 'zustand/react/shallow'
 import { ISoundGroup } from 'src/apis/audio/types/items'
-import { DragContainer } from '../group/dragContainer'
+import { DragContainer } from '@renderer/utils/dragContainer'
 
 export type GenericCategoryContainerProps = {
   groups: ISoundGroup[]

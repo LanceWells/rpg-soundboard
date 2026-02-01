@@ -59,7 +59,7 @@ export class SoundtrackSoundContainer extends AbstractSoundContainer {
     this.activeSoundId = this.howl.play()
 
     // This is here to invoke the loaded handler.
-    this.howl.load()
+    // this.howl.load()
   }
 
   private Crossfade(): void {
