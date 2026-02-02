@@ -35,14 +35,14 @@ export default function VirtualizedSearch<
   return (
     <div
       className={twMerge(
-        className,
         `
-      min-w-96
-      h-[340px]
-      max-h-[340px]
-      grid
-      grid-rows-[min-content_1fr]
-    `
+          min-w-96
+          h-[340px]
+          max-h-[340px]
+          grid
+          grid-rows-[min-content_1fr]
+        `,
+        className
       )}
     >
       <input

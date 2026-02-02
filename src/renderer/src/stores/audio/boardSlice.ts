@@ -1,5 +1,5 @@
 import { BoardID } from 'src/apis/audio/types/boards'
-import { ISoundGroup, SoundBoard } from 'src/apis/audio/types/items'
+import { ISoundGroup, SoundBoard, SoundGroupTypes } from 'src/apis/audio/types/items'
 import { IAudioApi } from 'src/apis/audio/interface'
 import { StateCreator } from 'zustand'
 import fuse from 'fuse.js'
@@ -20,7 +20,7 @@ export interface BoardSlice {
   updateBoard: IAudioApi['Boards']['Update']
   deleteBoard: (id: BoardID) => void
   setActiveBoardID: (id: BoardID) => void
-  searchForGroups: (searchText: string, types: string[]) => ISoundGroup[]
+  searchForGroups: (searchText: string, types: SoundGroupTypes[]) => ISoundGroup[]
 }
 
 export const createBoardSlice: StateCreator<BoardSlice> = (set) => ({
@@ -58,7 +58,8 @@ export const createBoardSlice: StateCreator<BoardSlice> = (set) => ({
   },
   setActiveBoardID(id) {
     set({
-      activeBoardID: window.audio.Boards.Get({ boardID: id }).board?.id ?? null
+      // activeBoardID: window.audio.Boards.Get({ boardID: id }).board?.id ?? null
+      activeBoardID: id
     })
   },
   updateBoard(request) {
@@ -73,14 +74,28 @@ export const createBoardSlice: StateCreator<BoardSlice> = (set) => ({
   },
   searchForGroups(searchText, types: string[]) {
     const boards = window.audio.Boards.GetAll({})
-    const allGroups = boards.boards.flatMap((b) => b.groups).filter((g) => types.includes(g.type))
+    // const allGroups = boards.boards.flatMap((b) => b.groups).filter((g) => types.includes(g.type))
+    const allGroups = boards.boards.flatMap((b) => {
+      const categories = new Map(b.categories.map((c) => [c.id, c.name]))
+      const groups = b.groups.map((g) => {
+        return {
+          name: 'name' in g ? g.name : '',
+          boardName: b.name,
+          categoryName: categories.get(g.category),
+          group: g
+        }
+      })
+
+      return groups
+    })
 
     const fuseSearch = new fuse(allGroups, {
-      keys: ['name']
+      keys: ['name', 'categoryName', 'boardName'],
+      threshold: 0.1
     })
 
     const results = fuseSearch.search(searchText)
 
-    return results.map((r) => r.item)
+    return results.map((r) => r.item.group)
   }
 })

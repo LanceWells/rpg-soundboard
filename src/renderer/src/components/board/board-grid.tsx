@@ -1,5 +1,5 @@
 import { useAudioStore } from '@renderer/stores/audio/audioStore'
-import { useCallback, useMemo } from 'react'
+import { useMemo } from 'react'
 import Board from './board'
 import { NewBoardModalId } from '../modals/newBoardModal/newBoardModal'
 import BoardIcon from '@renderer/assets/icons/board'
@@ -13,6 +13,8 @@ import LinkIcon from '@renderer/assets/icons/link'
 import { LinkEffectModalId } from '../modals/linkEffectModal/linkEffectModal'
 import { EditingMode } from '@renderer/stores/audio/editingSlice'
 import { NewGroupSelectModalId } from '../modals/newGroupSelectModal/newGroupSelectModal'
+import { BoardID } from 'src/apis/audio/types/boards'
+import { BoardV2 } from '@renderer/v2/boardV2'
 
 /**
  * A root-level component that is used to render every various soundboard, along with a means to
@@ -67,35 +69,53 @@ export default function BoardGrid() {
   }
 
   const { boardNodes, boardTabs } = useMemo(() => {
-    const boardNodes = boards.map((b) => {
-      return (
-        <div
-          key={b.id}
-          id={b.id}
-          className={`
+    const boardNodes = [
+      <div
+        key="brd-search-board"
+        id="brd-search-board"
+        className={`
+            ${activeBoardID === ('brd-search-board' as BoardID) ? 'visible' : 'hidden'}
+            h-full
+            max-h-full
+          `}
+      >
+        <BoardV2 />
+      </div>,
+      ...boards.map((b) => {
+        return (
+          <div
+            key={b.id}
+            id={b.id}
+            className={`
             ${activeBoardID === b.id ? 'visible' : 'hidden'}
             h-full
             max-h-full
           `}
-        >
-          <Board board={b} key={b.id} />
-        </div>
-      )
-    })
+          >
+            <Board board={b} key={b.id} />
+          </div>
+        )
+      })
+    ]
 
-    const boardTabs = boards.map((b) => {
-      return (
-        <li
-          key={`selector-${b.id}`}
-          onClick={() => setActiveBoardID(b.id)}
-          className={`
+    const boardTabs = [...boards, { id: 'brd-search-board' as BoardID, name: 'Search Board' }].map(
+      (b) => {
+        return (
+          <li
+            key={`selector-${b.id}`}
+            onClick={() => setActiveBoardID(b.id)}
+            className={`
             flex
             justify-center
         `}
-        >
-          <button
-            onClick={() => onBoardEdit(b)}
-            className={`
+          >
+            <button
+              onClick={() => {
+                if (b.id !== ('brd-search-board' as BoardID)) {
+                  onBoardEdit(b as SoundBoard)
+                }
+              }}
+              className={`
               btn
               btn-circle
               btn-sm
@@ -108,19 +128,20 @@ export default function BoardGrid() {
                   : 'opacity-0 pointer-events-none'
               }
             `}
-          >
-            <PencilIcon className="w-3 absolute" />
-          </button>
-          <a
-            className={`
+            >
+              <PencilIcon className="w-3 absolute" />
+            </button>
+            <a
+              className={`
             ${b.id === activeBoardID ? 'outline w-full' : ''}
             `}
-          >
-            {b.name}
-          </a>
-        </li>
-      )
-    })
+            >
+              {b.name}
+            </a>
+          </li>
+        )
+      }
+    )
 
     return {
       boardNodes,

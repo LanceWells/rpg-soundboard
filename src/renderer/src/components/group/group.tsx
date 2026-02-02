@@ -9,12 +9,13 @@ import GroupSource from './groupSource'
 import GroupReference from './groupReference'
 import GroupSequence from './groupSequence'
 import { isReferenceGroup, isSequenceGroup, isSourceGroup } from '@renderer/utils/typePredicates'
-import { memo } from 'react'
+import { CSSProperties, memo } from 'react'
 
 export type GroupProps = {
   group: ISoundGroup
   boardID: BoardID
   beingDragged?: boolean
+  style: CSSProperties
 }
 
 export default function Group(props: GroupProps) {

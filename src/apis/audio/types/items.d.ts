@@ -64,8 +64,10 @@ export type SoundEffectEditableFields = Omit<SoundEffect, 'id' | 'format'>
 
 export type SequenceElementID = `seq-${string}-${string}-${string}-${string}-${string}`
 
+export type SoundGroupTypes = 'sequence' | 'source' | 'reference'
+
 export interface ISoundGroup {
-  type: string
+  type: SoundGroupTypes
 
   /**
    * The ID for the group.
