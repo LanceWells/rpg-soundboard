@@ -5,6 +5,7 @@ import { LoopingSoundContainer } from './variants/looping'
 import { RapidSoundContainer } from './variants/rapid'
 import { SoundtrackSoundContainer } from './variants/soundtrack'
 import { EffectID } from 'src/apis/audio/types/effects'
+import { SoundtrackSoundContainerV2 } from './variants/soundtrackV2'
 
 export function NewSoundContainer(
   variant: SoundVariants,
@@ -17,7 +18,7 @@ export function NewSoundContainer(
     case 'Rapid':
       return new RapidSoundContainer(setup, lastEffectID)
     case 'Soundtrack':
-      return new SoundtrackSoundContainer(setup)
+      return new SoundtrackSoundContainerV2(setup)
     case 'Default':
     default:
       return new DefaultSoundContainer(setup)

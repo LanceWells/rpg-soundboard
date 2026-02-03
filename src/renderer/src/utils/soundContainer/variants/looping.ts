@@ -1,8 +1,9 @@
 import { SoundVariants } from 'src/apis/audio/types/soundVariants'
 import { AbstractSoundContainer } from '../abstract'
 import { SoundContainerSetup } from '../interface'
+import { AbstractSoundContainerV2 } from '../abstractV2'
 
-export class LoopingSoundContainer extends AbstractSoundContainer {
+export class LoopingSoundContainer extends AbstractSoundContainerV2 {
   Variant: SoundVariants = 'Looping'
 
   constructor(setup: SoundContainerSetup) {
@@ -10,9 +11,9 @@ export class LoopingSoundContainer extends AbstractSoundContainer {
   }
 
   override Stop(): void {
-    this.howl.fade(this.targetVolume, 0, this.fadeTime)
+    this.rpgAudio.fade(0, this.fadeTime)
     setTimeout(() => {
-      this.howl.stop()
+      super.Stop()
     }, this.fadeTime)
   }
 }

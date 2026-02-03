@@ -6,6 +6,7 @@ import { GroupSlice } from './groupSlice'
 import { ISoundContainer } from '@renderer/utils/soundContainer/interface'
 import { SequenceSoundContainer } from '@renderer/utils/soundContainer/variants/sequence'
 import { isSequenceGroup } from '@renderer/utils/typePredicates'
+import { ISoundGroupSource, SoundGroupSequence } from 'src/apis/audio/types/items'
 
 export interface SoundSlice {
   playGroup: (groupID: GroupID) => Promise<void>
@@ -62,16 +63,17 @@ export const createSoundSlice: StateCreator<SoundSlice & GroupSlice, [], [], Sou
 
     const playingSoundTracks = get()
       .playingGroups.map((g) => get().getGroup(g))
-      .filter((g) => g.type !== 'sequence' && g.variant === 'Soundtrack')
+      .filter((g) => isSoundtrack(g, get))
 
-    if (group.group?.type !== 'sequence' && group.group?.variant === 'Soundtrack') {
+    if (isSoundtrack(group.group, get)) {
       // If this is a soundtrack, and we already have one playing, then fade out the old soundtrack
       // and fade in the new soundtrack.
       playingSoundTracks.forEach((g) => get().stopGroup(g?.id as GroupID))
     } else {
       const remainingEffectsCount = get()
         .playingGroups.map((g) => get().getGroup(g))
-        .filter((g) => g.type === 'sequence' || ['Default', 'Rapid'].includes(g.variant))
+        // .filter((g) => g.type === 'sequence' || ['Default', 'Rapid'].includes(g.variant))
+        .filter((g) => !isSoundtrack(g, get))
         .flatMap((g) => g).length
 
       if (remainingEffectsCount === 0) {
@@ -128,7 +130,7 @@ function handleHowlStop(
     if (remainingEffectsCount === 0) {
       get()
         .playingGroups.map((g) => get().getGroup(g))
-        .filter((g) => g?.variant === 'Soundtrack')
+        .filter((g) => isSoundtrack(g, get))
         .flatMap((g) => GroupHandles.get(g.id))
         .filter((g) => !!g)
         .forEach((s) => s.Fade(1))
@@ -141,4 +143,26 @@ function handleHowlStop(
       playingGroups: newGroups
     }
   })
+}
+
+function isSequence(sound: ISoundGroupSource): sound is SoundGroupSequence {
+  return sound.variant === 'Sequence'
+}
+
+function isSoundtrack(g: ISoundGroupSource | undefined, get: () => GroupSlice): boolean {
+  if (g === undefined) {
+    return false
+  }
+  if (g.type !== 'sequence' && g.variant === 'Soundtrack') {
+    return true
+  }
+  if (isSequence(g)) {
+    const isPlaylist = g.sequence
+      .filter((g) => g.type === 'group')
+      .every((g) => get().getGroup(g.groupID).variant === 'Soundtrack')
+
+    return isPlaylist
+  }
+
+  return false
 }

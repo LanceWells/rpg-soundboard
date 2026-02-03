@@ -19,6 +19,7 @@ export type Group = {
   groupID: GroupID
   id: SequenceElementID
   effects: SoundEffectWithPlayerDetails[]
+  variant: SoundVariants
 }
 
 export type EffectGroup = Delay | Group
@@ -70,14 +71,24 @@ export class SequenceSoundContainer implements ISoundContainer {
     this.stoppedHandler = setup.stoppedHandler
   }
 
+  async GetDuration(): Promise<number> {
+    return [...this.durationMap.values()].reduce((acc, curr) => curr + acc, 0)
+  }
+
   async Init() {
     const containerPromises = this.setup.effectGroups
       .filter((g) => g.type === 'group')
       .map((e) =>
         Promise.race([
-          new Promise<ContainerWithSequenceID>((res) => {
-            const isLoaded = (gid: string, container: ISoundContainer) => {
-              this.durationMap.set(gid, container.Duration ?? 0)
+          new Promise<ContainerWithSequenceID>((res, rej) => {
+            const isLoaded = async (gid: string, container: ISoundContainer) => {
+              const duration = await container.GetDuration()
+
+              if (!Number.isFinite(duration)) {
+                rej(`Got an infinite duration for effect with group ID ${container.LoadedEffectID}`)
+              }
+
+              this.durationMap.set(gid, duration ?? 0)
               res({
                 container,
                 id: gid as SequenceElementID
@@ -90,7 +101,7 @@ export class SequenceSoundContainer implements ISoundContainer {
               }
             }
 
-            NewSoundContainer('Default', undefined, {
+            NewSoundContainer(e.variant, undefined, {
               effects: e.effects,
               loadedHandler: {
                 id: e.id,
@@ -183,12 +194,12 @@ export class SequenceSoundContainer implements ISoundContainer {
     this.HandleStopped()
   }
 
-  ChangeVolume(_volume: number): void {
-    // no-op
+  ChangeVolume(volume: number): void {
+    this.containers.forEach((c) => c.ChangeVolume(volume))
   }
 
-  Fade(_ratio: number): void {
-    // no-op
+  Fade(ratio: number): void {
+    this.containers.forEach((c) => c.Fade(ratio))
   }
 
   private HandleStopped() {
@@ -217,7 +228,8 @@ export class SequenceSoundContainer implements ISoundContainer {
         type: 'group',
         effects: s.sounds,
         groupID: e.groupID,
-        id: e.id
+        id: e.id,
+        variant: s.variant
       }
     })
   }
