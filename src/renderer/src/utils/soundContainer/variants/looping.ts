@@ -1,5 +1,4 @@
 import { SoundVariants } from 'src/apis/audio/types/soundVariants'
-import { AbstractSoundContainer } from '../abstract'
 import { SoundContainerSetup } from '../interface'
 import { AbstractSoundContainerV2 } from '../abstractV2'
 

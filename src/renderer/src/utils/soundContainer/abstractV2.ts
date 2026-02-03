@@ -12,7 +12,7 @@ export abstract class AbstractSoundContainerV2<
 > implements ISoundContainer
 {
   protected _lastEffectID: EffectID | undefined
-  protected readonly targetVolume
+  protected readonly targetVolume: number
   protected _loadedEffect: SoundEffectWithPlayerDetails
   protected rpgAudio: RpgAudio
   protected fadeTime: number = 250
@@ -39,32 +39,44 @@ export abstract class AbstractSoundContainerV2<
     this._loadedEffect = this.SelectEffect(effects)
     this.targetVolume = this._loadedEffect.volume / 100
 
-    const audio = new RpgAudio({
+    const onLoad = loadedHandler
+      ? (() => {
+          loadedHandler.handler(loadedHandler.id, this)
+        }).bind(this)
+      : undefined
+
+    const onStop = stopHandler
+      ? (() => {
+          stopHandler.handler(stopHandler.id, this)
+        }).bind(this)
+      : undefined
+
+    this.rpgAudio = new RpgAudio({
       ctx: this.getCtx(),
       loop,
       paths: [this._loadedEffect.path],
-      volume: this.targetVolume
+      volume: this.targetVolume,
+      onLoad,
+      onStop
     })
 
-    this.rpgAudio = audio
+    // if (loadedHandler) {
+    //   this.rpgAudio.on(
+    //     ListenerType.Load,
+    //     (() => {
+    //       loadedHandler.handler(loadedHandler.id, this)
+    //     }).bind(this)
+    //   )
+    // }
 
-    if (loadedHandler) {
-      this.rpgAudio.on(
-        ListenerType.Load,
-        (() => {
-          loadedHandler.handler(loadedHandler.id, this)
-        }).bind(this)
-      )
-    }
-
-    if (stopHandler) {
-      this.rpgAudio.on(
-        ListenerType.Stop,
-        (() => {
-          stopHandler.handler(stopHandler.id, this)
-        }).bind(this)
-      )
-    }
+    // if (stopHandler) {
+    //   this.rpgAudio.on(
+    //     ListenerType.Stop,
+    //     (() => {
+    //       stopHandler.handler(stopHandler.id, this)
+    //     }).bind(this)
+    //   )
+    // }
   }
 
   Play(): void {

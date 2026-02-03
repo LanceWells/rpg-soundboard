@@ -80,20 +80,20 @@ export class SequenceSoundContainer implements ISoundContainer {
       .filter((g) => g.type === 'group')
       .map((e) =>
         Promise.race([
-          new Promise<ContainerWithSequenceID>((res, rej) => {
-            const isLoaded = async (gid: string, container: ISoundContainer) => {
-              const duration = await container.GetDuration()
+          new Promise<ContainerWithSequenceID>(async (res, rej) => {
+            // const isLoaded = async (gid: string, container: ISoundContainer) => {
+            //   const duration = await container.GetDuration()
 
-              if (!Number.isFinite(duration)) {
-                rej(`Got an infinite duration for effect with group ID ${container.LoadedEffectID}`)
-              }
+            //   if (!Number.isFinite(duration)) {
+            //     rej(`Got an infinite duration for effect with group ID ${container.LoadedEffectID}`)
+            //   }
 
-              this.durationMap.set(gid, duration ?? 0)
-              res({
-                container,
-                id: gid as SequenceElementID
-              })
-            }
+            //   this.durationMap.set(gid, duration ?? 0)
+            //   res({
+            //     container,
+            //     id: gid as SequenceElementID
+            //   })
+            // }
 
             const isStopped = (gid: string, container: ISoundContainer) => {
               if (this.elementStoppedHandler) {
@@ -101,20 +101,24 @@ export class SequenceSoundContainer implements ISoundContainer {
               }
             }
 
-            NewSoundContainer(e.variant, undefined, {
+            const container = NewSoundContainer(e.variant, undefined, {
               effects: e.effects,
-              loadedHandler: {
-                id: e.id,
-                handler: isLoaded
-              },
+              // loadedHandler: {
+              //   id: e.id,
+              //   handler: isLoaded
+              // },
               stopHandler: {
                 id: e.id,
                 handler: isStopped
               }
             })
+
+            const duration = await container.GetDuration()
+            this.durationMap.set(e.id, duration)
+            res({ container, id: e.id as SequenceElementID })
           }),
           new Promise<ContainerWithSequenceID>((_res, rej) =>
-            setTimeout(() => rej(`Could not load ${e.groupID} in time`), 15000)
+            setTimeout(() => rej(`Could not load ${e.groupID} in time`), 1500000)
           )
         ])
       )

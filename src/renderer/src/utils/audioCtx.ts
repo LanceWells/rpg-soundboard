@@ -31,6 +31,9 @@ type RpgAudioConfig = {
   volume: number
   loop: boolean
   ctx: Ctx
+  onLoad?: () => void
+  onPlay?: () => void
+  onStop?: () => void
 }
 
 export class RpgAudio {
@@ -50,33 +53,73 @@ export class RpgAudio {
   }
 
   public async getDuration(): Promise<number> {
+    // await this.isReady()
+
     // The media element thinks in terms of seconds, but we operate in terms of milliseconds.
     const duration = (this._sourceNode?.mediaElement.duration ?? 0) * 1000
 
-    if (duration !== Infinity) {
+    if (!Number.isNaN(duration) && Number.isFinite(duration)) {
       return duration
     }
 
-    const awaitedDuration = await Promise.race<number>([
-      new Promise((res, rej) => {
-        this.getAudioElement().addEventListener(
+    const durationPromise = Promise.race<number>([
+      new Promise(async (res, rej) => {
+        const mediaElement = this.getAudioElement()
+
+        mediaElement.addEventListener(
           'durationchange',
           (() => {
-            const duration = this.getAudioElement().duration
-
-            if (duration === Infinity) {
-              rej('Could not get non-infinite duration.')
+            const duration = mediaElement.duration
+            if (isFinite(duration)) {
+              res(duration)
             }
-
-            res(duration)
           }).bind(this)
         )
       }),
-      new Promise((_res, rej) => setTimeout(() => rej(`Could not get duration in time`), 100))
+      new Promise(async (res) => {
+        const audio = (await (await fetch(this._config.paths[0])).bytes()).buffer
+        const audioBuffer = await this.getCtx().decodeAudioData(audio)
+        res(audioBuffer.duration)
+      }),
+      new Promise((_res, rej) => setTimeout(() => rej(`Could not get duration in time`), 500000))
     ])
 
-    return awaitedDuration
+    try {
+      const awaitedDuration = await durationPromise
+      return awaitedDuration * 1000
+    } catch (err) {
+      return 1000
+    }
+
+    // This one kinda works, but it seems to use the '100' on the first load, then it's fine each
+    // time after. This is probably because it's "streaming" the data each time after.
+    //
+    // const awaitedDuration = await Promise.race<number>([
+    //   new Promise((res, _rej) => res(100)),
+    //   new Promise((_res, rej) => setTimeout(() => rej(`Could not get duration in time`), 5000))
+    // ])
   }
+
+  // public async isReady(): Promise<boolean> {
+  //   if (this._sourceNode.mediaElement.duration !== Infinity) {
+  //     return true
+  //   }
+
+  //   const d = await Promise.race([
+  //     new Promise(async (res) => {
+  //       this._sourceNode.mediaElement.addEventListener('durationchange', () => {
+  //         res(this._sourceNode.mediaElement.duration)
+  //       })
+
+  //       this._sourceNode.mediaElement.currentTime = 1
+  //       this._sourceNode.mediaElement.load()
+  //       await new Promise((res) => setTimeout(() => res(null), 1000))
+  //       this._sourceNode.mediaElement.currentTime = 0
+  //     })
+  //   ])
+
+  //   return true
+  // }
 
   constructor(config: RpgAudioConfig) {
     this._config = config
@@ -84,6 +127,19 @@ export class RpgAudio {
     this._id = `aud-${uuidv4()}`
 
     const audioElement = this.getAudioElement()
+
+    const { onLoad, onPlay, onStop } = config
+
+    if (onLoad) {
+      this.on(ListenerType.Load, onLoad)
+    }
+    if (onPlay) {
+      this.on(ListenerType.Play, onPlay)
+    }
+    if (onStop) {
+      this.on(ListenerType.Stop, onStop)
+    }
+
     audioElement.src = config.paths[0]
     audioElement.loop = config.loop
 
@@ -118,15 +174,15 @@ export class RpgAudio {
       return
     }
 
-    // this._sourceNode.addEventListener(
-    //   'ended',
-    //   (() => {
-    //     this._isPlaying = false
-    //   }).bind(this)
-    // )
-
-    // this._isPlaying = true
-    this._sourceNode.mediaElement.play()
+    this._sourceNode.mediaElement
+      .play()
+      .then(() => {
+        // success
+        console.log('success')
+      })
+      .catch((err) => {
+        console.error(err)
+      })
   }
 
   public stop() {
@@ -134,7 +190,6 @@ export class RpgAudio {
       return
     }
 
-    // this._isPlaying = false
     this._sourceNode.mediaElement.pause()
   }
 
