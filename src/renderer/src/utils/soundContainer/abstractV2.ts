@@ -3,7 +3,8 @@ import { ISoundContainer, SoundContainerSetup } from './interface'
 import { EffectID } from 'src/apis/audio/types/effects'
 import { SoundEffectWithPlayerDetails } from 'src/apis/audio/types/groups'
 import { getRandomInt } from '../random'
-import { Ctx, ListenerType, RpgAudio } from '../audioCtx'
+import { Ctx, RpgAudio } from '@renderer/rpgAudioEngine'
+// import { Ctx, ListenerType, RpgAudio } from '../audioCtx'
 
 export abstract class AbstractSoundContainerV2<
   TStopped extends string = string,
@@ -54,10 +55,11 @@ export abstract class AbstractSoundContainerV2<
     this.rpgAudio = new RpgAudio({
       ctx: this.getCtx(),
       loop,
-      paths: [this._loadedEffect.path],
+      path: this._loadedEffect.path,
       volume: this.targetVolume,
       onLoad,
-      onStop
+      onStop,
+      isLargeFile: this._loadedEffect.useHtml5
     })
 
     // if (loadedHandler) {
@@ -92,8 +94,9 @@ export abstract class AbstractSoundContainerV2<
   }
 
   Fade(ratio: number, fadeTime: number = this.fadeTime): void {
-    const newVolume = this.rpgAudio.volume * ratio
-    this.rpgAudio.fade(newVolume, fadeTime)
+    // const newVolume = this.rpgAudio.volume * ratio
+    // this.rpgAudio.fade(newVolume, fadeTime)
+    this.rpgAudio.fade(ratio, fadeTime)
   }
 
   LoadedEffectID: `eff-${string}-${string}-${string}-${string}-${string}` | undefined

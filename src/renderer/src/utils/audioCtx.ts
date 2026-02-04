@@ -242,13 +242,13 @@ export class RpgAudio {
     this._sourceNode.mediaElement.pause()
   }
 
-  public playing(): boolean {
-    if (this._sourceNode === null) {
-      return false
-    }
+  // public playing(): boolean {
+  //   if (this._sourceNode === null) {
+  //     return false
+  //   }
 
-    return this._isPlaying
-  }
+  //   return this._isPlaying
+  // }
 
   public fade(newVolume: number, fadeInMs: number) {
     if (this._gainNode === null) {
