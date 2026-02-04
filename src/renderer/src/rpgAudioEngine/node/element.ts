@@ -1,6 +1,6 @@
-import { AbstractRpgAudioNode } from '.'
+import { AbstractPlayableRpgAudioNode } from '.'
 
-export class RpgAudioElementNode extends AbstractRpgAudioNode {
+export class RpgAudioElementNode extends AbstractPlayableRpgAudioNode {
   private _sourceNode: MediaElementAudioSourceNode
 
   constructor(ctx: AudioContext, path: string, loop: boolean) {

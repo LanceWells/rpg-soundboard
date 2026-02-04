@@ -1,6 +1,6 @@
-import { AudioCtx } from './ctx'
+import { AudioCtx, AudioProcessing } from './ctx'
 import { RpgAudioBufferNode, RpgAudioElementNode } from './node'
-import { RpgAudioConfig, ListenerType, Ctx, RpgAudioNode } from './types'
+import { RpgAudioConfig, ListenerType, Ctx, IRpgAudioPlayableNode } from './types'
 
 /**
  * An interface with the native Web Audio API. Each instance of this class will connect with the
@@ -8,8 +8,9 @@ import { RpgAudioConfig, ListenerType, Ctx, RpgAudioNode } from './types'
  */
 export class RpgAudio {
   private _config: RpgAudioConfig
-  private _sourceNode: RpgAudioNode
+  private _sourceNode: IRpgAudioPlayableNode
   private _gainNode: GainNode
+  private _nodeCtx: Ctx
 
   private _stopListeners: ((e: RpgAudio) => void)[] = []
   private _loadListeners: ((e: RpgAudio) => void)[] = []
@@ -17,6 +18,7 @@ export class RpgAudio {
 
   constructor(config: RpgAudioConfig) {
     this._config = config
+    this._nodeCtx = config.ctx
 
     const { onLoad, onPlay, onStop } = config
 
@@ -43,7 +45,8 @@ export class RpgAudio {
 
     this._gainNode = this.getCtx().createGain()
     this._sourceNode.connect(this._gainNode)
-    this._gainNode.connect(this.getCtx().destination)
+    // this._gainNode.connect(this.getCtx().destination)
+    this._gainNode.connect(this.getDestinationNode())
   }
 
   public on(listenOn: ListenerType, callback: (e: RpgAudio) => void) {
@@ -121,13 +124,15 @@ export class RpgAudio {
   }
 
   private getCtx() {
-    switch (this._config.ctx) {
+    return AudioCtx
+  }
+
+  private getDestinationNode(): AudioNode {
+    switch (this._nodeCtx) {
       case Ctx.Environmental:
-        return AudioCtx.environmentalCtx
-      case Ctx.Effectless:
-        return AudioCtx.effectlessCtx
-      case Ctx.Soundtrack:
-        return AudioCtx.soundtrackCtx
+        return AudioProcessing.cave.getNode()
+      default:
+        return AudioCtx.destination
     }
   }
 }

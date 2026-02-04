@@ -1,25 +1,18 @@
 import { v4 as uuidv4 } from 'uuid'
-import { RpgAudioNode, RpgAudioNodeEvent } from '../types'
+import { IRpgAudioNode, RpgAudioNodeEvent } from '../types'
 
-export abstract class AbstractRpgAudioNode implements RpgAudioNode {
+export abstract class AbstractRpgAudioNode implements IRpgAudioNode {
   protected _id: string
-
-  private _stopListeners: ((e: RpgAudioNode) => void)[] = []
-  private _loadListeners: ((e: RpgAudioNode) => void)[] = []
-  private _playListeners: ((e: RpgAudioNode) => void)[] = []
-  private _errrListeners: ((e: RpgAudioNode) => void)[] = []
-
   protected _isLoaded: boolean = false
+
+  private _loadListeners: ((e: IRpgAudioNode) => void)[] = []
+  private _errrListeners: ((e: IRpgAudioNode) => void)[] = []
 
   constructor() {
     this._id = `aud-${uuidv4()}`
   }
 
   protected abstract getNode(): AudioNode
-
-  abstract getDuration(): Promise<number>
-  abstract play(): Promise<void>
-  abstract stop(): Promise<void>
 
   connect(
     destinationNode: AudioNode,
@@ -29,29 +22,15 @@ export abstract class AbstractRpgAudioNode implements RpgAudioNode {
     return this.getNode().connect(destinationNode, output, input)
   }
 
-  on(eventType: RpgAudioNodeEvent, handler: (e: RpgAudioNode) => void): void {
+  on(eventType: RpgAudioNodeEvent, handler: (e: IRpgAudioNode) => void): void {
     switch (eventType) {
       case 'load':
         this._loadListeners.push(handler)
-        break
-      case 'stop':
-        this._stopListeners.push(handler)
-        break
-      case 'play':
-        this._playListeners.push(handler)
         break
       case 'errr':
         this._errrListeners.push(handler)
         break
     }
-  }
-
-  protected handlePlay() {
-    this._playListeners.forEach((l) => l(this))
-  }
-
-  protected handleStop() {
-    this._stopListeners.forEach((l) => l(this))
   }
 
   protected handleLoad() {

@@ -30,7 +30,7 @@ export const RpgAudioNodeEvent = {
 
 export type RpgAudioNodeEvent = keyof typeof RpgAudioNodeEvent
 
-export interface RpgAudioNode {
+export interface IRpgAudioPlayableNode extends IRpgAudioNode {
   getDuration(): Promise<number>
   connect(
     destinationNode: AudioNode,
@@ -39,5 +39,9 @@ export interface RpgAudioNode {
   ): AudioNode
   play(): Promise<void>
   stop(): Promise<void>
+  on(eventType: RpgAudioNodeEvent, handler: () => void): void
+}
+
+export interface IRpgAudioNode {
   on(eventType: RpgAudioNodeEvent, handler: () => void): void
 }

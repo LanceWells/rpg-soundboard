@@ -1,9 +1,8 @@
-import { AbstractRpgAudioNode } from './abstract'
+import { AbstractPlayableRpgAudioNode } from './abstractPlayable'
 
-export class RpgAudioBufferNode extends AbstractRpgAudioNode {
+export class RpgAudioBufferNode extends AbstractPlayableRpgAudioNode {
   private _sourceNode: AudioBufferSourceNode
   private _audioBuffer: AudioBuffer | null = null
-  // private _isLoaded: boolean = false
 
   constructor(ctx: AudioContext, path: string, loop: boolean) {
     super()
@@ -37,21 +36,6 @@ export class RpgAudioBufferNode extends AbstractRpgAudioNode {
     return this._sourceNode
   }
 
-  // private awaitLoad() {
-  //   if (this._isLoaded) {
-  //     return
-  //   }
-
-  //   return Promise.race<void>([
-  //     new Promise<void>(
-  //       ((res: (value: void | PromiseLike<void>) => void) => {
-  //         this.on('load', () => res())
-  //       }).bind(this)
-  //     ),
-  //     new Promise<void>((_res, rej) => setTimeout(() => rej('Could not load in time')))
-  //   ])
-  // }
-
   async getDuration(): Promise<number> {
     await this.awaitLoad()
 
@@ -72,9 +56,4 @@ export class RpgAudioBufferNode extends AbstractRpgAudioNode {
     this._sourceNode.stop()
     this.handleStop()
   }
-
-  // handleLoad(): void {
-  //   this._isLoaded = true
-  //   super.handleLoad()
-  // }
 }
