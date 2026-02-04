@@ -9,8 +9,8 @@ export class SoundtrackSoundContainerV2 extends AbstractSoundContainerV2 {
 
   protected override fadeTime: number = 2500
 
-  constructor(setup: SoundContainerSetup) {
-    super(setup, true)
+  constructor(setup: SoundContainerSetup, enableLoops: boolean = true) {
+    super(setup, enableLoops)
   }
 
   override Stop(): void {

@@ -80,7 +80,7 @@ export const createSoundSlice: StateCreator<SoundSlice & GroupSlice, [], [], Sou
         playingSoundTracks
           .flatMap((g) => GroupHandles.get(g.id))
           .filter((g) => !!g)
-          .forEach((s) => s.Fade(0.2))
+          .forEach((s) => s.Fade(0.1, 50))
       }
     }
 
@@ -133,7 +133,7 @@ function handleHowlStop(
         .filter((g) => isSoundtrack(g, get))
         .flatMap((g) => GroupHandles.get(g.id))
         .filter((g) => !!g)
-        .forEach((s) => s.Fade(1))
+        .forEach((s) => s.Fade(1, 3500))
     }
   }
 

@@ -10,15 +10,16 @@ import { SoundtrackSoundContainerV2 } from './variants/soundtrackV2'
 export function NewSoundContainer(
   variant: SoundVariants,
   lastEffectID: EffectID | undefined,
-  setup: SoundContainerSetup
+  setup: SoundContainerSetup,
+  enableLoops?: boolean
 ): ISoundContainer {
   switch (variant) {
     case 'Looping':
-      return new LoopingSoundContainer(setup)
+      return new LoopingSoundContainer(setup, enableLoops)
     case 'Rapid':
       return new RapidSoundContainer(setup, lastEffectID)
     case 'Soundtrack':
-      return new SoundtrackSoundContainerV2(setup)
+      return new SoundtrackSoundContainerV2(setup, enableLoops)
     case 'Default':
     default:
       return new DefaultSoundContainer(setup)

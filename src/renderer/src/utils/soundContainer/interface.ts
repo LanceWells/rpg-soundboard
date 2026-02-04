@@ -65,7 +65,7 @@ export interface ISoundContainer {
   Play(): void
   Stop(): void
   ChangeVolume(volume: number): void
-  Fade(ratio: number): void
+  Fade(ratio: number, fadeTime?: number): void
   GetDuration(): Promise<number>
   readonly LoadedEffectID: EffectID | undefined
   readonly Duration: number | undefined

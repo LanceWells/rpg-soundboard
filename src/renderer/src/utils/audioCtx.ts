@@ -44,6 +44,8 @@ export class RpgAudio {
   private _volume: number
   private _id: string
 
+  private _isLoaded: boolean = false
+
   private _stopListeners: ((e: RpgAudio) => void)[] = []
   private _loadListeners: ((e: RpgAudio) => void)[] = []
   private _playListeners: ((e: RpgAudio) => void)[] = []
@@ -153,6 +155,10 @@ export class RpgAudio {
     audioElement.addEventListener('pause', this.handleStop.bind(this))
     audioElement.addEventListener('loadeddata', this.handleLoad.bind(this))
     audioElement.addEventListener('play', this.handlePlay.bind(this))
+    audioElement.addEventListener('error', this.handleError.bind(this))
+    audioElement.onerror = (event, source, lineno, colno, error) => {
+      console.error(event, source, lineno, colno, error)
+    }
   }
 
   public on(listenOn: ListenerType, callback: (e: RpgAudio) => void) {
@@ -170,19 +176,62 @@ export class RpgAudio {
   }
 
   public play() {
+    if (this._sourceNode.mediaElement.currentTime !== 0) {
+      this._sourceNode.mediaElement.currentTime = 0
+    }
+
     if (this._sourceNode === null) {
       return
     }
 
-    this._sourceNode.mediaElement
-      .play()
-      .then(() => {
-        // success
-        console.log('success')
-      })
-      .catch((err) => {
-        console.error(err)
-      })
+    if (this._isLoaded) {
+      this._sourceNode.mediaElement.play()
+      return
+    }
+
+    this._sourceNode.mediaElement.addEventListener(
+      'loadeddata',
+      (() => {
+        this._sourceNode.mediaElement
+          .play()
+          .then(() => {
+            // success
+            console.log('success')
+          })
+          .catch((err) => {
+            // this._sourceNode.mediaElement.load()
+            console.error(`${this._isLoaded}\n${JSON.stringify(err)}`)
+            this.stop()
+          })
+      }).bind(this)
+    )
+
+    // this.on(
+    //   ListenerType.Load,
+    //   (() => {
+    //     this._sourceNode.mediaElement
+    //       .play()
+    //       .then(() => {
+    //         // success
+    //         console.log('success')
+    //       })
+    //       .catch((err) => {
+    //         // this._sourceNode.mediaElement.load()
+    //         console.error(`${this._isLoaded}\n${JSON.stringify(err)}`)
+    //       })
+    //   }).bind(this)
+    // )
+
+    // this._sourceNode.mediaElement
+    //   .play()
+    //   .then(() => {
+    //     // success
+    //     console.log('success')
+    //   })
+    //   .catch((err) => {
+    //     // this._sourceNode.mediaElement.load()
+    //     console.error(`${this._isLoaded}\n${JSON.stringify(err)}`)
+    //   })
   }
 
   public stop() {
@@ -229,8 +278,8 @@ export class RpgAudio {
 
   private genWaveArray(newVolume: number): Float32Array {
     const arr = new Float32Array(2)
-    arr[0] = this._volume
-    arr[1] = newVolume
+    arr[0] = this._gainNode?.gain.value ?? this._volume
+    arr[1] = this._volume * newVolume
     return arr
   }
 
@@ -245,7 +294,12 @@ export class RpgAudio {
   }
 
   private handleLoad(_event: Event) {
+    this._isLoaded = true
     this._loadListeners.forEach((l) => l(this))
+  }
+
+  private handleError(_event: Event) {
+    console.log('err')
   }
 
   private getCtx() {

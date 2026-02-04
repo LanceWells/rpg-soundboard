@@ -91,9 +91,9 @@ export abstract class AbstractSoundContainerV2<
     this.rpgAudio.setVolume(volume)
   }
 
-  Fade(ratio: number): void {
+  Fade(ratio: number, fadeTime: number = this.fadeTime): void {
     const newVolume = this.rpgAudio.volume * ratio
-    this.rpgAudio.fade(newVolume, this.fadeTime)
+    this.rpgAudio.fade(newVolume, fadeTime)
   }
 
   LoadedEffectID: `eff-${string}-${string}-${string}-${string}-${string}` | undefined
