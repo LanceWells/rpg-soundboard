@@ -2,7 +2,6 @@ import { AbstractRpgAudioNode } from '.'
 
 export class RpgAudioElementNode extends AbstractRpgAudioNode {
   private _sourceNode: MediaElementAudioSourceNode
-  // private _isLoaded: boolean = false
 
   constructor(ctx: AudioContext, path: string, loop: boolean) {
     super()

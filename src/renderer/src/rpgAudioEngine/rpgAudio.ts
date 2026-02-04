@@ -2,6 +2,10 @@ import { AudioCtx } from './ctx'
 import { RpgAudioBufferNode, RpgAudioElementNode } from './node'
 import { RpgAudioConfig, ListenerType, Ctx, RpgAudioNode } from './types'
 
+/**
+ * An interface with the native Web Audio API. Each instance of this class will connect with the
+ * same context as specified in the config.
+ */
 export class RpgAudio {
   private _config: RpgAudioConfig
   private _sourceNode: RpgAudioNode

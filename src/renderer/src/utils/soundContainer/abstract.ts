@@ -121,7 +121,7 @@ export abstract class AbstractSoundContainer<
   }
 
   public async GetDuration(): Promise<number> {
-    throw new Error('not implemented')
+    return this.duration ?? 0
   }
 
   protected HandleHowlStop() {
