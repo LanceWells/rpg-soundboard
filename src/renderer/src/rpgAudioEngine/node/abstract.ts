@@ -49,11 +49,15 @@ export abstract class AbstractRpgAudioNode implements IRpgAudioNode {
 
     return Promise.race<void>([
       new Promise<void>(
-        ((res: (value: void | PromiseLike<void>) => void) => {
+        ((
+          res: (value: void | PromiseLike<void>) => void,
+          rej: (value: void | PromiseLike<void>) => void
+        ) => {
           this.on('load', () => res())
+          this.on('errr', () => rej())
         }).bind(this)
       ),
-      new Promise<void>((_res, rej) => setTimeout(() => rej('Could not load in time'), 1000))
+      new Promise<void>((_res, rej) => setTimeout(() => rej('Could not load in time'), 5000))
     ])
   }
 }

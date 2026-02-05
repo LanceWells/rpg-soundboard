@@ -213,6 +213,10 @@ export class SequenceSoundContainer implements ISoundContainer {
     this.containers.forEach((c) => c.Fade(ratio, fadeTime))
   }
 
+  isSoundtrack(): boolean {
+    return [...this.containers.values()].every((c) => c.Variant === 'Soundtrack')
+  }
+
   private HandleStopped() {
     this.activeTimeouts.forEach((t) => clearTimeout(t))
     if (this.activeLoopInterval) {

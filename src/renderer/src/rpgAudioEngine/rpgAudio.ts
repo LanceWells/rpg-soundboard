@@ -33,6 +33,7 @@ export class RpgAudio {
     }
 
     if (config.isLargeFile) {
+      // this._sourceNode = new RpgAudioBufferNode(this.getCtx(), config.path, config.loop)
       this._sourceNode = new RpgAudioElementNode(this.getCtx(), config.path, config.loop)
     } else {
       this._sourceNode = new RpgAudioBufferNode(this.getCtx(), config.path, config.loop)

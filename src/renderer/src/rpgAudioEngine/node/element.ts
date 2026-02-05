@@ -7,7 +7,9 @@ export class RpgAudioElementNode extends AbstractPlayableRpgAudioNode {
     super()
 
     const audioElement = this.getAudioElement()
-    audioElement.src = path
+    const sourceElement = this.getSourceElement()
+    // audioElement.src = path
+    sourceElement.src = path
     audioElement.loop = loop
 
     this._sourceNode = ctx.createMediaElementSource(audioElement)
@@ -17,6 +19,12 @@ export class RpgAudioElementNode extends AbstractPlayableRpgAudioNode {
     audioElement.addEventListener('loadeddata', this.handleLoad.bind(this))
     audioElement.addEventListener('play', this.handlePlay.bind(this))
     audioElement.addEventListener('error', this.handleErrr.bind(this))
+    audioElement.addEventListener('error', (ev) => {
+      console.error(ev)
+    })
+    sourceElement.addEventListener('error', (ev) => {
+      console.error(ev)
+    })
   }
 
   protected getNode(): AudioNode {
@@ -41,10 +49,16 @@ export class RpgAudioElementNode extends AbstractPlayableRpgAudioNode {
   }
 
   async play(): Promise<void> {
-    this._sourceNode.mediaElement.play()
+    try {
+      await this.awaitLoad()
+      this._sourceNode.mediaElement.play()
+    } catch (err) {
+      console.error('')
+    }
   }
 
   async stop(): Promise<void> {
+    await this.awaitLoad()
     this._sourceNode.mediaElement.pause()
   }
 
@@ -67,10 +81,33 @@ export class RpgAudioElementNode extends AbstractPlayableRpgAudioNode {
     if (audioElement === null) {
       const newAudioElement = document.createElement('audio')
       newAudioElement.id = this._id
+
+      // This crossorigin setting is (still, I almost don't believe it), critical. There's some
+      // problem where loading a sound file with the same URL back-to-back will fail to load on
+      // subsequent attempts. I noticed that by waiting an arbitrary length of time (probably one to
+      // several minutes), that the sound would start loading again. Presumably this is because the
+      // audio element will attempt to load from some cached value on subsequent attempts using some
+      // CORS credentials.
+      //
+      // An empty string is, shockingly, a valid and intentional value for CORS settings on
+      // HTMLMedialElements; it implies that we should enable both CORS and Same-Origin policies.
+      // Conversely, if the property is not specified at all, then CORS is disabled.
+      newAudioElement.crossOrigin = ''
       audioElement = audioBank.appendChild(newAudioElement)
     }
-
     return audioElement as HTMLAudioElement
+  }
+
+  private getSourceElement(): HTMLAudioElement {
+    const audioElement = this.getAudioElement()
+
+    let sourceElement = audioElement.querySelector(`#${this._id}-src`)
+    if (sourceElement === null) {
+      const newAudioSource = document.createElement('source')
+      newAudioSource.id = this._id
+      sourceElement = audioElement.appendChild(newAudioSource)
+    }
+    return sourceElement as HTMLAudioElement
   }
 
   // protected handleLoad(): void {
