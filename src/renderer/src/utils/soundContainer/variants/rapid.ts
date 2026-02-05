@@ -1,11 +1,12 @@
 import { SoundVariants } from 'src/apis/audio/types/soundVariants'
-import { AbstractSoundContainer } from '../abstract'
 import { SoundEffectWithPlayerDetails } from 'src/apis/audio/types/groups'
 import { getRandomArbitrary, getRandomInt } from '@renderer/utils/random'
 import { SoundContainerSetup } from '../interface'
 import { EffectID } from 'src/apis/audio/types/effects'
+import { AbstractSoundContainerV2 } from '../abstractV2'
+import { Ctx } from '@renderer/rpgAudioEngine'
 
-export class RapidSoundContainer extends AbstractSoundContainer {
+export class RapidSoundContainer extends AbstractSoundContainerV2 {
   Variant: SoundVariants = 'Rapid'
 
   protected override SelectEffect(effects: SoundEffectWithPlayerDetails[]) {
@@ -20,13 +21,15 @@ export class RapidSoundContainer extends AbstractSoundContainer {
     return effects[effectIndex]
   }
 
-  constructor(setup: SoundContainerSetup, lastEffectID: EffectID | undefined) {
-    super(setup, false, lastEffectID)
+  constructor(setup: SoundContainerSetup, lastEffectID: EffectID | undefined, ctx?: Ctx) {
+    super(setup, false, lastEffectID, ctx)
   }
 
   override Play() {
+    const randomPan = getRandomArbitrary(-0.2, 0.2)
     const randomRate = getRandomArbitrary(0.8, 1.2)
     super.Play()
-    this.howl.rate(randomRate)
+    super.Rate(randomRate)
+    super.Pan(randomPan)
   }
 }

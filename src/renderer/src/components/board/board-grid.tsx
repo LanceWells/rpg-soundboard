@@ -28,6 +28,8 @@ export default function BoardGrid() {
   const setEditingMode = useAudioStore((store) => store.setEditingMode)
   const editBoard = useAudioStore((store) => store.updateEditingBoardV2)
   const editSource = useAudioStore((store) => store.updateEditingSourceV2)
+  const toggleInCave = useAudioStore((store) => store.toggleInCave)
+  const inCave = useAudioStore((store) => store.isInCave)
 
   const onNewBoard = () => {
     editBoard()
@@ -66,6 +68,10 @@ export default function BoardGrid() {
     editBoard()
     editBoard(board, board.id)
     ;(document.getElementById(EditBoardModalId) as HTMLDialogElement).showModal()
+  }
+
+  const onToggleInCave = () => {
+    toggleInCave()
   }
 
   const { boardNodes, boardTabs } = useMemo(() => {
@@ -172,6 +178,9 @@ export default function BoardGrid() {
             p-2
             w-full`}
         >
+          <div className="tooltip" data-tip="Set Echo">
+            <input type="checkbox" className="toggle" onChange={onToggleInCave} checked={inCave} />
+          </div>
           <div className="tooltip" data-tip="New Board">
             <button className="btn btn-secondary btn-soft p-2" onClick={onNewBoard}>
               <BoardIcon />

@@ -317,7 +317,7 @@ function FileEntry(props: FileEntryProps) {
       <input
         type="range"
         min="0"
-        max="100"
+        max="200"
         className="range [grid-area:slider]"
         step="10"
         value={file.volume}

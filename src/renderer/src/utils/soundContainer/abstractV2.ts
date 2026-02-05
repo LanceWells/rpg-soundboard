@@ -17,11 +17,12 @@ export abstract class AbstractSoundContainerV2<
   protected _loadedEffect: SoundEffectWithPlayerDetails
   protected rpgAudio: RpgAudio
   protected fadeTime: number = 250
+  protected ctx: Ctx
 
   public abstract Variant: SoundVariants
 
   protected getCtx(): Ctx {
-    return Ctx.Environmental
+    return this.ctx
   }
 
   protected SelectEffect(effects: SoundEffectWithPlayerDetails[]): SoundEffectWithPlayerDetails {
@@ -32,10 +33,12 @@ export abstract class AbstractSoundContainerV2<
   protected constructor(
     setup: SoundContainerSetup<TStopped, TLoaded, TPlaying>,
     loop: boolean,
-    lastEffectID?: EffectID
+    lastEffectID?: EffectID,
+    ctx?: Ctx
   ) {
     const { effects, stopHandler, loadedHandler } = setup
 
+    this.ctx = ctx ?? Ctx.Effectless
     this._lastEffectID = lastEffectID
     this._loadedEffect = this.SelectEffect(effects)
     this.targetVolume = this._loadedEffect.volume / 100
@@ -61,24 +64,6 @@ export abstract class AbstractSoundContainerV2<
       onStop,
       isLargeFile: this._loadedEffect.useHtml5
     })
-
-    // if (loadedHandler) {
-    //   this.rpgAudio.on(
-    //     ListenerType.Load,
-    //     (() => {
-    //       loadedHandler.handler(loadedHandler.id, this)
-    //     }).bind(this)
-    //   )
-    // }
-
-    // if (stopHandler) {
-    //   this.rpgAudio.on(
-    //     ListenerType.Stop,
-    //     (() => {
-    //       stopHandler.handler(stopHandler.id, this)
-    //     }).bind(this)
-    //   )
-    // }
   }
 
   Play(): void {
@@ -89,13 +74,19 @@ export abstract class AbstractSoundContainerV2<
     this.rpgAudio.stop()
   }
 
+  Rate(rate: number): void {
+    this.rpgAudio.rate(rate)
+  }
+
+  Pan(pan: number): void {
+    this.rpgAudio.pan(pan)
+  }
+
   ChangeVolume(volume: number): void {
     this.rpgAudio.setVolume(volume)
   }
 
   Fade(ratio: number, fadeTime: number = this.fadeTime): void {
-    // const newVolume = this.rpgAudio.volume * ratio
-    // this.rpgAudio.fade(newVolume, fadeTime)
     this.rpgAudio.fade(ratio, fadeTime)
   }
 

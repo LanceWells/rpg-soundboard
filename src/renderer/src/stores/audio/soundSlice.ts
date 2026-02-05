@@ -7,11 +7,15 @@ import { ISoundContainer } from '@renderer/utils/soundContainer/interface'
 import { SequenceSoundContainer } from '@renderer/utils/soundContainer/variants/sequence'
 import { isSequenceGroup } from '@renderer/utils/typePredicates'
 import { ISoundGroupSource, SoundGroupSequence } from 'src/apis/audio/types/items'
+import { Ctx } from '@renderer/rpgAudioEngine'
 
 export interface SoundSlice {
   playGroup: (groupID: GroupID) => Promise<void>
   stopGroup: (groupID: GroupID) => void
   getSounds: (groupID: GroupID) => Promise<GetSoundsResponse>
+  toggleInCave: () => void
+  soundCtx(): Ctx
+  isInCave: boolean
 }
 
 const GroupHandles: Map<GroupID, Array<ISoundContainer>> = new Map()
@@ -22,6 +26,7 @@ export const createSoundSlice: StateCreator<SoundSlice & GroupSlice, [], [], Sou
   set,
   get
 ) => ({
+  isInCave: false,
   async getSounds(groupID) {
     return await window.audio.Groups.GetSounds({
       groupID
@@ -40,25 +45,34 @@ export const createSoundSlice: StateCreator<SoundSlice & GroupSlice, [], [], Sou
       )
 
       const effectGroups = await Promise.all(effectGroupPromises)
-      sound = await new SequenceSoundContainer({
-        effectGroups,
-        stoppedHandler: {
-          id: groupID,
-          handler: (groupID: string) => handleHowlStop(groupID as GroupID, set, get)
-        }
-      }).Init()
+      sound = await new SequenceSoundContainer(
+        {
+          effectGroups,
+          stoppedHandler: {
+            id: groupID,
+            handler: (groupID: string) => handleHowlStop(groupID as GroupID, set, get)
+          }
+        },
+        get().soundCtx()
+      ).Init()
     } else {
       const audio = await window.audio.Groups.GetSounds({
         groupID
       })
 
-      sound = NewSoundContainer(audio.variant, RepeatSoundIDs.get(groupID), {
-        effects: audio.sounds,
-        stopHandler: {
-          id: groupID,
-          handler: (groupID: string) => handleHowlStop(groupID as GroupID, set, get)
-        }
-      })
+      sound = NewSoundContainer(
+        audio.variant,
+        RepeatSoundIDs.get(groupID),
+        {
+          effects: audio.sounds,
+          stopHandler: {
+            id: groupID,
+            handler: (groupID: string) => handleHowlStop(groupID as GroupID, set, get)
+          }
+        },
+        undefined,
+        get().soundCtx()
+      )
     }
 
     const playingSoundTracks = get()
@@ -106,6 +120,19 @@ export const createSoundSlice: StateCreator<SoundSlice & GroupSlice, [], [], Sou
     if (GroupHandles.has(groupID)) {
       GroupHandles.get(groupID)?.forEach((handle) => handle.Stop())
     }
+  },
+  toggleInCave() {
+    set(() => {
+      return {
+        isInCave: !get().isInCave
+      }
+    })
+  },
+  soundCtx() {
+    if (get().isInCave) {
+      return Ctx.Environmental
+    }
+    return Ctx.Effectless
   }
 })
 

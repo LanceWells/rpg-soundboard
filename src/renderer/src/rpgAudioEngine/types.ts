@@ -39,6 +39,8 @@ export interface IRpgAudioPlayableNode extends IRpgAudioNode {
   ): AudioNode
   play(): Promise<void>
   stop(): Promise<void>
+  rate(rate: number): Promise<void>
+  pan(pan: number): Promise<void>
   on(eventType: RpgAudioNodeEvent, handler: () => void): void
 }
 

@@ -44,6 +44,7 @@ export class RpgAudio {
     this._sourceNode.on('errr', this.handleError.bind(this))
 
     this._gainNode = this.getCtx().createGain()
+    this._gainNode.gain.value = config.volume
     this._sourceNode.connect(this._gainNode)
     // this._gainNode.connect(this.getCtx().destination)
     this._gainNode.connect(this.getDestinationNode())
@@ -86,6 +87,14 @@ export class RpgAudio {
     } catch (err) {
       console.error(err)
     }
+  }
+
+  public rate(rate: number) {
+    this._sourceNode.rate(rate)
+  }
+
+  public pan(pan: number) {
+    this._sourceNode.pan(pan)
   }
 
   public getDuration() {

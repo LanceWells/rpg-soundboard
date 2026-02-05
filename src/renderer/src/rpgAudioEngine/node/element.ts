@@ -11,6 +11,7 @@ export class RpgAudioElementNode extends AbstractPlayableRpgAudioNode {
     audioElement.loop = loop
 
     this._sourceNode = ctx.createMediaElementSource(audioElement)
+
     audioElement.addEventListener('ended', this.handleStop.bind(this))
     audioElement.addEventListener('pause', this.handleStop.bind(this))
     audioElement.addEventListener('loadeddata', this.handleLoad.bind(this))
@@ -81,4 +82,10 @@ export class RpgAudioElementNode extends AbstractPlayableRpgAudioNode {
     this.getAudioElement().remove()
     super.handleStop()
   }
+
+  async rate(rate: number): Promise<void> {
+    this.getAudioElement().playbackRate = rate
+  }
+
+  async pan(): Promise<void> {}
 }

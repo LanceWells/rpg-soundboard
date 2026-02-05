@@ -3,6 +3,7 @@ import { AbstractPlayableRpgAudioNode } from './abstractPlayable'
 export class RpgAudioBufferNode extends AbstractPlayableRpgAudioNode {
   private _sourceNode: AudioBufferSourceNode
   private _audioBuffer: AudioBuffer | null = null
+  private _pannerNode: StereoPannerNode
 
   constructor(ctx: AudioContext, path: string, loop: boolean) {
     super()
@@ -10,7 +11,9 @@ export class RpgAudioBufferNode extends AbstractPlayableRpgAudioNode {
     this._sourceNode = ctx.createBufferSource()
     this._sourceNode.loop = loop
 
+    this._pannerNode = ctx.createStereoPanner()
     this._sourceNode.addEventListener('ended', this.handleStop.bind(this))
+    this._sourceNode.connect(this._pannerNode)
 
     this.init(ctx, path)
   }
@@ -33,7 +36,7 @@ export class RpgAudioBufferNode extends AbstractPlayableRpgAudioNode {
   }
 
   protected getNode(): AudioNode {
-    return this._sourceNode
+    return this._pannerNode
   }
 
   async getDuration(): Promise<number> {
@@ -55,5 +58,13 @@ export class RpgAudioBufferNode extends AbstractPlayableRpgAudioNode {
   async stop(): Promise<void> {
     this._sourceNode.stop()
     this.handleStop()
+  }
+
+  async rate(rate: number): Promise<void> {
+    this._sourceNode.playbackRate.value = rate
+  }
+
+  async pan(pan: number): Promise<void> {
+    this._pannerNode.pan.value = pan
   }
 }

@@ -15,6 +15,8 @@ export abstract class AbstractPlayableRpgAudioNode
   abstract getDuration(): Promise<number>
   abstract play(): Promise<void>
   abstract stop(): Promise<void>
+  abstract pan(pan: number): Promise<void>
+  abstract rate(rate: number): Promise<void>
 
   connect(
     destinationNode: AudioNode,

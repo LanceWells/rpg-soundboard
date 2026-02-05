@@ -1,6 +1,7 @@
-import { SoundVariantFields, SoundVariants } from 'src/apis/audio/types/soundVariants'
+import { SoundVariants } from 'src/apis/audio/types/soundVariants'
 import { AbstractSoundContainerV2 } from '../abstractV2'
 import { SoundContainerSetup } from '../interface'
+import { Ctx } from '@renderer/rpgAudioEngine'
 
 export class SoundtrackSoundContainerV2 extends AbstractSoundContainerV2 {
   Variant: SoundVariants = 'Soundtrack'
@@ -10,7 +11,11 @@ export class SoundtrackSoundContainerV2 extends AbstractSoundContainerV2 {
   protected override fadeTime: number = 2500
 
   constructor(setup: SoundContainerSetup, enableLoops: boolean = true) {
-    super(setup, enableLoops)
+    super(setup, enableLoops, undefined)
+  }
+
+  protected override getCtx(): Ctx {
+    return Ctx.Soundtrack
   }
 
   override Stop(): void {

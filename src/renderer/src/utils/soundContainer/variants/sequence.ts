@@ -7,6 +7,7 @@ import {
 import { Handler, ISoundContainer } from '../interface'
 import { NewSoundContainer } from '../util'
 import { SequenceElementID, SoundGroupSequenceElement } from 'src/apis/audio/types/items'
+import { Ctx } from '@renderer/rpgAudioEngine'
 
 export type Delay = {
   type: 'delay'
@@ -51,6 +52,7 @@ export class SequenceSoundContainer implements ISoundContainer {
   private totalRuntime: number = 0
   private activeTimeouts: NodeJS.Timeout[] = []
   private activeLoopInterval: NodeJS.Timeout | undefined
+  private ctx: Ctx
 
   private elementPlayingHandler:
     | ((sequence: SequenceElementID, container: ISoundContainer) => void)
@@ -64,7 +66,8 @@ export class SequenceSoundContainer implements ISoundContainer {
 
   durationMap: Map<string, number> = new Map()
 
-  constructor(setup: SequenceSpecificSetup) {
+  constructor(setup: SequenceSpecificSetup, ctx: Ctx) {
+    this.ctx = ctx
     this.setup = setup
     this.containers = new Map()
     this.elementPlayingHandler = setup.elementPlayingHandler
@@ -98,7 +101,8 @@ export class SequenceSoundContainer implements ISoundContainer {
                   handler: isStopped
                 }
               },
-              false
+              false,
+              this.ctx
             )
 
             const duration = await container.GetDuration()
