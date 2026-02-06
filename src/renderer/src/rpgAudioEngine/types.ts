@@ -1,3 +1,5 @@
+import { RpgAudio } from './rpgAudio'
+
 export enum Ctx {
   Environmental,
   Soundtrack,
@@ -16,9 +18,17 @@ export type RpgAudioConfig = {
   loop: boolean
   ctx: Ctx
   isLargeFile: boolean
-  onLoad?: () => void
-  onPlay?: () => void
-  onStop?: () => void
+  onLoad?: (audio: RpgAudio) => void
+  onPlay?: (audio: RpgAudio) => void
+  onStop?: (audio: RpgAudio) => void
+}
+
+export enum RpgAudioState {
+  Loading,
+  Ready,
+  Playing,
+  Stopped,
+  Error
 }
 
 export const RpgAudioNodeEvent = {

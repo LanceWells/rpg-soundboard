@@ -4,7 +4,6 @@ import { EffectID } from 'src/apis/audio/types/effects'
 import { SoundEffectWithPlayerDetails } from 'src/apis/audio/types/groups'
 import { getRandomInt } from '../random'
 import { Ctx, RpgAudio } from '@renderer/rpgAudioEngine'
-// import { Ctx, ListenerType, RpgAudio } from '../audioCtx'
 
 export abstract class AbstractSoundContainerV2<
   TStopped extends string = string,
@@ -87,12 +86,12 @@ export abstract class AbstractSoundContainerV2<
   }
 
   Fade(ratio: number, fadeTime: number = this.fadeTime): void {
-    this.rpgAudio.fade(ratio, fadeTime)
+    this.rpgAudio.fade(this.targetVolume * ratio, fadeTime)
   }
 
-  LoadedEffectID: `eff-${string}-${string}-${string}-${string}-${string}` | undefined
-
-  Duration: number | undefined
+  public get LoadedEffectID(): EffectID {
+    return this._loadedEffect.id
+  }
 
   async GetDuration() {
     return await this.rpgAudio.getDuration()

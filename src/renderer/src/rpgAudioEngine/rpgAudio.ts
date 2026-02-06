@@ -1,6 +1,6 @@
 import { AudioCtx, AudioProcessing } from './ctx'
 import { RpgAudioBufferNode, RpgAudioElementNode } from './node'
-import { RpgAudioConfig, ListenerType, Ctx, IRpgAudioPlayableNode } from './types'
+import { RpgAudioConfig, ListenerType, Ctx, IRpgAudioPlayableNode, RpgAudioState } from './types'
 
 /**
  * An interface with the native Web Audio API. Each instance of this class will connect with the
@@ -11,10 +11,15 @@ export class RpgAudio {
   private _sourceNode: IRpgAudioPlayableNode
   private _gainNode: GainNode
   private _nodeCtx: Ctx
+  private _state: RpgAudioState = RpgAudioState.Loading
 
   private _stopListeners: ((e: RpgAudio) => void)[] = []
   private _loadListeners: ((e: RpgAudio) => void)[] = []
   private _playListeners: ((e: RpgAudio) => void)[] = []
+
+  public get State() {
+    return this._state
+  }
 
   constructor(config: RpgAudioConfig) {
     this._config = config
@@ -33,7 +38,6 @@ export class RpgAudio {
     }
 
     if (config.isLargeFile) {
-      // this._sourceNode = new RpgAudioBufferNode(this.getCtx(), config.path, config.loop)
       this._sourceNode = new RpgAudioElementNode(this.getCtx(), config.path, config.loop)
     } else {
       this._sourceNode = new RpgAudioBufferNode(this.getCtx(), config.path, config.loop)
@@ -47,7 +51,6 @@ export class RpgAudio {
     this._gainNode = this.getCtx().createGain()
     this._gainNode.gain.value = config.volume
     this._sourceNode.connect(this._gainNode)
-    // this._gainNode.connect(this.getCtx().destination)
     this._gainNode.connect(this.getDestinationNode())
   }
 
@@ -66,14 +69,18 @@ export class RpgAudio {
   }
 
   public play() {
-    this._sourceNode.play()
+    this._sourceNode.play().catch((err) => {
+      console.error('Error playing', err)
+    })
   }
 
   public stop() {
-    this._sourceNode.stop()
+    this._sourceNode.stop().catch((err) => {
+      console.error('Error stopping', err)
+    })
   }
 
-  public fade(newVolume: number, fadeInMs: number) {
+  public fade(newVolume: number, fadeOverMs: number) {
     if (this._gainNode === null) {
       return
     }
@@ -83,7 +90,7 @@ export class RpgAudio {
       this._gainNode.gain.setValueCurveAtTime(
         this.genWaveArray(newVolume),
         this.getCtx().currentTime,
-        fadeInMs / 1000
+        fadeOverMs / 1000
       )
     } catch (err) {
       console.error(err)
@@ -110,26 +117,30 @@ export class RpgAudio {
     this._gainNode.gain.value = newVolume
   }
 
-  private genWaveArray(ratio: number): Float32Array {
+  private genWaveArray(newVolume: number): Float32Array {
     const arr = new Float32Array(2)
     arr[0] = this._gainNode?.gain.value ?? this._config.volume
-    arr[1] = this._config.volume * ratio
+    arr[1] = newVolume
     return arr
   }
 
   private handlePlay() {
+    this._state = RpgAudioState.Playing
     this._playListeners.forEach((l) => l(this))
   }
 
   private handleStop() {
+    this._state = RpgAudioState.Stopped
     this._stopListeners.forEach((l) => l(this))
   }
 
   private handleLoad() {
+    this._state = RpgAudioState.Ready
     this._loadListeners.forEach((l) => l(this))
   }
 
   private handleError() {
+    this._state = RpgAudioState.Error
     console.log('err')
   }
 

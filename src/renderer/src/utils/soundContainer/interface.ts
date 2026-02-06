@@ -68,5 +68,4 @@ export interface ISoundContainer {
   Fade(ratio: number, fadeTime?: number): void
   GetDuration(): Promise<number>
   readonly LoadedEffectID: EffectID | undefined
-  readonly Duration: number | undefined
 }
