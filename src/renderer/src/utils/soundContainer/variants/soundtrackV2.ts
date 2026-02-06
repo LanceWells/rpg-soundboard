@@ -3,6 +3,7 @@ import { Handler, ISoundContainer, SoundContainerSetup } from '../interface'
 import { Ctx, ListenerType, RpgAudio, RpgAudioState } from '@renderer/rpgAudioEngine'
 import { getRandomInt } from '@renderer/utils/random'
 import { SoundEffectWithPlayerDetails } from 'src/apis/audio/types/groups'
+import { produce } from 'immer'
 
 type RpgAudioContainer = {
   targetVolume: number
@@ -12,21 +13,44 @@ type RpgAudioContainer = {
 export class SoundtrackSoundContainerV2 implements ISoundContainer {
   public Variant: SoundVariants = 'Soundtrack'
 
-  private readonly crossfadeTime: number = 2500
+  private readonly crossfadeTime: number = 12500
   private _fadeTime: number = 2500
   private _isActive: boolean = true
 
   private _audioQueue: [RpgAudioContainer, ...RpgAudioContainer[]]
   private ctx: Ctx
-  private _effects: SoundEffectWithPlayerDetails[]
   private _loadedHandler: Handler<string> | undefined
   private _stopHandler: Handler<string> | undefined
 
+  private _effects: SoundEffectWithPlayerDetails[]
+  private _effectsPointer: number = 0
+
   private timeouts: Set<NodeJS.Timeout> = new Set()
 
-  private selectEffect(effects: SoundEffectWithPlayerDetails[]): SoundEffectWithPlayerDetails {
-    const effectIndex = getRandomInt(0, effects.length - 1)
-    return effects[effectIndex]
+  private shuffleEffects() {
+    // This elipses is actually pretty important. It turns out that the array returned by the
+    // produce function is considered "immutable", and the splice operation is effectively calling
+    // a delete operation on the 'n' property of an array. This elipses actually avoids that problem
+    // by reconstructing the array, but keeping the objects.
+    const effectsCopy = [...produce(this._effects, (draft) => draft)]
+    const newEffects: SoundEffectWithPlayerDetails[] = []
+
+    while (effectsCopy.length > 0) {
+      const randomInt = getRandomInt(0, effectsCopy.length - 1)
+      const effect = effectsCopy.splice(randomInt, 1)
+      newEffects.push(...effect)
+    }
+
+    this._effects = newEffects
+  }
+
+  private getNextEffect(): SoundEffectWithPlayerDetails {
+    if (this._effectsPointer === this._effects.length) {
+      this.shuffleEffects()
+      this._effectsPointer = 0
+    }
+
+    return this._effects[this._effectsPointer++]
   }
 
   constructor(setup: SoundContainerSetup, ctx?: Ctx) {
@@ -37,8 +61,9 @@ export class SoundtrackSoundContainerV2 implements ISoundContainer {
     this._stopHandler = stopHandler
     this.ctx = ctx ?? Ctx.Effectless
 
-    const activeEffect = this.selectEffect(this._effects)
-    const initialAudio = this.createAudio(activeEffect)
+    this.shuffleEffects()
+    const initialAudio = this.createAudio(this.getNextEffect())
+
     initialAudio.audio.on(
       ListenerType.Load,
       (() => {
@@ -48,7 +73,7 @@ export class SoundtrackSoundContainerV2 implements ISoundContainer {
       }).bind(this)
     )
 
-    this._audioQueue = [this.createAudio(activeEffect)]
+    this._audioQueue = [initialAudio]
   }
 
   private createAudio(effect: SoundEffectWithPlayerDetails): RpgAudioContainer {
@@ -111,7 +136,7 @@ export class SoundtrackSoundContainerV2 implements ISoundContainer {
     await this.playSong(this._audioQueue[0], 0)
 
     while (this._isActive) {
-      const nextEffect = this.selectEffect(this._effects)
+      const nextEffect = this.getNextEffect()
       this._audioQueue.push(this.createAudio(nextEffect))
       await this.playSong(this._audioQueue[0], this.crossfadeTime)
     }
