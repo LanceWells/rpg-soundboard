@@ -1,3 +1,4 @@
+import { RpgAudioConvolverNode } from './node/convolver'
 import { RpgAudio } from './rpgAudio'
 
 export enum Ctx {
@@ -23,6 +24,10 @@ export type RpgAudioConfig = {
   onStop?: (audio: RpgAudio) => void
 }
 
+export type RandomReverbNodeConfig = {
+  nodes: [RpgAudioConvolverNode, ...RpgAudioConvolverNode[]]
+}
+
 export enum RpgAudioState {
   Loading,
   Ready,
@@ -42,11 +47,7 @@ export type RpgAudioNodeEvent = keyof typeof RpgAudioNodeEvent
 
 export interface IRpgAudioPlayableNode extends IRpgAudioNode {
   getDuration(): Promise<number>
-  connect(
-    destinationNode: AudioNode,
-    output?: number | undefined,
-    input?: number | undefined
-  ): AudioNode
+
   play(): Promise<void>
   stop(): Promise<void>
   rate(rate: number): Promise<void>
@@ -56,4 +57,10 @@ export interface IRpgAudioPlayableNode extends IRpgAudioNode {
 
 export interface IRpgAudioNode {
   on(eventType: RpgAudioNodeEvent, handler: () => void): void
+  connect(
+    destinationNode: AudioNode,
+    output?: number | undefined,
+    input?: number | undefined
+  ): AudioNode
+  disconnect(): void
 }

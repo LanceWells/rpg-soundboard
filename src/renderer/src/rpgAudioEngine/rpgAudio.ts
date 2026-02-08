@@ -69,15 +69,23 @@ export class RpgAudio {
   }
 
   public play() {
-    this._sourceNode.play().catch((err) => {
-      console.error('Error playing', err)
-    })
+    if (this.State !== RpgAudioState.Playing) {
+      this._sourceNode.play().catch((err) => {
+        console.error('Error playing', err)
+      })
+    }
   }
 
   public stop() {
-    this._sourceNode.stop().catch((err) => {
-      console.error('Error stopping', err)
-    })
+    this._sourceNode
+      .stop()
+      .catch((err) => {
+        console.error('Error stopping', err)
+      })
+      .finally(() => {
+        this._sourceNode.disconnect()
+        this._gainNode.disconnect()
+      })
   }
 
   public fade(newVolume: number, fadeOverMs: number) {
@@ -151,7 +159,8 @@ export class RpgAudio {
   private getDestinationNode(): AudioNode {
     switch (this._nodeCtx) {
       case Ctx.Environmental:
-        return AudioProcessing.cave.getNode()
+        // return AudioProcessing.cave.getNode()
+        return AudioProcessing.caveRandom.getRandomNode()
       default:
         return AudioCtx.destination
     }

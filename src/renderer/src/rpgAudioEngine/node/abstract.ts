@@ -22,6 +22,10 @@ export abstract class AbstractRpgAudioNode implements IRpgAudioNode {
     return this.getNode().connect(destinationNode, output, input)
   }
 
+  disconnect() {
+    this.getNode().disconnect()
+  }
+
   on(eventType: RpgAudioNodeEvent, handler: (e: IRpgAudioNode) => void): void {
     switch (eventType) {
       case 'load':
@@ -42,7 +46,7 @@ export abstract class AbstractRpgAudioNode implements IRpgAudioNode {
     this._errrListeners.forEach((l) => l(this))
   }
 
-  protected async awaitLoad() {
+  public async awaitLoad() {
     if (this._isLoaded) {
       return
     }
