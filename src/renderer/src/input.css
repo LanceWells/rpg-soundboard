@@ -1,11 +1,15 @@
+@import url("https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap");
 @import 'tailwindcss';
-@plugin "daisyui" {
+/* @plugin "daisyui" {
   themes: dark --default;
-}
+} */
 
 html {
   height: 100dvh;
   width: 100dvw;
+  background-color: #1f1b1f;
+  color: white;
+  font-family: "Pixelify Sans", sans-serif;
 }
 
 body {
@@ -14,6 +18,16 @@ body {
 }
 
 @theme {
+  --color-paper-1: #1f1b1f;
+  --color-paper-2: #352935;
+  --color-shop-100: #966a4a;
+  --color-shop-200: #7a5343;
+  --color-shop-300: #573d39;
+
+  --shadow-pixel-md: 6px 6px rgb(0, 0, 0);
+
+  --font-pixel: "Pixelify Sans", sans-serif;
+
   --animate-radialspin: radialspin 2s linear infinite;
 
   @keyframes radialspin {
