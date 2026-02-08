@@ -9,6 +9,7 @@ import NewEffectModal from './components/modals/newEffectModal/newEffectModal'
 import NewGroupSelectModal from './components/modals/newGroupSelectModal/newGroupSelectModal'
 import EditSequenceModal from './components/modals/sequenceModal/editModal'
 import NewSequenceModal from './components/modals/sequenceModal/newModal'
+import { GroupGrid } from './componentsV2/groupGrid'
 
 /**
  * The base of the application. This is the root of the tree and contains all base-level elements.
@@ -16,7 +17,8 @@ import NewSequenceModal from './components/modals/sequenceModal/newModal'
 export default function App() {
   return (
     <div className="flex flex-col h-full grow">
-      <NewSequenceModal />
+      <GroupGrid />
+      {/* <NewSequenceModal />
       <EditSequenceModal />
       <NewGroupSelectModal />
       <NewEffectModal />
@@ -26,7 +28,7 @@ export default function App() {
       <NewCategoryModal />
       <EditCategoryModal />
       <LinkEffectModal />
-      <BoardGrid />
+      <BoardGrid /> */}
     </div>
   )
 }
