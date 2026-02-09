@@ -24,6 +24,8 @@ body {
   --color-shop-200: #7a5343;
   --color-shop-300: #573d39;
 
+  --color-caption-bg: rgba(0, 0, 0, 0.5);
+
   --shadow-pixel-md: 6px 6px rgb(0, 0, 0);
 
   --font-pixel: "Pixelify Sans", sans-serif;

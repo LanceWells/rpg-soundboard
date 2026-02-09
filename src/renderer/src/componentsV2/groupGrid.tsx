@@ -1,4 +1,6 @@
 import { GroupBase } from './group'
+import MusicNote from '@renderer/assets/images/MusicScroll.png'
+import BirdBag from '@renderer/assets/images/BirdBag.png'
 
 export function GroupGrid() {
   return (
@@ -49,7 +51,7 @@ export function GroupGrid() {
           shadow-shop-300
         `}
         >
-          <span>What are you looking for?</span>
+          <span>Whatchu want?</span>
           <input
             type="text"
             className={`
@@ -75,24 +77,25 @@ export function GroupGrid() {
           <div
             className={`
             flex
+            content-start
             justify-center
             flex-wrap
             gap-4
-            m-2
+            p-2
+            h-full
             overflow-y-scroll
+            overflow-x-hidden
           `}
           >
-            <GroupBase />
-            <GroupBase />
-            <GroupBase />
-            <GroupBase />
-            <GroupBase />
-            <GroupBase />
-            <GroupBase />
-            <GroupBase />
-            <GroupBase />
-            <GroupBase />
-            <GroupBase />
+            <GroupBase src={MusicNote} />
+            <GroupBase src={MusicNote} />
+            <GroupBase src={MusicNote} />
+            <GroupBase src={MusicNote} />
+            <GroupBase src={BirdBag} />
+            <GroupBase src={BirdBag} />
+            <GroupBase src={BirdBag} />
+            <GroupBase src={BirdBag} />
+            <GroupBase src={BirdBag} />
           </div>
         </div>
       </div>
