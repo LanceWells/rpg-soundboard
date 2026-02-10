@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap');
 @import 'tailwindcss';
 /* @plugin "daisyui" {
   themes: dark --default;
@@ -9,12 +9,72 @@ html {
   width: 100dvw;
   background-color: #1f1b1f;
   color: white;
-  font-family: "Pixelify Sans", sans-serif;
+  font-family: 'Pixelify Sans', sans-serif;
+}
+
+/*
+Source - https://stackoverflow.com/a/14068216
+Posted by Vargr, modified by community. See post 'Timeline' for change history
+Retrieved 2026-02-10, License - CC BY-SA 4.0
+*/
+
+img {
+  image-rendering: optimizeSpeed; /* STOP SMOOTHING, GIVE ME SPEED  */
+  image-rendering: -moz-crisp-edges; /* Firefox                        */
+  image-rendering: -o-crisp-edges; /* Opera                          */
+  image-rendering: -webkit-optimize-contrast; /* Chrome (and eventually Safari) */
+  image-rendering: pixelated; /* Universal support since 2021   */
+  image-rendering: optimize-contrast; /* CSS3 Proposed                  */
+  -ms-interpolation-mode: nearest-neighbor; /* IE8+                           */
 }
 
 body {
   height: 100%;
   width: 100%;
+}
+
+@layer components {
+  .shop-border {
+    border-image-slice: 144 144 144 144;
+    border-image-width: 60px 60px 60px 60px;
+    border-image-outset: 0px 0px 0px 0px;
+    border-image-repeat: repeat repeat;
+    border-image-source: url('./assets/images/WoodPaneling.png');
+    border-style: solid;
+    border-style: var(--tw-border-style);
+    border-width: 34px;
+
+    ::-webkit-scrollbar {
+      width: 20px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background-color: var(--color-shop-300);
+    }
+
+    ::-webkit-scrollbar-button {
+      background-color: var(--color-shop-100);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background-color: var(--color-shop-100);
+    }
+  }
+
+  .shop-shelf {
+    border-image-slice: 0 15 27 15;
+    border-image-width: 13px 13px 13px 13px;
+    border-image-outset: 13px 13px 13px 13px;
+    border-image-repeat: stretch stretch;
+    border-image-source: url('./assets/images/WoodShelf.png');
+    border-style: solid;
+  }
+
+  .shop-wall {
+    background-attachment: scroll;
+    background-repeat: repeat;
+    background-image: url('./assets/images/Wall.png');
+  }
 }
 
 @theme {
@@ -28,7 +88,7 @@ body {
 
   --shadow-pixel-md: 6px 6px rgb(0, 0, 0);
 
-  --font-pixel: "Pixelify Sans", sans-serif;
+  --font-pixel: 'Pixelify Sans', sans-serif;
 
   --animate-radialspin: radialspin 2s linear infinite;
 

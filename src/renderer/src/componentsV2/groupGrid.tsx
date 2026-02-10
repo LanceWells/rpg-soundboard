@@ -1,6 +1,7 @@
 import { GroupBase } from './group'
 import MusicNote from '@renderer/assets/images/MusicScroll.png'
 import BirdBag from '@renderer/assets/images/BirdBag.png'
+import TownHero from '@renderer/assets/images/TownHero.png'
 
 export function GroupGrid() {
   return (
@@ -9,7 +10,7 @@ export function GroupGrid() {
       w-full
       h-full
       grid
-      grid-cols-[280px_1fr]
+      grid-cols-[288px_1fr]
     `}
     >
       <div
@@ -27,28 +28,25 @@ export function GroupGrid() {
         >
           RPG Soundboard
         </h1>
+        <img src={TownHero} />
       </div>
       <div
         className={`
-          mx-4
-          my-8
           grid
-          gap-4
+          max-h-dvh
+          overflow-hidden
           grid-rows-[min-content_1fr]
-          
       `}
       >
         <div
           className={`
-          p-3
           w-fit
-          border-4
           shadow-pixel-md
           grid
           grid-rows-2
           bg-shop-200
-          border-shop-100
-          shadow-shop-300
+          shop-border
+          p-2
         `}
         >
           <span>Whatchu want?</span>
@@ -56,7 +54,6 @@ export function GroupGrid() {
             type="text"
             className={`
             bg-black
-            rounded-md
             p-1
             border-4
             border-shop-100
@@ -66,26 +63,26 @@ export function GroupGrid() {
         <div
           className={`
           w-full
-          h-full
-          border-4
-          shadow-pixel-md
           bg-shop-200
-          border-shop-100
-          shadow-shop-300
+          shop-border
+          flex
+          min-h-full
+          box-border
         `}
         >
           <div
             className={`
-            flex
-            content-start
-            justify-center
-            flex-wrap
-            gap-4
-            p-2
-            h-full
-            overflow-y-scroll
-            overflow-x-hidden
-          `}
+              overflow-y-scroll
+              overflow-x-hidden
+              flex
+              content-start
+              justify-center
+              flex-wrap
+              gap-2
+              p-2
+              shop-wall
+              grow
+            `}
           >
             <GroupBase src={MusicNote} />
             <GroupBase src={MusicNote} />
