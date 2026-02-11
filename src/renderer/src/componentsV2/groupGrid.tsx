@@ -2,6 +2,9 @@ import { GroupBase } from './group'
 import MusicNote from '@renderer/assets/images/MusicScroll.png'
 import BirdBag from '@renderer/assets/images/BirdBag.png'
 import TownHero from '@renderer/assets/images/TownHero.png'
+import GoblinHead from '@renderer/assets/images/Heads/Goblin.png'
+import BanditHead from '@renderer/assets/images/Heads/Bandit.png'
+import SuccubusHead from '@renderer/assets/images/Heads/Succubus.png'
 
 export function GroupGrid() {
   return (
@@ -72,6 +75,7 @@ export function GroupGrid() {
         >
           <div
             className={`
+              w-full
               overflow-y-scroll
               overflow-x-hidden
               flex
@@ -81,18 +85,17 @@ export function GroupGrid() {
               gap-2
               p-2
               shop-wall
-              grow
             `}
           >
-            <GroupBase src={MusicNote} />
-            <GroupBase src={MusicNote} />
-            <GroupBase src={MusicNote} />
-            <GroupBase src={MusicNote} />
-            <GroupBase src={BirdBag} />
-            <GroupBase src={BirdBag} />
-            <GroupBase src={BirdBag} />
-            <GroupBase src={BirdBag} />
-            <GroupBase src={BirdBag} />
+            <GroupBase src={MusicNote} variant="Default" title="Music" />
+            <GroupBase src={BanditHead} variant="Looping" title="Bandit" />
+            <GroupBase src={MusicNote} variant="Rapid" title="Other Music" />
+            <GroupBase src={MusicNote} variant="Sequence" title="Even more music" />
+            <GroupBase src={BirdBag} variant="Soundtrack" title="A bird bag" />
+            <GroupBase src={GoblinHead} variant="Default" title="Goblin" />
+            <GroupBase src={BirdBag} variant="Default" title="Another bird bag?" />
+            <GroupBase src={SuccubusHead} variant="Default" title="Succubus" />
+            <GroupBase src={BirdBag} variant="Default" title="A third bag of bird" />
           </div>
         </div>
       </div>
