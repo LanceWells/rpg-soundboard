@@ -4,6 +4,8 @@ import LoopingTag from '@renderer/assets/images/Tags/Looping.png'
 import RapidTag from '@renderer/assets/images/Tags/Rapid.png'
 import SoundtrackTag from '@renderer/assets/images/Tags/Soundtrack.png'
 import SequenceTag from '@renderer/assets/images/Tags/Sequence.png'
+import { SoundIcon } from 'src/apis/audio/types/items'
+import { GroupIcon } from './groupIcon'
 
 export type GroupBaseProps = {
   // group: ISoundGroupSource
@@ -12,6 +14,7 @@ export type GroupBaseProps = {
   src: string
   variant: SoundVariants
   title: string
+  icon?: SoundIcon
 }
 
 export function GroupBase(props: GroupBaseProps) {
@@ -44,7 +47,7 @@ export function GroupBase(props: GroupBaseProps) {
     `}
       onClick={() => {}}
     >
-      <img
+      {/* <img
         className={`
           absolute
           top-2
@@ -57,7 +60,8 @@ export function GroupBase(props: GroupBaseProps) {
           transform-[translate(-50%,_0)]
       `}
         src={src}
-      />
+      /> */}
+      <GroupIcon icon={{ name: 'moon', backgroundColor: 'black', foregroundColor: 'white' }} />
       <img
         className={`
           absolute

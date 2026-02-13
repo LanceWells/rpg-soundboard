@@ -225,35 +225,8 @@
   .top-2 {
     top: calc(var(--spacing) * 2);
   }
-  .top-3 {
-    top: calc(var(--spacing) * 3);
-  }
-  .top-5 {
-    top: calc(var(--spacing) * 5);
-  }
-  .top-10 {
-    top: calc(var(--spacing) * 10);
-  }
-  .top-17 {
-    top: calc(var(--spacing) * 17);
-  }
-  .top-30 {
-    top: calc(var(--spacing) * 30);
-  }
   .top-32 {
     top: calc(var(--spacing) * 32);
-  }
-  .top-33 {
-    top: calc(var(--spacing) * 33);
-  }
-  .top-34 {
-    top: calc(var(--spacing) * 34);
-  }
-  .top-35 {
-    top: calc(var(--spacing) * 35);
-  }
-  .top-40 {
-    top: calc(var(--spacing) * 40);
   }
   .-right-3 {
     right: calc(var(--spacing) * -3);
@@ -287,6 +260,12 @@
   }
   .z-20 {
     z-index: 20;
+  }
+  .z-40 {
+    z-index: 40;
+  }
+  .z-50 {
+    z-index: 50;
   }
   .container {
     width: 100%;
@@ -499,9 +478,6 @@
   .grid-cols-3 {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
-  .grid-cols-8 {
-    grid-template-columns: repeat(8, minmax(0, 1fr));
-  }
   .grid-cols-\[288px_1fr\] {
     grid-template-columns: 288px 1fr;
   }
@@ -534,6 +510,9 @@
   }
   .grid-rows-\[min-content_1fr\] {
     grid-template-rows: min-content 1fr;
+  }
+  .grid-rows-\[min-content_min-content_1fr_min-content\] {
+    grid-template-rows: min-content min-content 1fr min-content;
   }
   .flex-col {
     flex-direction: column;
@@ -856,6 +835,9 @@
   .\[grid-area\:preview\] {
     grid-area: preview;
   }
+  .\[grid-area\:search\] {
+    grid-area: search;
+  }
   .\[grid-area\:slider\] {
     grid-area: slider;
   }
@@ -867,6 +849,9 @@
   }
   .\[grid-template-areas\:\"categories_categories_categories\"_\"groups_groups_groups\"_\"delete_\._\.\"\] {
     grid-template-areas: "categories categories categories" "groups groups groups" "delete . .";
+  }
+  .\[grid-template-areas\:\"header\"_\"hero\"_\"\.\"_\"search\"\] {
+    grid-template-areas: "header" "hero" "." "search";
   }
   .\[grid-template-areas\:\"icon_form_fileselect\"_\"lookup_lookup_files\"_\"foreground_background_toggles\"\] {
     grid-template-areas: "icon form fileselect" "lookup lookup files" "foreground background toggles";
@@ -1175,7 +1160,6 @@ body {
     background-image: url('./assets/images/BareShelf.png');
   }
   .shop-wall {
-    background-attachment: scroll;
     background-repeat: repeat;
     background-image: url('./assets/images/Wall.png');
   }

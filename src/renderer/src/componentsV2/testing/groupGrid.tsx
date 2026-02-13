@@ -20,6 +20,10 @@ export function GroupGrid() {
         className={`
         bg-paper-2
         p-2
+        shop-wall
+        grid
+        [grid-template-areas:"header"_"hero"_"."_"search"]
+        grid-rows-[min-content_min-content_1fr_min-content]
       `}
       >
         <h1
@@ -32,24 +36,15 @@ export function GroupGrid() {
           RPG Soundboard
         </h1>
         <img src={TownHero} />
-      </div>
-      <div
-        className={`
-          grid
-          max-h-dvh
-          overflow-hidden
-          grid-rows-[min-content_1fr]
-      `}
-      >
         <div
           className={`
-          w-fit
+          w-full
           shadow-pixel-md
           grid
           grid-rows-2
           bg-shop-200
-          shop-border
           p-2
+          [grid-area:search]
         `}
         >
           <span>Whatchu want?</span>
@@ -63,6 +58,13 @@ export function GroupGrid() {
           `}
           />
         </div>
+      </div>
+      <div
+        className={`
+          max-h-dvh
+          overflow-hidden
+      `}
+      >
         <div
           className={`
           w-full
@@ -70,6 +72,7 @@ export function GroupGrid() {
           shop-border
           flex
           min-h-full
+          max-h-full
           box-border
         `}
         >
