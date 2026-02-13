@@ -97,7 +97,6 @@ export function GroupGrid() {
             <GroupBase src={BirdBag} variant="Soundtrack" title="A bird bag" />
             <GroupBase src={GoblinHead} variant="Default" title="Goblin" />
             <GroupBase src={BirdBag} variant="Default" title="Another bird bag?" />
-            <GroupBase src={SuccubusHead} variant="Default" title="Succubus" />
             <GroupBase src={BirdBag} variant="Default" title="A third bag of bird" />
           </div>
         </div>
