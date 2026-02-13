@@ -24,10 +24,10 @@ export function GroupBase(props: GroupBaseProps) {
       justify-items-center
       overflow-ellipsis
       overflow-clip
-      w-[160px]
-      w-max-[160px]
-      h-[160px]
-      h-max-[160px]
+      w-[150px]
+      w-max-[150px]
+      h-[168px]
+      h-max-[168px]
       relative
       before:absolute
       before:w-full
@@ -35,17 +35,19 @@ export function GroupBase(props: GroupBaseProps) {
       before:opacity-0
       before:left-0
       before:top-0
+      before:z-30
       before:bg-white
+      active:before:bg-blue-500
       before:transition-opacity
       hover:before:opacity-20
-      active:border-4
+      rounded-md
     `}
       onClick={() => {}}
     >
       <img
         className={`
           absolute
-          top-0
+          top-2
           w-[120px]
           w-max-[120px]
           h-[120px]
@@ -59,8 +61,7 @@ export function GroupBase(props: GroupBaseProps) {
       <img
         className={`
           absolute
-          top-25
-          z-0
+          top-0
           left-1/2
           transform-[translate(-50%,_0)]
         `}
@@ -73,7 +74,7 @@ export function GroupBase(props: GroupBaseProps) {
         overflow-ellipsis
         text-nowrap
         absolute
-        top-30
+        top-32
         w-[140px]
         z-20
         left-3

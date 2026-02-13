@@ -62,12 +62,7 @@ body {
   }
 
   .shop-shelf {
-    border-image-slice: 0 15 27 15;
-    border-image-width: 13px 13px 13px 13px;
-    border-image-outset: 13px 13px 13px 13px;
-    border-image-repeat: stretch stretch;
-    border-image-source: url('./assets/images/WoodShelf.png');
-    border-style: solid;
+    background-image: url('./assets/images/BareShelf.png');
   }
 
   .shop-wall {

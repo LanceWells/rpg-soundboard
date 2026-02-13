@@ -82,9 +82,9 @@ export function GroupGrid() {
               content-start
               justify-center
               flex-wrap
-              gap-2
-              p-2
-              shop-wall
+              attach
+              shop-shelf
+              bg-local
             `}
           >
             <GroupBase src={MusicNote} variant="Default" title="Music" />
