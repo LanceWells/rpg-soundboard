@@ -463,6 +463,9 @@
   .transform {
     transform: var(--tw-rotate-x,) var(--tw-rotate-y,) var(--tw-rotate-z,) var(--tw-skew-x,) var(--tw-skew-y,);
   }
+  .transform-\[translate\(-50\%\,_-50\%\)\] {
+    transform: translate(-50%, -50%);
+  }
   .transform-\[translate\(-50\%\,_0\)\] {
     transform: translate(-50%, 0);
   }
