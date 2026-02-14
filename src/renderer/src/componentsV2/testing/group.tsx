@@ -61,7 +61,7 @@ export function GroupBase(props: GroupBaseProps) {
       `}
         src={src}
       /> */}
-      <GroupIcon icon={{ name: 'moon', backgroundColor: 'black', foregroundColor: 'white' }} />
+      <GroupIcon icon={{ name: 'warehouse', backgroundColor: 'black', foregroundColor: 'brown' }} />
       <img
         className={`
           absolute

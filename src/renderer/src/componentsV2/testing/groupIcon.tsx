@@ -1,5 +1,6 @@
 import { SoundIcon } from 'src/apis/audio/types/items'
 import BookImage from '@renderer/assets/images/Book.png'
+import ScrollImage from '@renderer/assets/images/Scroll.png'
 import { useEffect, useRef } from 'react'
 import { soundboardIcons } from '@renderer/utils/fetchIcons'
 import { svgToData } from '@iconify/utils'
@@ -81,12 +82,16 @@ export function GroupIcon(props: GroupIconProps) {
       ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
       ctx.imageSmoothingEnabled = false
 
-      iCtx.drawImage(svgImg, 0, 0, 16, 16)
+      iCtx.drawImage(svgImg, 0, 0, 24, 24)
       const imgBitmap = iCtx.canvas.transferToImageBitmap()
 
       ctx.transform(9, 0, 0, 9, 0, 0)
-      ctx.drawImage(imgBitmap, 3, 3, 32, 32)
+      ctx.drawImage(imgBitmap, 2, 2, 24, 24)
       imgBitmap.close()
+
+      ctx.globalCompositeOperation = 'source-in'
+      ctx.fillStyle = icon.foregroundColor
+      ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height)
 
       svgImg.removeEventListener('load', onload)
     }
@@ -117,7 +122,7 @@ export function GroupIcon(props: GroupIconProps) {
           left-0
           z-40
         `}
-        src={BookImage}
+        src={ScrollImage}
         width={144}
         height={144}
       />
