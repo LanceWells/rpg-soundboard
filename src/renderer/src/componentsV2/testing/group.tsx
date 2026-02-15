@@ -4,6 +4,8 @@ import LoopingTag from '@renderer/assets/images/Tags/Looping.png'
 import RapidTag from '@renderer/assets/images/Tags/Rapid.png'
 import SoundtrackTag from '@renderer/assets/images/Tags/Soundtrack.png'
 import SequenceTag from '@renderer/assets/images/Tags/Sequence.png'
+import NoteAnimation from '@renderer/assets/images/NoteRender.gif'
+import Rat from '@renderer/assets/images/Rat.png'
 import { MemoizedGroupIcon } from './groupIcon'
 import { GroupID } from 'src/apis/audio/types/groups'
 import { useAudioStore } from '@renderer/stores/audio/audioStore'
@@ -80,13 +82,27 @@ export function GroupBase(props: GroupBaseProps) {
       `}
         src={src}
       /> */}
-      <MemoizedGroupIcon
+      <img
+        className={`
+          absolute
+          top-2
+          w-[120px]
+          w-max-[120px]
+          h-[120px]
+          h-max-[120px]
+          z-10
+          left-1/2
+          transform-[translate(-50%,_0)]
+      `}
+        src={Rat}
+      />
+      {/* <MemoizedGroupIcon
         icon={{
           name: group.icon.name,
           backgroundColor: 'black',
           foregroundColor: group.icon.foregroundColor
         }}
-      />
+      /> */}
       <img
         className={`
           absolute
@@ -105,11 +121,16 @@ export function GroupBase(props: GroupBaseProps) {
         absolute
         top-32
         w-[140px]
-        z-20
+        z-30
         left-3
         p-1
+        text-lg
         pointer-events-none
-        text-black
+        ${
+          isPlaying
+            ? 'background-animate bg-gradient-to-r from-indigo-500 via-green-500 to-pink-500 bg-clip-text text-transparent select-none'
+            : 'text-white'
+        }
         `}
       >
         {group.name}

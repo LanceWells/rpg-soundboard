@@ -69,6 +69,33 @@ body {
     background-repeat: repeat;
     background-image: url('./assets/images/Wall.png');
   }
+
+  /*
+  Source - https://stackoverflow.com/a/75705045
+  Posted by Rory
+  Retrieved 2026-02-15, License - CC BY-SA 4.0
+  */
+
+  .background-animate {
+    background-size: 200%;
+    -webkit-animation: AnimateBackgroud 1s ease infinite;
+    -moz-animation: AnimateBackgroud 1s ease infinite;
+    animation: AnimateBackgroud 1s ease infinite;
+  }
+
+  @keyframes AnimateBackgroud {
+    0% {
+      background-position: 0;
+    }
+
+    50% {
+      background-position: 100%;
+    }
+
+    100% {
+      background-position: 0;
+    }
+  }
 }
 
 @theme {
