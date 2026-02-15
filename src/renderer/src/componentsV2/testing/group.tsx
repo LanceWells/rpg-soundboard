@@ -4,21 +4,13 @@ import LoopingTag from '@renderer/assets/images/Tags/Looping.png'
 import RapidTag from '@renderer/assets/images/Tags/Rapid.png'
 import SoundtrackTag from '@renderer/assets/images/Tags/Soundtrack.png'
 import SequenceTag from '@renderer/assets/images/Tags/Sequence.png'
-import { SoundIcon } from 'src/apis/audio/types/items'
-import { GroupIcon, MemoizedGroupIcon } from './groupIcon'
+import { MemoizedGroupIcon } from './groupIcon'
 import { GroupID } from 'src/apis/audio/types/groups'
 import { useAudioStore } from '@renderer/stores/audio/audioStore'
 import { useShallow } from 'zustand/shallow'
 import { useCallback } from 'react'
 
 export type GroupBaseProps = {
-  // group: ISoundGroupSource
-  // onClickEdit: () => void;
-  // onClickPlay: () => void;
-  // src: string
-  // variant: SoundVariants
-  // title: string
-  // icon?: SoundIcon
   id: GroupID
 }
 
@@ -48,6 +40,7 @@ export function GroupBase(props: GroupBaseProps) {
 
   return (
     <button
+      data-groupid={group.id}
       className={`
         cursor-pointer
         justify-items-center

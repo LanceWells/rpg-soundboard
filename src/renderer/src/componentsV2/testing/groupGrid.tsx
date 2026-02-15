@@ -105,9 +105,6 @@ export function GroupGrid() {
           }}
           className={`
             w-full
-            content-start
-            justify-center
-            flex-wrap
             attach
             shop-shelf
             bg-local
@@ -115,14 +112,6 @@ export function GroupGrid() {
             relative
           `}
         >
-          {/* <GroupBase src={MusicNote} variant="Default" title="Music" />
-          <GroupBase src={BanditHead} variant="Looping" title="Bandit" />
-          <GroupBase src={MusicNote} variant="Rapid" title="Other Music" />
-          <GroupBase src={MusicNote} variant="Sequence" title="Even more music" />
-          <GroupBase src={BirdBag} variant="Soundtrack" title="A bird bag" />
-          <GroupBase src={GoblinHead} variant="Default" title="Goblin" />
-          <GroupBase src={BirdBag} variant="Default" title="Another bird bag?" />
-          <GroupBase src={BirdBag} variant="Default" title="A third bag of bird" /> */}
           {rowVirtualizer.getVirtualItems().map((virtualItem) => {
             const item = searchItems[virtualItem.index]
             const width = parentRef.current?.clientWidth ?? 0

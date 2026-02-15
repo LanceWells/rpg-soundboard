@@ -1,7 +1,7 @@
 import { SoundIcon } from 'src/apis/audio/types/items'
 import BookImage from '@renderer/assets/images/Book.png'
 import ScrollImage from '@renderer/assets/images/Scroll.png'
-import { memo, useEffect, useRef } from 'react'
+import { memo, useEffect, useRef, useState } from 'react'
 import { soundboardIcons } from '@renderer/utils/fetchIcons'
 import { svgToData } from '@iconify/utils'
 
@@ -38,7 +38,7 @@ export function GroupIcon(props: GroupIconProps) {
   const { icon } = props
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null)
-  const imgRef = useRef<HTMLImageElement | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     if (canvasRef.current === null) {
@@ -93,13 +93,14 @@ export function GroupIcon(props: GroupIconProps) {
       ctx.fillStyle = icon.foregroundColor
       ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height)
 
+      setIsLoading(false)
       svgImg.removeEventListener('load', onload)
     }
 
     svgImg.addEventListener('load', onload)
 
     svgImg.src = dataurl
-  }, [imgRef.current, canvasRef.current, canvasRef.current?.getContext('2d')])
+  }, [canvasRef.current, canvasRef.current?.getContext('2d')])
 
   const [r, g, b] = [
     icon.foregroundColor.substring(1, 3),
@@ -124,19 +125,31 @@ export function GroupIcon(props: GroupIconProps) {
       transform-[translate(-50%,_0)]
     `}
     >
-      <img
+      <span
         className={`
+          ${isLoading ? 'visible' : 'hidden'}
+      `}
+      >
+        Loading
+      </span>
+      <div
+        className={`
+          ${isLoading ? 'hidden' : 'visible'}
+        `}
+      >
+        <img
+          className={`
           absolute
           top-0
           left-0
           z-40
         `}
-        src={bgImg}
-        width={144}
-        height={144}
-      />
-      <canvas
-        className={`
+          src={bgImg}
+          width={144}
+          height={144}
+        />
+        <canvas
+          className={`
           absolute
           z-50
           w-full
@@ -144,10 +157,11 @@ export function GroupIcon(props: GroupIconProps) {
           top-0
           left-0
         `}
-        width={144}
-        height={144}
-        ref={canvasRef}
-      />
+          width={144}
+          height={144}
+          ref={canvasRef}
+        />
+      </div>
     </div>
   )
 }
