@@ -23,28 +23,28 @@ export function GroupBase(props: GroupBaseProps) {
   return (
     <button
       className={`
-      cursor-pointer
-      justify-items-center
-      overflow-ellipsis
-      overflow-clip
-      w-[150px]
-      w-max-[150px]
-      h-[168px]
-      h-max-[168px]
-      relative
-      before:absolute
-      before:w-full
-      before:h-full
-      before:opacity-0
-      before:left-0
-      before:top-0
-      before:z-30
-      before:bg-white
-      active:before:bg-blue-500
-      before:transition-opacity
-      hover:before:opacity-20
-      rounded-md
-    `}
+        cursor-pointer
+        justify-items-center
+        overflow-ellipsis
+        overflow-clip
+        w-[150px]
+        w-max-[150px]
+        h-[168px]
+        h-max-[168px]
+        relative
+        before:absolute
+        before:w-full
+        before:h-full
+        before:opacity-0
+        before:left-0
+        before:top-0
+        before:z-30
+        before:bg-white
+        active:before:bg-blue-500
+        before:transition-opacity
+        hover:before:opacity-20
+        rounded-md
+      `}
       onClick={() => {}}
     >
       {/* <img
@@ -61,7 +61,7 @@ export function GroupBase(props: GroupBaseProps) {
       `}
         src={src}
       /> */}
-      <GroupIcon icon={{ name: 'warehouse', backgroundColor: 'black', foregroundColor: 'brown' }} />
+      <GroupIcon icon={{ name: 'rogue', backgroundColor: 'black', foregroundColor: 'brown' }} />
       <img
         className={`
           absolute

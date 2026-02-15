@@ -4,9 +4,41 @@ import BirdBag from '@renderer/assets/images/BirdBag.png'
 import TownHero from '@renderer/assets/images/TownHero.png'
 import GoblinHead from '@renderer/assets/images/Heads/Goblin.png'
 import BanditHead from '@renderer/assets/images/Heads/Bandit.png'
-import SuccubusHead from '@renderer/assets/images/Heads/Succubus.png'
+import { useAudioStore } from '@renderer/stores/audio/audioStore'
+import { useMemo, useRef, useState } from 'react'
+import { useDebounce } from 'use-debounce'
+import { useVirtualizer } from '@tanstack/react-virtual'
 
 export function GroupGrid() {
+  // const [search, setSearch] = useState('')
+  // const [debouncedSearch] = useDebounce(search, 500)
+  // const parentRef = useRef<HTMLDivElement | null>(null)
+
+  // const { searchForGroups } = useAudioStore((store) => ({
+  //   searchForGroups: store.searchForGroups
+  // }))
+
+  // const searchItems = useMemo(() => {
+  //   parentRef.current?.scrollTo({ top: 0 })
+  //   return onSearch(debouncedSearch)
+  // }, [debouncedSearch])
+
+  const w = 620
+  function estimateSize(i: number): number {
+    const maxCols = Math.floor((w - 20) / 150)
+    const col = i % maxCols
+    return (168 / maxCols) * col
+  }
+
+  // const rowVirtualizer = useVirtualizer({
+  //   count: searchItems.length,
+  //   getScrollElement: () => parentRef.current,
+  //   estimateSize: (i) => {
+
+  //   },
+  //   overscan: 20
+  // })
+
   return (
     <div
       className={`
@@ -61,23 +93,16 @@ export function GroupGrid() {
       </div>
       <div
         className={`
-          max-h-dvh
-          overflow-hidden
-      `}
-      >
-        <div
-          className={`
           w-full
-          bg-shop-200
           shop-border
           flex
           min-h-full
           max-h-full
           box-border
         `}
-        >
-          <div
-            className={`
+      >
+        <div
+          className={`
               w-full
               overflow-y-scroll
               overflow-x-hidden
@@ -89,16 +114,15 @@ export function GroupGrid() {
               shop-shelf
               bg-local
             `}
-          >
-            <GroupBase src={MusicNote} variant="Default" title="Music" />
-            <GroupBase src={BanditHead} variant="Looping" title="Bandit" />
-            <GroupBase src={MusicNote} variant="Rapid" title="Other Music" />
-            <GroupBase src={MusicNote} variant="Sequence" title="Even more music" />
-            <GroupBase src={BirdBag} variant="Soundtrack" title="A bird bag" />
-            <GroupBase src={GoblinHead} variant="Default" title="Goblin" />
-            <GroupBase src={BirdBag} variant="Default" title="Another bird bag?" />
-            <GroupBase src={BirdBag} variant="Default" title="A third bag of bird" />
-          </div>
+        >
+          <GroupBase src={MusicNote} variant="Default" title="Music" />
+          <GroupBase src={BanditHead} variant="Looping" title="Bandit" />
+          <GroupBase src={MusicNote} variant="Rapid" title="Other Music" />
+          <GroupBase src={MusicNote} variant="Sequence" title="Even more music" />
+          <GroupBase src={BirdBag} variant="Soundtrack" title="A bird bag" />
+          <GroupBase src={GoblinHead} variant="Default" title="Goblin" />
+          <GroupBase src={BirdBag} variant="Default" title="Another bird bag?" />
+          <GroupBase src={BirdBag} variant="Default" title="A third bag of bird" />
         </div>
       </div>
     </div>

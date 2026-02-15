@@ -89,6 +89,10 @@ export const createBoardSlice: StateCreator<BoardSlice> = (set) => ({
       return groups
     })
 
+    if (searchText === '') {
+      return allGroups.map((r) => r.group)
+    }
+
     const fuseSearch = new fuse(allGroups, {
       keys: ['name', 'categoryName', 'boardName'],
       threshold: 0.1
