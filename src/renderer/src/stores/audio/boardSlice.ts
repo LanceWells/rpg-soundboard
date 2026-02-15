@@ -77,14 +77,16 @@ export const createBoardSlice: StateCreator<BoardSlice> = (set) => ({
     // const allGroups = boards.boards.flatMap((b) => b.groups).filter((g) => types.includes(g.type))
     const allGroups = boards.boards.flatMap((b) => {
       const categories = new Map(b.categories.map((c) => [c.id, c.name]))
-      const groups = b.groups.map((g) => {
-        return {
-          name: 'name' in g ? g.name : '',
-          boardName: b.name,
-          categoryName: categories.get(g.category),
-          group: g
-        }
-      })
+      const groups = b.groups
+        .map((g) => {
+          return {
+            name: 'name' in g ? g.name : '',
+            boardName: b.name,
+            categoryName: categories.get(g.category),
+            group: g
+          }
+        })
+        .filter((g) => g.group.type !== 'reference')
 
       return groups
     })
@@ -99,6 +101,16 @@ export const createBoardSlice: StateCreator<BoardSlice> = (set) => ({
     })
 
     const results = fuseSearch.search(searchText)
+
+    results.reduce((acc, curr) => {
+      if (acc.has(curr.item.group.id)) {
+        console.error('duplicate group')
+      }
+
+      acc.set(curr.item.group.id, curr.item.group)
+
+      return acc
+    }, new Map<string, ISoundGroup>())
 
     return results.map((r) => r.item.group)
   }

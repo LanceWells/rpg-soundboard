@@ -1,7 +1,7 @@
 import { SoundIcon } from 'src/apis/audio/types/items'
 import BookImage from '@renderer/assets/images/Book.png'
 import ScrollImage from '@renderer/assets/images/Scroll.png'
-import { useEffect, useRef } from 'react'
+import { memo, useEffect, useRef } from 'react'
 import { soundboardIcons } from '@renderer/utils/fetchIcons'
 import { svgToData } from '@iconify/utils'
 
@@ -101,6 +101,15 @@ export function GroupIcon(props: GroupIconProps) {
     svgImg.src = dataurl
   }, [imgRef.current, canvasRef.current, canvasRef.current?.getContext('2d')])
 
+  const [r, g, b] = [
+    icon.foregroundColor.substring(1, 3),
+    icon.foregroundColor.substring(3, 5),
+    icon.foregroundColor.substring(5, 7)
+  ]
+
+  const brightness = (Number.parseInt(r, 16) + Number.parseInt(g, 16) + Number.parseInt(b, 16)) / 3
+  const bgImg = brightness > 100 ? BookImage : ScrollImage
+
   return (
     <div
       className={`
@@ -122,7 +131,7 @@ export function GroupIcon(props: GroupIconProps) {
           left-0
           z-40
         `}
-        src={ScrollImage}
+        src={bgImg}
         width={144}
         height={144}
       />
@@ -142,3 +151,5 @@ export function GroupIcon(props: GroupIconProps) {
     </div>
   )
 }
+
+export const MemoizedGroupIcon = memo(GroupIcon)

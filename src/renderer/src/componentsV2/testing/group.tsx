@@ -5,20 +5,46 @@ import RapidTag from '@renderer/assets/images/Tags/Rapid.png'
 import SoundtrackTag from '@renderer/assets/images/Tags/Soundtrack.png'
 import SequenceTag from '@renderer/assets/images/Tags/Sequence.png'
 import { SoundIcon } from 'src/apis/audio/types/items'
-import { GroupIcon } from './groupIcon'
+import { GroupIcon, MemoizedGroupIcon } from './groupIcon'
+import { GroupID } from 'src/apis/audio/types/groups'
+import { useAudioStore } from '@renderer/stores/audio/audioStore'
+import { useShallow } from 'zustand/shallow'
+import { useCallback } from 'react'
 
 export type GroupBaseProps = {
   // group: ISoundGroupSource
   // onClickEdit: () => void;
   // onClickPlay: () => void;
-  src: string
-  variant: SoundVariants
-  title: string
-  icon?: SoundIcon
+  // src: string
+  // variant: SoundVariants
+  // title: string
+  // icon?: SoundIcon
+  id: GroupID
 }
 
 export function GroupBase(props: GroupBaseProps) {
-  const { src, variant, title } = props
+  const { id } = props
+
+  const getGroup = useAudioStore((store) => store.getGroup)
+  const group = getGroup(id)
+
+  const { playGroup, stopGroup, isPlaying, resetEditingGroup, editBoard } = useAudioStore(
+    useShallow((state) => ({
+      playGroup: state.playGroup,
+      stopGroup: state.stopGroup,
+      isPlaying: state.playingGroups.some((g) => g === group.id),
+      resetEditingGroup: state.updateEditingSourceV2,
+      editBoard: state.updateEditingBoardV2
+    }))
+  )
+
+  const onClickPlay = useCallback(() => {
+    if (group.variant !== 'Rapid' && isPlaying) {
+      stopGroup(group.id)
+    } else {
+      playGroup(group.id)
+    }
+  }, [group, isPlaying])
 
   return (
     <button
@@ -45,7 +71,7 @@ export function GroupBase(props: GroupBaseProps) {
         hover:before:opacity-20
         rounded-md
       `}
-      onClick={() => {}}
+      onClick={onClickPlay}
     >
       {/* <img
         className={`
@@ -61,7 +87,13 @@ export function GroupBase(props: GroupBaseProps) {
       `}
         src={src}
       /> */}
-      <GroupIcon icon={{ name: 'rogue', backgroundColor: 'black', foregroundColor: 'brown' }} />
+      <MemoizedGroupIcon
+        icon={{
+          name: group.icon.name,
+          backgroundColor: 'black',
+          foregroundColor: group.icon.foregroundColor
+        }}
+      />
       <img
         className={`
           absolute
@@ -87,10 +119,10 @@ export function GroupBase(props: GroupBaseProps) {
         text-black
         `}
       >
-        {title}
+        {group.name}
       </span>
       <VariantTag
-        variant={variant}
+        variant={group.variant}
         className={`
           absolute
           bottom-0

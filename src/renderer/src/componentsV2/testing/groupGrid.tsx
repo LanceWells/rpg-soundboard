@@ -1,43 +1,34 @@
 import { GroupBase } from './group'
-import MusicNote from '@renderer/assets/images/MusicScroll.png'
-import BirdBag from '@renderer/assets/images/BirdBag.png'
 import TownHero from '@renderer/assets/images/TownHero.png'
-import GoblinHead from '@renderer/assets/images/Heads/Goblin.png'
-import BanditHead from '@renderer/assets/images/Heads/Bandit.png'
 import { useAudioStore } from '@renderer/stores/audio/audioStore'
 import { useMemo, useRef, useState } from 'react'
 import { useDebounce } from 'use-debounce'
 import { useVirtualizer } from '@tanstack/react-virtual'
 
 export function GroupGrid() {
-  // const [search, setSearch] = useState('')
-  // const [debouncedSearch] = useDebounce(search, 500)
-  // const parentRef = useRef<HTMLDivElement | null>(null)
+  const [search, setSearch] = useState('')
+  const [debouncedSearch] = useDebounce(search, 500)
+  const parentRef = useRef<HTMLDivElement | null>(null)
 
-  // const { searchForGroups } = useAudioStore((store) => ({
-  //   searchForGroups: store.searchForGroups
-  // }))
+  const searchForGroups = useAudioStore((store) => store.searchForGroups)
 
-  // const searchItems = useMemo(() => {
-  //   parentRef.current?.scrollTo({ top: 0 })
-  //   return onSearch(debouncedSearch)
-  // }, [debouncedSearch])
+  const searchItems = useMemo(() => {
+    parentRef.current?.scrollTo({ top: 0 })
+    return searchForGroups(debouncedSearch, ['source', 'sequence'])
+  }, [debouncedSearch])
 
-  const w = 620
-  function estimateSize(i: number): number {
-    const maxCols = Math.floor((w - 20) / 150)
-    const col = i % maxCols
-    return (168 / maxCols) * col
-  }
+  const lanes =
+    parentRef.current === null ? 1 : Math.floor(((parentRef.current.clientWidth ?? 30) - 20) / 150)
 
-  // const rowVirtualizer = useVirtualizer({
-  //   count: searchItems.length,
-  //   getScrollElement: () => parentRef.current,
-  //   estimateSize: (i) => {
-
-  //   },
-  //   overscan: 20
-  // })
+  const rowVirtualizer = useVirtualizer({
+    count: searchItems.length,
+    getScrollElement: () => parentRef.current,
+    estimateSize: () => {
+      return 168
+    },
+    lanes,
+    overscan: lanes * 2
+  })
 
   return (
     <div
@@ -81,6 +72,10 @@ export function GroupGrid() {
         >
           <span>Whatchu want?</span>
           <input
+            onChange={(e) => {
+              setSearch(e.target.value)
+            }}
+            placeholder="Search"
             type="text"
             className={`
             bg-black
@@ -92,6 +87,7 @@ export function GroupGrid() {
         </div>
       </div>
       <div
+        ref={parentRef}
         className={`
           w-full
           shop-border
@@ -99,30 +95,56 @@ export function GroupGrid() {
           min-h-full
           max-h-full
           box-border
+          overflow-y-scroll
+          overflow-x-hidden
         `}
       >
         <div
+          style={{
+            height: `${rowVirtualizer.getTotalSize()}px`
+          }}
           className={`
-              w-full
-              overflow-y-scroll
-              overflow-x-hidden
-              flex
-              content-start
-              justify-center
-              flex-wrap
-              attach
-              shop-shelf
-              bg-local
-            `}
+            w-full
+            content-start
+            justify-center
+            flex-wrap
+            attach
+            shop-shelf
+            bg-local
+            min-h-full
+            relative
+          `}
         >
-          <GroupBase src={MusicNote} variant="Default" title="Music" />
+          {/* <GroupBase src={MusicNote} variant="Default" title="Music" />
           <GroupBase src={BanditHead} variant="Looping" title="Bandit" />
           <GroupBase src={MusicNote} variant="Rapid" title="Other Music" />
           <GroupBase src={MusicNote} variant="Sequence" title="Even more music" />
           <GroupBase src={BirdBag} variant="Soundtrack" title="A bird bag" />
           <GroupBase src={GoblinHead} variant="Default" title="Goblin" />
           <GroupBase src={BirdBag} variant="Default" title="Another bird bag?" />
-          <GroupBase src={BirdBag} variant="Default" title="A third bag of bird" />
+          <GroupBase src={BirdBag} variant="Default" title="A third bag of bird" /> */}
+          {rowVirtualizer.getVirtualItems().map((virtualItem) => {
+            const item = searchItems[virtualItem.index]
+            const width = parentRef.current?.clientWidth ?? 0
+            const maxCols = Math.floor((width - 20) / 150)
+            const row = Math.floor(virtualItem.index / maxCols)
+            const col = virtualItem.index % maxCols
+
+            return (
+              <div
+                style={{
+                  transform: `translate(${col * 150}px, ${row * 168}px)`
+                }}
+                className={`
+                absolute
+                top-0
+                left-0
+              `}
+              >
+                <GroupBase key={item.id} id={item.id} />
+              </div>
+            )
+          })}
         </div>
       </div>
     </div>
