@@ -1,20 +1,13 @@
 import { StateCreator } from 'zustand'
-import { BoardSlice } from './boardSlice'
 import {
   SequenceElementID,
-  SoundBoardEditableFields,
-  SoundCategory,
   SoundGroupSequence,
   SoundGroupSource,
   SoundGroupSourceEditableFields
 } from 'src/apis/audio/types/items'
 import { enableMapSet, produce } from 'immer'
-import { getDefaultBoard } from './editingSlice'
-import { BoardID } from 'src/apis/audio/types/boards'
 import { getDefaultGroup, getDefaultSequence } from './groupSlice'
-import { CategorySlice } from './categorySlice'
 import { GroupID } from 'src/apis/audio/types/groups'
-import { IAudioApi } from 'src/apis/audio/interface'
 
 /**
  * A set of editing modes that the view might exist in.
@@ -48,18 +41,11 @@ type EditableElement<T> = T extends { id: infer TID }
   : never
 
 export type EditingElements = {
-  category: EditableElement<SoundCategory>
   sequence: EditableElement<SoundGroupSequence>
   source:
     | {
         id: GroupID | undefined
         element: SoundGroupSourceEditableFields | undefined
-      }
-    | undefined
-  board:
-    | {
-        id: BoardID | undefined
-        element: SoundBoardEditableFields | undefined
       }
     | undefined
 }
@@ -88,20 +74,13 @@ export interface EditingSliceV2 extends EditingElementsMethods {
   draggingID: string | null
   setEditingMode: (isEditing: EditingMode) => void
   setSequenceElementPlayingStatusV2: (id: SequenceElementID, status: boolean) => void
-  addBoardReference: (sourceBoard: BoardID, sourceGroup: GroupID) => void
-  removeBoardReference: (sourceBoard: BoardID, sourceGroup: GroupID) => void
-  updateBoardReference: IAudioApi['Groups']['UpdateLink']
-  setDraggingID: (id: string | null) => void
 }
 
 enableMapSet()
 
-export const createEditingSliceV2: StateCreator<
-  EditingSliceV2 & BoardSlice & CategorySlice,
-  [],
-  [],
-  EditingSliceV2
-> = (set, get) => ({
+export const createEditingSliceV2: StateCreator<EditingSliceV2, [], [], EditingSliceV2> = (
+  set
+) => ({
   editingMode: 'Off' as EditingMode,
   editingElementsV2: {
     board: undefined,
@@ -116,59 +95,6 @@ export const createEditingSliceV2: StateCreator<
       editingMode: isEditing
     })
   },
-  updateEditingBoardV2: (newValue, id) => {
-    set(
-      produce((state: EditingSliceV2) => {
-        if (newValue === undefined) {
-          state.editingElementsV2.board = undefined
-          return
-        }
-
-        if (state.editingElementsV2.board === undefined) {
-          state.editingElementsV2.board = {
-            element: getDefaultBoard(),
-            id: undefined
-          }
-        }
-
-        Object.assign(state.editingElementsV2.board.element!, newValue)
-
-        if (id !== undefined) {
-          state.editingElementsV2.board.id = id
-        }
-      })
-    )
-  },
-  updateEditingCategoryV2: (newValue, id) => {
-    set(
-      produce((state: EditingSliceV2) => {
-        if (newValue === undefined) {
-          state.editingElementsV2.category = undefined
-          return
-        }
-
-        const defaultCategory = get().getDefaultCategory()
-
-        if (state.editingElementsV2.category === undefined) {
-          state.editingElementsV2.category = {
-            element: defaultCategory,
-            id: undefined
-          }
-
-          // Object.defineProperty(state.editingElementsV2.category.element, 'id', {
-          //   writable: true
-          // })
-        }
-
-        Object.assign(state.editingElementsV2.category.element!, newValue)
-        if (id !== undefined) {
-          state.editingElementsV2.category.id = id
-        }
-
-        return
-      })
-    )
-  },
   updateEditingSequenceV2: (newValue, id) => {
     set(
       produce((state: EditingSliceV2) => {
@@ -177,11 +103,9 @@ export const createEditingSliceV2: StateCreator<
           return
         }
 
-        const defaultCategory = get().getDefaultCategory()
-
         if (state.editingElementsV2.sequence === undefined) {
           state.editingElementsV2.sequence = {
-            element: getDefaultSequence(defaultCategory.id),
+            element: getDefaultSequence(),
             id: undefined
           }
         }
@@ -201,11 +125,9 @@ export const createEditingSliceV2: StateCreator<
           return
         }
 
-        const defaultCategory = get().getDefaultCategory()
-
         if (state.editingElementsV2.source === undefined) {
           state.editingElementsV2.source = {
-            element: getDefaultGroup(defaultCategory.id),
+            element: getDefaultGroup(),
             id: undefined
           }
         }
@@ -227,59 +149,5 @@ export const createEditingSliceV2: StateCreator<
         }
       })
     )
-  },
-  addBoardReference(sourceBoard, sourceGroup) {
-    const activeBoardID = get().activeBoardID
-    const activeBoard = get().boards.find((b) => b.id === activeBoardID) ?? null
-    if (!activeBoard) {
-      return
-    }
-
-    window.audio.Groups.LinkGroup({
-      destinationBoard: activeBoard.id,
-      sourceBoard,
-      sourceGroup
-    })
-
-    const newBoards = window.audio.Boards.GetAll({}).boards
-
-    set({
-      boards: newBoards
-    })
-  },
-  removeBoardReference(sourceBoard, sourceGroup) {
-    const activeBoardID = get().activeBoardID
-    const activeBoard = get().boards.find((b) => b.id === activeBoardID) ?? null
-    if (!activeBoard) {
-      return
-    }
-
-    window.audio.Groups.UnlinkGroup({
-      sourceBoard,
-      sourceGroup,
-      destinationBoard: activeBoard.id
-    })
-
-    const newBoards = window.audio.Boards.GetAll({}).boards
-
-    set({
-      boards: newBoards
-    })
-  },
-  updateBoardReference(request) {
-    window.audio.Groups.UpdateLink(request)
-
-    const newBoards = window.audio.Boards.GetAll({}).boards
-
-    set({
-      boards: newBoards
-    })
-
-    return {}
-  },
-  setDraggingID(id) {
-    set({
-      draggingID: id
-    })
   }
 })

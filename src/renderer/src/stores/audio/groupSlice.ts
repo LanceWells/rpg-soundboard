@@ -1,35 +1,33 @@
 import { IAudioApi } from 'src/apis/audio/interface'
-import { BoardID } from 'src/apis/audio/types/boards'
 import { GroupID } from 'src/apis/audio/types/groups'
 import {
-  ISoundGroupSource,
+  ISoundGroup,
   SoundGroupSequence,
   SoundGroupSequenceEditableFields,
   SoundGroupSource,
-  SoundGroupSourceEditableFields
+  SoundGroupSourceEditableFields,
+  SoundGroupTypes
 } from 'src/apis/audio/types/items'
 import { StateCreator } from 'zustand'
-import { BoardSlice } from './boardSlice'
 import { produce } from 'immer'
 import { ColorOptions } from '@renderer/components/icon/colorPicker'
-import { CategoryID } from 'src/apis/audio/types/categories'
-import { EditingSlice } from './editingSlice'
 import { isSequenceGroup, isSourceGroup } from '@renderer/utils/typePredicates'
 import { EditingSliceV2 } from './editingSliceV2'
+import fuse from 'fuse.js'
 
 export interface GroupSlice {
+  groups: ISoundGroup[]
   /**
    * The set of IDs for groups that are actively playing a sound effect.
    */
   playingGroups: GroupID[]
-  getGroup: (groupID: GroupID) => ISoundGroupSource
+  getGroup: (groupID: GroupID) => ISoundGroup
   getGroupSource: (groupID: GroupID) => SoundGroupSource
   getGroupSequence: (groupID: GroupID) => SoundGroupSequence
   addGroup: IAudioApi['Groups']['Create']
   addSequence: IAudioApi['Groups']['CreateSequence']
   updateGroup: IAudioApi['Groups']['Update']
   updateGroupPartial: (
-    boardID: BoardID,
     groupID: GroupID,
     updatedFields: Partial<SoundGroupSourceEditableFields>
   ) => void
@@ -37,65 +35,42 @@ export interface GroupSlice {
     groupID: GroupID,
     updatedFields: Partial<SoundGroupSequenceEditableFields>
   ) => void
-  moveGroup: (groupID: GroupID, newBoardID: BoardID) => void
   deleteGroup: (id: GroupID) => void
+  searchForGroups: (searchText: string, types: SoundGroupTypes[]) => ISoundGroup[]
 }
 
-export const createGroupSlice: StateCreator<
-  GroupSlice & BoardSlice & EditingSlice & EditingSliceV2,
-  [],
-  [],
-  GroupSlice
-> = (set, get) => ({
+export const createGroupSlice: StateCreator<GroupSlice & EditingSliceV2, [], [], GroupSlice> = (
+  set,
+  get
+) => ({
+  groups: window.audio.Groups.GetAll().groups,
   addGroup(req) {
-    const activeBoardID = get().activeBoardID
-    const activeBoard = get().boards.find((b) => b.id === activeBoardID) ?? null
     const newGroup = window.audio.Groups.Create(req)
-    const newBoards = window.audio.Boards.GetAll({}).boards
-
-    if (activeBoard === null) {
-      return newGroup
-    }
-
     set({
-      boards: newBoards
+      groups: window.audio.Groups.GetAll().groups
     })
 
     return newGroup
   },
   addSequence(req) {
-    const activeBoardID = get().activeBoardID
-    const activeBoard = get().boards.find((b) => b.id === activeBoardID) ?? null
     const newGroup = window.audio.Groups.CreateSequence(req)
-    const newBoards = window.audio.Boards.GetAll({}).boards
-
-    if (activeBoard === null) {
-      return newGroup
-    }
+    const newGroups = window.audio.Groups.GetAll().groups
 
     set({
-      boards: newBoards
+      groups: newGroups
     })
 
-    // get().resetEditingSequence()
     get().updateEditingSequenceV2({})
 
     return newGroup
   },
   deleteGroup(id) {
-    const activeBoardID = get().activeBoardID
-    const activeBoard = get().boards.find((b) => b.id === activeBoardID) ?? null
     window.audio.Groups.Delete({
       groupID: id
     })
 
-    const newBoards = window.audio.Boards.GetAll({}).boards
-    if (activeBoard === null) {
-      return
-    }
-
     set({
-      boards: newBoards
+      groups: window.audio.Groups.GetAll().groups
     })
   },
   getGroup(request) {
@@ -130,46 +105,16 @@ export const createGroupSlice: StateCreator<
 
     return group
   },
-  moveGroup(groupID, newBoardID) {
-    const activeBoardID = get().activeBoardID
-    const activeBoard = get().boards.find((b) => b.id === activeBoardID) ?? null
-    const { group } = window.audio.Groups.Get({ groupID })
-
-    if (activeBoard === null) {
-      return
-    }
-
-    if (group === undefined) {
-      return
-    }
-
-    window.audio.Groups.Move({ groupID, boardID: newBoardID })
-
-    const newBoards = window.audio.Boards.GetAll({}).boards
-
-    set({
-      boards: newBoards
-    })
-  },
   updateGroup(req) {
-    const activeBoardID = get().activeBoardID
-    const activeBoard = get().boards.find((b) => b.id === activeBoardID) ?? null
     const updatedGroup = window.audio.Groups.Update(req)
-    const newBoards = window.audio.Boards.GetAll({}).boards
-
-    if (activeBoard === null) {
-      return updatedGroup
-    }
 
     set({
-      boards: newBoards
+      groups: window.audio.Groups.GetAll().groups
     })
 
     return updatedGroup
   },
-  updateGroupPartial(boardID, groupID, updatedFields) {
-    const activeBoardID = get().activeBoardID
-    const activeBoard = get().boards.find((b) => b.id === activeBoardID) ?? null
+  updateGroupPartial(groupID, updatedFields) {
     const currentGroup = window.audio.Groups.Get({
       groupID
     }).group
@@ -183,28 +128,15 @@ export const createGroupSlice: StateCreator<
     }) as SoundGroupSource
 
     window.audio.Groups.Update({
-      boardID,
       groupID,
       ...newGroup
     })
 
-    const newBoards = window.audio.Boards.GetAll({}).boards
-
-    if (activeBoard === null) {
-      return
-    }
-
     set({
-      boards: newBoards
+      groups: window.audio.Groups.GetAll().groups
     })
   },
   updateSequencePartial(groupID, updatedFields) {
-    const activeBoardID = get().activeBoardID
-    if (!activeBoardID) {
-      throw new Error('Cannot update sequence without an active board ID')
-    }
-
-    const activeBoard = get().boards.find((b) => b.id === activeBoardID) ?? null
     const currentGroup = window.audio.Groups.Get({
       groupID
     }).group
@@ -219,39 +151,45 @@ export const createGroupSlice: StateCreator<
 
     window.audio.Groups.UpdateSequence({
       groupID,
-      boardID: activeBoardID,
       ...newGroup
     })
 
-    const newBoards = window.audio.Boards.GetAll({}).boards
-
-    if (activeBoard === null) {
-      return
-    }
-
     set({
-      boards: newBoards
+      groups: window.audio.Groups.GetAll().groups
     })
   },
   editingGroup: null,
   editingGroupID: undefined,
-  playingGroups: []
+  playingGroups: [],
+  searchForGroups(searchText) {
+    const allGroups = window.audio.Groups.GetAll().groups
+
+    if (searchText === '') {
+      return allGroups.map((r) => r.group)
+    }
+
+    const fuseSearch = new fuse(allGroups, {
+      keys: ['name', 'categoryName', 'boardName'],
+      threshold: 0.1
+    })
+
+    const results = fuseSearch.search(searchText)
+
+    results.reduce((acc, curr) => {
+      if (acc.has(curr.item.group.id)) {
+        console.error('duplicate group')
+      }
+
+      acc.set(curr.item.group.id, curr.item.group)
+
+      return acc
+    }, new Map<string, ISoundGroup>())
+
+    return results.map((r) => r.item.group)
+  }
 })
 
-// export const getDefaultGroup = (categoryID: CategoryID): SoundGroupSourceEditableFields => ({
-//   type: 'source',
-//   effects: [],
-//   icon: {
-//     backgroundColor: ColorOptions.black,
-//     foregroundColor: ColorOptions.white,
-//     name: 'moon'
-//   },
-//   name: '',
-//   variant: 'Default',
-//   category: categoryID
-// })
-
-export const getDefaultGroup = (categoryID: CategoryID): Omit<SoundGroupSource, 'id'> => ({
+export const getDefaultGroup = (): Omit<SoundGroupSource, 'id'> => ({
   type: 'source',
   effects: [],
   icon: {
@@ -260,13 +198,11 @@ export const getDefaultGroup = (categoryID: CategoryID): Omit<SoundGroupSource, 
     name: 'moon'
   },
   name: '',
-  variant: 'Default',
-  category: categoryID
+  variant: 'Default'
 })
 
-export const getDefaultSequence = (categoryID: CategoryID): SoundGroupSequenceEditableFields => ({
+export const getDefaultSequence = (): SoundGroupSequenceEditableFields => ({
   type: 'sequence',
-  category: categoryID,
   icon: {
     backgroundColor: ColorOptions.black,
     foregroundColor: ColorOptions.white,

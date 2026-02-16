@@ -4,8 +4,6 @@ import LoopingTag from '@renderer/assets/images/Tags/Looping.png'
 import RapidTag from '@renderer/assets/images/Tags/Rapid.png'
 import SoundtrackTag from '@renderer/assets/images/Tags/Soundtrack.png'
 import SequenceTag from '@renderer/assets/images/Tags/Sequence.png'
-import NoteAnimation from '@renderer/assets/images/NoteRender.gif'
-import Rat from '@renderer/assets/images/Rat.png'
 import { MemoizedGroupIcon } from './groupIcon'
 import { GroupID } from 'src/apis/audio/types/groups'
 import { useAudioStore } from '@renderer/stores/audio/audioStore'
@@ -22,13 +20,11 @@ export function GroupBase(props: GroupBaseProps) {
   const getGroup = useAudioStore((store) => store.getGroup)
   const group = getGroup(id)
 
-  const { playGroup, stopGroup, isPlaying, resetEditingGroup, editBoard } = useAudioStore(
+  const { playGroup, stopGroup, isPlaying } = useAudioStore(
     useShallow((state) => ({
       playGroup: state.playGroup,
       stopGroup: state.stopGroup,
-      isPlaying: state.playingGroups.some((g) => g === group.id),
-      resetEditingGroup: state.updateEditingSourceV2,
-      editBoard: state.updateEditingBoardV2
+      isPlaying: state.playingGroups.some((g) => g === group.id)
     }))
   )
 

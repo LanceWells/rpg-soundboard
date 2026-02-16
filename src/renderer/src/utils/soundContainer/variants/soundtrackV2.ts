@@ -53,13 +53,13 @@ export class SoundtrackSoundContainerV2 implements ISoundContainer {
     return this._effects[this._effectsPointer++]
   }
 
-  constructor(setup: SoundContainerSetup, ctx?: Ctx) {
+  constructor(setup: SoundContainerSetup, _enableLoops: boolean = true) {
     const { effects, stopHandler, loadedHandler } = setup
 
     this._effects = effects
     this._loadedHandler = loadedHandler
     this._stopHandler = stopHandler
-    this.ctx = ctx ?? Ctx.Effectless
+    this.ctx = Ctx.Effectless
 
     this.shuffleEffects()
     const initialAudio = this.createAudio(this.getNextEffect())

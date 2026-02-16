@@ -29,36 +29,18 @@ export type EffectModalProps = {
 export default function EffectModal(props: PropsWithChildren<EffectModalProps>) {
   const { id, handleSubmit, actionName, modalTitle, children, handleClose } = props
 
-  const {
-    editingBoard,
-    // editingBoardID,
-    editingGroup,
-    // setGroupName,
-    addGroup,
-    editGroup
-    // resetEditingGroup,
-    // setGroupVariant
-  } = useAudioStore(
+  const { editingGroup, addGroup, editGroup } = useAudioStore(
     useShallow((state) => ({
-      // editingBoardID: state.editingBoardID,
-      editingBoard: state.editingElementsV2.board,
       editingGroup: state.editingElementsV2.source,
-      // editingGroup: state.editingGroup,
-      // setGroupName: state.setGroupName,
       addGroup: state.addGroup,
-      // resetEditingGroup: state.resetEditingGroup,
-      // setGroupVariant: state.setGroupVariant,
       editGroup: state.updateEditingSourceV2
     }))
   )
-
-  const editingBoardID = editingBoard?.id
 
   const [effectNameErr, setEffectNameErr] = useState('')
   const [fileListErr, setFileListErr] = useState('')
 
   const onClose = useCallback(() => {
-    // resetEditingGroup()
     editGroup({})
 
     if (handleClose) {
@@ -93,22 +75,15 @@ export default function EffectModal(props: PropsWithChildren<EffectModalProps>) 
         return
       }
 
-      if (editingGroup.element.icon && editingBoardID) {
-        // handleSubmit({
-        //   ...editingGroup,
-        //   boardID: editingBoardID,
-        //   variant: editingGroup.variant,
-        //   category: editingGroup.category
-        // })
+      if (editingGroup.element.icon) {
         handleSubmit({
-          boardID: editingBoardID,
           ...editingGroup.element
         })
       }
 
       ;(document.getElementById(id) as HTMLDialogElement).close()
     },
-    [addGroup, editingBoardID, editingGroup]
+    [addGroup, editingGroup]
   )
 
   const onChangeVariant = useCallback<ChangeEventHandler<HTMLSelectElement>>(
@@ -116,7 +91,6 @@ export default function EffectModal(props: PropsWithChildren<EffectModalProps>) 
       editGroup({
         variant: e.target.value as SoundVariants
       })
-      // setGroupVariant(e.target.value as SoundVariants)
     },
     [editGroup]
   )
@@ -174,8 +148,6 @@ export default function EffectModal(props: PropsWithChildren<EffectModalProps>) 
               })
             }
           />
-          {/* <ForegroundPicker pickerID={`default-icon-foreground-${actionName}`} />
-          <BackgroundPicker pickerID={`default-icon-background-${actionName}`} /> */}
           <ColorPicker
             pickerID={`effect-foreground-${actionName}`}
             color={fgColor}

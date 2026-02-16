@@ -1,11 +1,11 @@
 import { useAudioStore } from '@renderer/stores/audio/audioStore'
-import { ISoundGroupSource } from 'src/apis/audio/types/items'
+import { ISoundGroup } from 'src/apis/audio/types/items'
 import { IconEffect } from '../effect/icon-effect'
 import GroupIcon from './groupIcon'
 import { useShallow } from 'zustand/shallow'
 
 export type GroupBaseProps = {
-  group: ISoundGroupSource
+  group: ISoundGroup
   beingDragged?: boolean
   onClickEdit: () => void
   onClickPlay: () => void

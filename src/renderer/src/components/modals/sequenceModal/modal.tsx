@@ -20,6 +20,7 @@ import GroupLookup from '@renderer/components/group/groupLookup'
 import { SelectorElement } from './groupSelectorElement'
 import CloseIcon from '@renderer/assets/icons/close'
 import ColorPicker from '@renderer/components/icon/colorPicker'
+import { Ctx } from '@renderer/rpgAudioEngine'
 
 export type SequenceModalProps = {
   id: string
@@ -32,41 +33,22 @@ export type SequenceModalProps = {
 export default function SequenceModal(props: PropsWithChildren<SequenceModalProps>) {
   const { actionName, handleSubmit, id, modalTitle, handleClose, children } = props
 
-  const {
-    editingSequence,
-    editingBoard: editingBoardID,
-    editSequence,
-    boards,
-    getSounds,
-    setPlaying,
-    // setStopped,
-    activeBoardID
-  } = useAudioStore(
+  const { editingSequence, editSequence, getSounds, setPlaying, groups } = useAudioStore(
     useShallow((state) => ({
-      activeBoardID: state.activeBoardID,
       editingSequence: state.editingElementsV2.sequence,
-      editingBoard: state.editingElementsV2.board,
       editSequence: state.updateEditingSequenceV2,
-      boards: state.boards,
+      groups: state.groups,
       getSounds: state.getSounds,
       setPlaying: state.setSequenceElementPlayingStatusV2
-      // setPlaying: state.markSequenceElementAsPlaying,
-      // setStopped: state.markSequenceElementAsStopped
     }))
   )
 
   const [isPlaying, setIsPlaying] = useState(false)
   const previewContainerRef = useRef<SequenceSoundContainer | null>(null)
 
-  const groupSet = useMemo(
-    () =>
-      new Map(
-        boards
-          .flatMap((b) => b.groups)
-          .filter((g) => g.type === 'source')
-          .map((g) => [g.id, g])
-      ),
-    [boards]
+  const groupMap = useMemo(
+    () => new Map(groups.filter((g) => g.type === 'source').map((g) => [g.id, g])),
+    [groups]
   )
 
   const newBlankElement = () =>
@@ -85,20 +67,22 @@ export default function SequenceModal(props: PropsWithChildren<SequenceModalProp
 
     const effects = await Promise.all(effectPromises)
 
-    const newContainer = new SequenceSoundContainer({
-      effectGroups: effects,
-      elementPlayingHandler(sequence) {
-        setPlaying(sequence, true)
+    const newContainer = new SequenceSoundContainer(
+      {
+        effectGroups: effects,
+        elementPlayingHandler(sequence) {
+          setPlaying(sequence, true)
+        },
+        elementStoppedHandler(sequence) {
+          setPlaying(sequence, false)
+        },
+        stoppedHandler: {
+          id: '',
+          handler: () => setIsPlaying(false)
+        }
       },
-      elementStoppedHandler(sequence) {
-        setPlaying(sequence, false)
-        // setStopped(sequence)
-      },
-      stoppedHandler: {
-        id: '',
-        handler: () => setIsPlaying(false)
-      }
-    })
+      Ctx.Environmental
+    )
 
     await newContainer.Init()
 
@@ -112,11 +96,6 @@ export default function SequenceModal(props: PropsWithChildren<SequenceModalProp
   }
 
   const onSubmit: MouseEventHandler = (e) => {
-    if (!activeBoardID) {
-      console.error('Do not have an active board ID')
-      return
-    }
-
     if (!editingSequence?.element) {
       console.error('Do not have an editing sequence')
       return
@@ -143,13 +122,12 @@ export default function SequenceModal(props: PropsWithChildren<SequenceModalProp
       setSequenceErr('')
     }
 
-    if (failToSubmit || editingBoardID === undefined) {
+    if (failToSubmit) {
       e.preventDefault()
       return
     }
 
     handleSubmit({
-      boardID: activeBoardID,
       ...editingSequence?.element
     })
   }
@@ -183,7 +161,7 @@ export default function SequenceModal(props: PropsWithChildren<SequenceModalProp
       return
     }
 
-    const activeObj = groupSet.get(activeID)
+    const activeObj = groupMap.get(activeID)
     if (activeObj === undefined) {
       return
     }

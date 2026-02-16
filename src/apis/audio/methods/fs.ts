@@ -2,30 +2,22 @@ import path from 'node:path'
 import { GetAppDataPath } from '../../../utils/paths'
 import fs from 'node:fs'
 import { SupportedFileTypes } from '../supportedFileTypes'
-import { BoardID } from '../types/boards'
 import { GroupID } from '../types/groups'
 
-const getBoardPath = (boardID: BoardID): string => {
+export const getGroupPath = (groupID: GroupID): string => {
   const appDataPath = GetAppDataPath()
-  const boardDir = path.join(appDataPath, 'board-data', boardID)
-
-  return boardDir
-}
-
-export const getGroupPath = (boardID: BoardID, groupID: GroupID): string => {
-  const grpDir = path.join(getBoardPath(boardID), groupID)
+  const grpDir = path.join(appDataPath, 'board-data', groupID)
 
   return grpDir
 }
 
-export const getGroupEffectsPath = (boardID: BoardID, groupID: GroupID): string => {
-  const effDir = path.join(getGroupPath(boardID, groupID), 'effects')
+export const getGroupEffectsPath = (groupID: GroupID): string => {
+  const effDir = path.join(getGroupPath(groupID), 'effects')
 
   return effDir
 }
 
 export const saveSoundEffect = (
-  boardID: BoardID,
   groupID: GroupID,
   srcFilePath: string
 ): { path: string; format: SupportedFileTypes } => {
@@ -39,7 +31,7 @@ export const saveSoundEffect = (
     throw new Error(`Unsupported file type ${srcFileData.ext}`)
   }
 
-  const dstFileDir = getGroupPath(boardID, groupID)
+  const dstFileDir = getGroupPath(groupID)
   if (!fs.existsSync(dstFileDir)) {
     fs.mkdirSync(dstFileDir, { recursive: true })
   }
@@ -58,7 +50,7 @@ export const saveSoundEffect = (
     base: `${fName}`
   })
 
-  const auxDirPath = path.join('board-data', boardID, groupID)
+  const auxDirPath = path.join('board-data', groupID)
   const auxFilePath = path.format({
     dir: auxDirPath,
     base: `${fName}`
@@ -91,8 +83,8 @@ export const deleteFile = (pathToDelete: string) => {
   fs.rmSync(litPath)
 }
 
-export const deleteGroupFolder = (boardID: BoardID, groupID: GroupID) => {
-  const groupPath = getGroupPath(boardID, groupID)
+export const deleteGroupFolder = (groupID: GroupID) => {
+  const groupPath = getGroupPath(groupID)
 
   if (!fs.existsSync(groupPath)) {
     console.error(`Attempt to delete a folder that does not exist (${groupPath})`)
@@ -105,38 +97,20 @@ export const deleteGroupFolder = (boardID: BoardID, groupID: GroupID) => {
   })
 }
 
-export const copyGroupFolder = (
-  oldBoardID: BoardID,
-  newBoardID: BoardID,
-  oldGroupID: GroupID,
-  newGroupID: GroupID
-) => {
-  const oldGroupPath = getGroupPath(oldBoardID, oldGroupID)
+export const copyGroupFolder = (oldGroupID: GroupID, newGroupID: GroupID) => {
+  const oldGroupPath = getGroupPath(oldGroupID)
   if (!fs.existsSync(oldGroupPath)) {
     console.error(`Attempt to copy from a folder that does not exist (${oldGroupPath})`)
     return
   }
 
-  const newGroupPath = getGroupPath(newBoardID, newGroupID)
+  const newGroupPath = getGroupPath(newGroupID)
   if (fs.existsSync(newGroupPath)) {
     console.error(`Attempt to copy to a folder that already exists (${newGroupPath})`)
     return
   }
 
   fs.cpSync(oldGroupPath, newGroupPath, {
-    recursive: true,
-    force: true
-  })
-}
-
-export const deleteBoardFolder = (boardID: BoardID) => {
-  const boardPath = getBoardPath(boardID)
-
-  if (!fs.existsSync(boardPath)) {
-    console.error(`Attempt to delete a folder that does not exist (${boardPath})`)
-  }
-
-  fs.rmSync(boardPath, {
     recursive: true,
     force: true
   })

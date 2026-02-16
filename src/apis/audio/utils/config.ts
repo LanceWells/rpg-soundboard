@@ -1,11 +1,9 @@
 import { produce } from 'immer'
 import { ConfigMigrations, MigratableConfigStorage } from '../../../utils/migratableConfigStorage'
 import { AudioApiConfig } from '../interface'
-import { BoardID } from '../types/boards'
-import { CategoryID } from '../types/categories'
 import { GroupID } from '../types/groups'
-import { ISoundGroupSource, SoundBoard, SoundCategory } from '../types/items'
-import { isSequenceGroup, isSourceGroup } from '../methods/typePredicates'
+import { ISoundGroup } from '../types/items'
+import { AudioApiConfigV2, SoundGroupSource as SoundGroupSourceV2 } from './legacyV2Types'
 
 /**
  * An instantiation of the config for information related to this audio API.
@@ -18,11 +16,11 @@ export class AudioConfigStorage extends MigratableConfigStorage<AudioApiConfig> 
         fn: (inConfig: unknown) => {
           console.log('Version 1 migration')
           console.log(inConfig)
-          const outConfig = produce(inConfig as AudioApiConfig, (draft) => {
+          const outConfig = produce(inConfig as AudioApiConfig, (draft: any) => {
             draft.boards.forEach((b) => {
               if (!b.categories || b.categories.length === 0) {
-                const newCategoryID: CategoryID = `cat-${crypto.randomUUID()}`
-                const newCategory: SoundCategory = {
+                const newCategoryID = `cat-${crypto.randomUUID()}`
+                const newCategory = {
                   id: newCategoryID,
                   name: b.name
                 }
@@ -49,7 +47,7 @@ export class AudioConfigStorage extends MigratableConfigStorage<AudioApiConfig> 
         version: 2,
         fn: (inConfig: unknown) => {
           console.log('Version 2 migration')
-          const outConfig = produce(inConfig as AudioApiConfig, (draft) => {
+          const outConfig = produce(inConfig, (draft: any) => {
             draft.boards.forEach((b) => {
               b.groups.forEach((g) => {
                 g.type = 'source'
@@ -63,23 +61,44 @@ export class AudioConfigStorage extends MigratableConfigStorage<AudioApiConfig> 
 
           return outConfig
         }
+      },
+      {
+        version: 3,
+        fn: (inConfig: unknown) => {
+          console.log('Version 3 migration')
+          const outConfig: AudioApiConfig = {
+            Groups: [],
+            version: 3
+          }
+
+          outConfig.Groups = (inConfig as AudioApiConfigV2).boards
+            .flatMap((b) => b.groups)
+            .filter((g) => g.type === 'reference')
+            .map<ISoundGroup>((g) => {
+              // Redundant, but trying to make the typecheck better.
+              if (g.type === 'reference') {
+                return {} as ISoundGroup
+              }
+
+              if (g.type === 'source') {
+                const tg = g as SoundGroupSourceV2
+                return {} as SoundGroupSou
+              }
+            })
+        }
       }
     ]
   }
 
-  private _boardMap: Map<BoardID, SoundBoard>
-  private _groupMap: Map<GroupID, ISoundGroupSource>
-  private _categoryMap: Map<CategoryID, SoundCategory>
+  private _groupMap: Map<GroupID, ISoundGroup>
 
   /**
    * @inheritdoc
    */
   constructor() {
-    super('audio', { boards: [], version: 2 })
+    super('audio', { Groups: [], version: 3 })
 
-    this._boardMap = new Map()
     this._groupMap = new Map()
-    this._categoryMap = new Map()
 
     this.migrateConfig()
     this._reloadMaps()
@@ -102,42 +121,23 @@ export class AudioConfigStorage extends MigratableConfigStorage<AudioApiConfig> 
   }
 
   /**
-   * Gets a board using the provided ID.
-   * @param boardID The ID for the board to fetch from the stored configuration object.
-   * @returns The board whose ID matches, if one was found. Otherwise, `undefined`.
-   */
-  getBoard(boardID: BoardID): SoundBoard | undefined {
-    return this._boardMap.get(boardID)
-  }
-
-  /**
    * Gets a group using the provided ID.
    * @param boardID The ID for the group to fetch from the stored configuration object.
    * @returns The group whose ID matches, if one was found. Otherwise, `undefined`.
    */
-  getGroup(groupID: GroupID): ISoundGroupSource | undefined {
+  getGroup(groupID: GroupID): ISoundGroup | undefined {
     return this._groupMap.get(groupID)
   }
 
-  getCategory(categoryID: CategoryID): SoundCategory | undefined {
-    return this._categoryMap.get(categoryID)
+  getAllGroups(): ISoundGroup[] {
+    return [...this._groupMap.values()]
   }
 
   private _reloadMaps() {
-    this._boardMap.clear()
     this._groupMap.clear()
-    this._categoryMap.clear()
 
-    this.Config.boards.forEach((b: SoundBoard) => {
-      this._boardMap.set(b.id, b)
-      b.groups.forEach((g) => {
-        if (isSourceGroup(g) || isSequenceGroup(g)) {
-          this._groupMap.set(g.id, g)
-        }
-      })
-      b.categories?.forEach((c) => {
-        this._categoryMap.set(c.id, c)
-      })
+    this.Config.Groups.forEach((g) => {
+      this._groupMap.set(g.id, g)
     })
   }
 }

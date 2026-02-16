@@ -84,7 +84,7 @@ export class SequenceSoundContainer implements ISoundContainer {
       .filter((g) => g.type === 'group')
       .map((e) =>
         Promise.race([
-          new Promise<ContainerWithSequenceID>(async (res, rej) => {
+          new Promise<ContainerWithSequenceID>(async (res) => {
             const isStopped = (gid: string, container: ISoundContainer) => {
               if (this.elementStoppedHandler) {
                 this.elementStoppedHandler(gid as SequenceElementID, container)

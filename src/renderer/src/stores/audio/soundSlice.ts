@@ -6,7 +6,7 @@ import { GroupSlice } from './groupSlice'
 import { ISoundContainer } from '@renderer/utils/soundContainer/interface'
 import { SequenceSoundContainer } from '@renderer/utils/soundContainer/variants/sequence'
 import { isSequenceGroup } from '@renderer/utils/typePredicates'
-import { ISoundGroupSource, SoundGroupSequence } from 'src/apis/audio/types/items'
+import { ISoundGroup, SoundGroupSequence } from 'src/apis/audio/types/items'
 import { Ctx } from '@renderer/rpgAudioEngine'
 
 export interface SoundSlice {
@@ -172,11 +172,11 @@ function handleHowlStop(
   })
 }
 
-function isSequence(sound: ISoundGroupSource): sound is SoundGroupSequence {
+function isSequence(sound: ISoundGroup): sound is SoundGroupSequence {
   return sound.variant === 'Sequence'
 }
 
-function isSoundtrack(g: ISoundGroupSource | undefined, get: () => GroupSlice): boolean {
+function isSoundtrack(g: ISoundGroup | undefined, get: () => GroupSlice): boolean {
   if (g === undefined) {
     return false
   }

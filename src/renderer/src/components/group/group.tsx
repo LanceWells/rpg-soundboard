@@ -1,19 +1,11 @@
-import { BoardID } from 'src/apis/audio/types/boards'
-import {
-  ISoundGroup,
-  SoundGroupReference,
-  SoundGroupSequence,
-  SoundGroupSource
-} from 'src/apis/audio/types/items'
+import { ISoundGroup, SoundGroupSequence, SoundGroupSource } from 'src/apis/audio/types/items'
 import GroupSource from './groupSource'
-import GroupReference from './groupReference'
 import GroupSequence from './groupSequence'
-import { isReferenceGroup, isSequenceGroup, isSourceGroup } from '@renderer/utils/typePredicates'
+import { isSequenceGroup, isSourceGroup } from '@renderer/utils/typePredicates'
 import { CSSProperties, memo } from 'react'
 
 export type GroupProps = {
   group: ISoundGroup
-  boardID: BoardID
   beingDragged?: boolean
   style: CSSProperties
 }
@@ -27,10 +19,6 @@ export default function Group(props: GroupProps) {
 
   if (isSequenceGroup(group)) {
     return <GroupSequence {...props} group={group as SoundGroupSequence} />
-  }
-
-  if (isReferenceGroup(group)) {
-    return <GroupReference {...props} group={group as SoundGroupReference} />
   }
 
   return <></>

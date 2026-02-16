@@ -1,8 +1,7 @@
 import { produce } from 'immer'
 import { AudioConfig } from '../utils/config'
 import path from 'node:path'
-import { copyGroupFolder, deleteFile, deleteGroupFolder, getFileSize, saveSoundEffect } from './fs'
-import { BoardsAudioAPI } from './boards'
+import { deleteFile, getFileSize, saveSoundEffect } from './fs'
 import crypto from 'node:crypto'
 import { SupportedFileTypes } from '../supportedFileTypes'
 import { GetAppDataPath } from '../../../utils/paths'
@@ -14,7 +13,6 @@ import {
   SoundGroupSequenceElement,
   SoundGroupSource
 } from '../types/items'
-import { CategoryID } from '../types/categories'
 import { EffectID } from '../types/effects'
 import {
   IGroups,
@@ -27,14 +25,7 @@ import {
   UpdateResponse,
   DeleteRequest,
   DeleteResponse,
-  ReorderRequest,
-  ReorderResponse,
   GetSoundRequest,
-  GetSoundResponse,
-  MoveRequest,
-  MoveResponse,
-  LinkRequest,
-  LinkResponse,
   GetSoundsResponse,
   SoundEffectWithPlayerDetails,
   CreateSequenceRequest
@@ -56,17 +47,20 @@ export const GroupsAudioAPI: IGroups = {
   /**
    * @inheritdoc
    */
-  Create: function (request: CreateRequest): CreateResponse {
-    const matchingBoard = AudioConfig.getBoard(request.boardID)
-    if (!matchingBoard) {
-      throw new Error(`Could not find matching board with ID ${request.boardID}.`)
+  GetAll() {
+    return {
+      groups: AudioConfig.getAllGroups()
     }
-
+  },
+  /**
+   * @inheritdoc
+   */
+  Create: function (request: CreateRequest): CreateResponse {
     const newGroupID: GroupID = `grp-${crypto.randomUUID()}`
 
     const newEffects = request.effects.map((eff) => {
       const newEffectID: EffectID = `eff-${crypto.randomUUID()}`
-      const savedFile = saveSoundEffect(request.boardID, newGroupID, eff.path)
+      const savedFile = saveSoundEffect(newGroupID, eff.path)
       const newEffect: SoundEffect = {
         id: newEffectID,
         path: savedFile.path,
@@ -84,13 +78,11 @@ export const GroupsAudioAPI: IGroups = {
       id: newGroupID,
       name: request.name,
       icon: request.icon,
-      variant: request.variant,
-      category: matchingBoard.categories[0].id
+      variant: request.variant
     }
 
     const newConfig = produce(AudioConfig.Config, (draft) => {
-      const matchingBoard = draft.boards.find((b) => b.id === request.boardID)
-      matchingBoard?.groups.push(newGroup)
+      draft.Groups.push(newGroup)
     })
 
     AudioConfig.Config = newConfig
@@ -103,11 +95,6 @@ export const GroupsAudioAPI: IGroups = {
    * @inheritdoc
    */
   CreateSequence(request: CreateSequenceRequest) {
-    const matchingBoard = AudioConfig.getBoard(request.boardID)
-    if (!matchingBoard) {
-      throw new Error(`Could not find matching board with ID ${request.boardID}.`)
-    }
-
     const newSequenceGroupID: GroupID = `grp-${crypto.randomUUID()}`
 
     const newElements = request.sequence.map<SoundGroupSequenceElement>((e) => {
@@ -135,8 +122,6 @@ export const GroupsAudioAPI: IGroups = {
 
     const newGroup: SoundGroupSequence = {
       type: 'sequence',
-      boardID: request.boardID,
-      category: matchingBoard.categories[0].id,
       icon: request.icon,
       id: newSequenceGroupID,
       name: request.name,
@@ -145,8 +130,7 @@ export const GroupsAudioAPI: IGroups = {
     }
 
     const newConfig = produce(AudioConfig.Config, (draft) => {
-      const matchingBoard = draft.boards.find((b) => b.id === request.boardID)
-      matchingBoard?.groups.push(newGroup)
+      draft.Groups.push(newGroup)
     })
 
     AudioConfig.Config = newConfig
@@ -190,8 +174,6 @@ export const GroupsAudioAPI: IGroups = {
 
     const updatedGroup: SoundGroupSequence = {
       type: 'sequence',
-      boardID: request.boardID,
-      category: request.category,
       icon: request.icon,
       id: request.groupID,
       name: request.name,
@@ -200,9 +182,8 @@ export const GroupsAudioAPI: IGroups = {
     }
 
     const newConfig = produce(AudioConfig.Config, (draft) => {
-      const matchingBoard = draft.boards.find((b) => b.id === request.boardID)
       const newGroups =
-        matchingBoard?.groups.map<ISoundGroup>((g) => {
+        draft.Groups.map<ISoundGroup>((g) => {
           if (g.id === request.groupID) {
             return updatedGroup
           }
@@ -210,9 +191,7 @@ export const GroupsAudioAPI: IGroups = {
           return g
         }) ?? []
 
-      if (matchingBoard) {
-        matchingBoard.groups = newGroups
-      }
+      draft.Groups = newGroups
     })
 
     AudioConfig.Config = newConfig
@@ -249,7 +228,7 @@ export const GroupsAudioAPI: IGroups = {
       }
 
       const newEffectID: EffectID = `eff-${crypto.randomUUID()}`
-      const savedFile = saveSoundEffect(request.boardID, request.groupID, curr.path)
+      const savedFile = saveSoundEffect(request.groupID, curr.path)
       const name = path.parse(curr.name).name
       const newEffect: SoundEffect = {
         id: newEffectID,
@@ -276,14 +255,12 @@ export const GroupsAudioAPI: IGroups = {
       id: request.groupID,
       name: request.name,
       icon: request.icon,
-      variant: request.variant,
-      category: request.category
+      variant: request.variant
     }
 
     const newConfig = produce(AudioConfig.Config, (draft) => {
-      const matchingBoard = draft.boards.find((b) => b.id === request.boardID)
       const newGroups =
-        matchingBoard?.groups.map<ISoundGroup>((g) => {
+        draft.Groups.map<ISoundGroup>((g) => {
           if (!isSourceGroup(g)) {
             return g
           }
@@ -294,9 +271,7 @@ export const GroupsAudioAPI: IGroups = {
           return g
         }) ?? []
 
-      if (matchingBoard) {
-        matchingBoard.groups = newGroups
-      }
+      draft.Groups = newGroups
     })
 
     AudioConfig.Config = newConfig
@@ -309,203 +284,16 @@ export const GroupsAudioAPI: IGroups = {
    * @inheritdoc
    */
   Delete: function (request: DeleteRequest): DeleteResponse {
-    // Get the board for this group in the map.
-    // Remove the group from that board.
-    const boardFromMap = [...BoardsAudioAPI.GetAll({}).boards].find((b) =>
-      b.groups.some((g) => isSourceGroup(g) && g.id === request.groupID)
-    )
-
-    if (!boardFromMap) {
-      return {}
-    }
-
-    const boardID = boardFromMap?.id
-
     // Edit the config so that the appropriate board does not include the group to delete.
     const newConfig = produce(AudioConfig.Config, (draft) => {
-      draft.boards.forEach((b) => {
-        b.groups = b.groups.filter((g) => {
-          return g.id !== request.groupID
-        })
+      draft.Groups = draft.Groups.filter((g) => {
+        return g.id !== request.groupID
       })
     })
 
     AudioConfig.Config = newConfig
 
-    if (boardID) {
-      deleteGroupFolder(boardID, request.groupID)
-    }
-
     return {}
-  },
-  Move: function (request: MoveRequest): MoveResponse {
-    const oldBoardFromMap = [...BoardsAudioAPI.GetAll({}).boards].find((b) =>
-      b.groups.some((g) => isSourceGroup(g) && g.id === request.groupID)
-    )
-
-    if (!oldBoardFromMap) {
-      return {}
-    }
-
-    const newBoardFromMap = [...BoardsAudioAPI.GetAll({}).boards].find(
-      (b) => b.id === request.boardID
-    )
-
-    if (!newBoardFromMap) {
-      return {}
-    }
-
-    const newGroupID: GroupID = `grp-${crypto.randomUUID()}`
-    const newConfig = produce(AudioConfig.Config, (draft) => {
-      if (!oldBoardFromMap) {
-        return
-      }
-
-      const oldBoardFromConfig = draft.boards.find((b) => b.id === oldBoardFromMap.id)
-      if (!oldBoardFromConfig) {
-        return
-      }
-
-      const newBoardFromConfig = draft.boards.find((b) => b.id === request.boardID)
-      if (!newBoardFromConfig) {
-        return
-      }
-
-      const groupFromConfigIndex = oldBoardFromConfig.groups.findIndex(
-        (g) => isSourceGroup(g) && g.id === request.groupID
-      )
-      if (groupFromConfigIndex === -1) {
-        return
-      }
-
-      const groupFromConfig = oldBoardFromConfig.groups.splice(
-        groupFromConfigIndex,
-        1
-      )[0] as SoundGroupSource
-
-      groupFromConfig.id = newGroupID
-      groupFromConfig.effects = groupFromConfig.effects.map((e) => ({
-        ...e,
-        path: e.path
-          .replace(oldBoardFromConfig.id, newBoardFromConfig.id)
-          .replace(request.groupID, newGroupID)
-      }))
-
-      const newCategory = newBoardFromConfig.categories[0]
-      groupFromConfig.category = newCategory.id
-      newBoardFromConfig.groups.push(groupFromConfig)
-    })
-
-    copyGroupFolder(oldBoardFromMap.id, newBoardFromMap.id, request.groupID, newGroupID)
-    deleteGroupFolder(oldBoardFromMap.id, request.groupID)
-
-    AudioConfig.Config = newConfig
-
-    return {}
-  },
-  /**
-   * @inheritdoc
-   */
-  Reorder: function (request: ReorderRequest): ReorderResponse {
-    const board = AudioConfig.getBoard(request.boardID)
-
-    if (!board) {
-      console.error(`${this.Reorder.name}: board not found with id (${request.boardID})`)
-      return {}
-    }
-
-    if (request.category && !board.categories?.map((c) => c.id).includes(request.category)) {
-      console.error(`${this.Reorder.name}: category not found with id (${request.category})`)
-      return {}
-    }
-
-    const groupsByCategory = board.groups.reduce((acc, curr) => {
-      if (!acc.has(curr.category)) {
-        acc.set(curr.category, [])
-      }
-
-      acc.get(curr.category)!.push(curr)
-      return acc
-    }, new Map<CategoryID, ISoundGroup[]>())
-
-    const thisCategoryID = request['category']
-    const thisCategoryGroups = groupsByCategory.get(thisCategoryID)
-
-    if (!thisCategoryGroups) {
-      console.error(`${this.Reorder.name}: invalid category ${thisCategoryID}`)
-      return {}
-    }
-
-    if (request.newOrder.length !== thisCategoryGroups!.length) {
-      console.error(
-        `${this.Reorder.name}: new order is (${request.newOrder.length}) which does not match (${board.groups.length})`
-      )
-      return {}
-    }
-
-    // Most importantly, the groups in this category should be in the new order that we've specified
-    // in the request.
-    const groupsInNewOrder = [
-      ...(board.categories?.flatMap((c) => {
-        const theseGroups = groupsByCategory.get(c.id) ?? []
-        if (request.category !== c.id) {
-          return theseGroups
-        }
-
-        const groupMap = new Map(theseGroups.map((g) => [g.id, g]))
-        const newOrder = request.newOrder
-          .map((o) => groupMap.get(o))
-          .filter((o) => o !== undefined) as SoundGroupSource[]
-
-        return newOrder
-      }) ?? [])
-    ]
-
-    const newConfig = produce(AudioConfig.Config, (draft) => {
-      const matchingBoard = draft.boards.find((b) => b.id === request.boardID)
-      matchingBoard!.groups = groupsInNewOrder
-    })
-
-    AudioConfig.Config = newConfig
-
-    return {}
-  },
-  /**
-   * @inheritdoc
-   */
-  GetSound: async function (_request: GetSoundRequest): Promise<GetSoundResponse> {
-    throw new Error('Deprecated')
-    // const group = AudioConfig.getGroup(request.groupID)
-
-    // if (!group || group.effects.length === 0) {
-    //   throw new Error(`Could not find group with effects with id ${request.groupID}.`)
-    // }
-
-    // let idsToSkip: EffectID[] = []
-    // if (request.idsToSkip && request.idsToSkip.length < group.effects.length) {
-    //   idsToSkip = request.idsToSkip
-    // }
-
-    // let effect: SoundEffect
-    // do {
-    //   const effectIndex = crypto.randomInt(0, group.effects.length)
-    //   effect = group.effects[effectIndex]
-    // } while (idsToSkip.includes(effect.id))
-
-    // const appDataPath = GetAppDataPath() + '/'
-    // const actualSystemPath = effect.path.replace('aud://', appDataPath)
-
-    // const srcFileSizeInMb = await getFileSize(actualSystemPath)
-    // const useHtml5 = srcFileSizeInMb > html5ThresholdSizeMb
-
-    // return {
-    //   src: effect.path,
-    //   format: effect.format as SupportedFileTypes,
-    //   volume: effect.volume,
-    //   effectID: effect.id,
-    //   variant: group.variant,
-    //   useHtml5
-    // }
   },
   /**
    * @inheritdoc
@@ -550,115 +338,5 @@ export const GroupsAudioAPI: IGroups = {
       variant: group.variant,
       sounds: effects
     }
-  },
-  LinkGroup: function (request: LinkRequest): LinkResponse {
-    const matchingGroup = AudioConfig.getGroup(request.sourceGroup)
-    if (!matchingGroup) {
-      throw new Error(`Could not find matching group with ID ${request.sourceGroup}.`)
-    }
-
-    const matchingSourceBoard = AudioConfig.getBoard(request.sourceBoard)
-    if (!matchingSourceBoard) {
-      throw new Error(`Could not find matching board with ID ${request.sourceBoard}.`)
-    }
-
-    const matchingDestinationBoard = AudioConfig.getBoard(request.destinationBoard)
-    if (!matchingDestinationBoard) {
-      throw new Error(`Could not find matching board with ID ${request.destinationBoard}.`)
-    }
-
-    // Already has this group. Don't copy it again.
-    if (
-      matchingDestinationBoard.groups.some(
-        (g) => g.type === 'reference' && g.id === matchingGroup.id
-      )
-    ) {
-      return {}
-    }
-
-    const newConfig = produce(AudioConfig.Config, (draft) => {
-      const destinationBoard = draft.boards.find((b) => b.id === request.destinationBoard)
-      if (!destinationBoard) {
-        return draft
-      }
-
-      destinationBoard.groups.push({
-        type: 'reference',
-        category: destinationBoard.categories[0].id,
-        id: request.sourceGroup
-      })
-
-      return draft
-    })
-
-    AudioConfig.Config = newConfig
-
-    return {}
-  },
-  UnlinkGroup(request) {
-    const matchingGroup = AudioConfig.getGroup(request.sourceGroup)
-    if (!matchingGroup) {
-      throw new Error(`Could not find matching group with ID ${request.sourceGroup}.`)
-    }
-
-    const matchingSourceBoard = AudioConfig.getBoard(request.sourceBoard)
-    if (!matchingSourceBoard) {
-      throw new Error(`Could not find matching board with ID ${request.sourceBoard}.`)
-    }
-
-    const matchingDestinationBoard = AudioConfig.getBoard(request.destinationBoard)
-    if (!matchingDestinationBoard) {
-      throw new Error(`Could not find matching board with ID ${request.destinationBoard}.`)
-    }
-
-    const newConfig = produce(AudioConfig.Config, (draft) => {
-      const board = draft.boards.find((b) => b.id === request.destinationBoard)
-      if (!board) {
-        return draft
-      }
-
-      board.groups = board?.groups.filter(
-        (r) => r.type !== 'reference' || r.id !== request.sourceGroup
-      )
-      return draft
-    })
-
-    AudioConfig.Config = newConfig
-
-    return {}
-  },
-  UpdateLink(request) {
-    const matchingBoard = AudioConfig.getBoard(request.destinationBoardID)
-    if (!matchingBoard) {
-      throw new Error(`Could not find matching board with ID ${request.destinationBoardID}.`)
-    }
-
-    const matchingReference = matchingBoard.groups.find(
-      (g) => g.type === 'reference' && g.id === request.sourceGroupID
-    )
-    if (!matchingReference) {
-      throw new Error(`Could not find matching group with ID ${request.sourceGroupID}.`)
-    }
-
-    const newConfig = produce(AudioConfig.Config, (draft) => {
-      const board = draft.boards.find((b) => b.id === request.destinationBoardID)
-      if (!board) {
-        return draft
-      }
-
-      const group = board.groups.find((g) => g.id === request.sourceGroupID)
-      if (!group) {
-        return draft
-      }
-
-      if (request.updates.category) {
-        group.category = request.updates.category
-      }
-      return draft
-    })
-
-    AudioConfig.Config = newConfig
-
-    return {}
   }
 }

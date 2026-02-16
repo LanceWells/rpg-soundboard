@@ -64,7 +64,7 @@ export type SoundEffectEditableFields = Omit<SoundEffect, 'id' | 'format'>
 
 export type SequenceElementID = `seq-${string}-${string}-${string}-${string}-${string}`
 
-export type SoundGroupTypes = 'sequence' | 'source' | 'reference'
+export type SoundGroupTypes = 'sequence' | 'source'
 
 export interface ISoundGroup {
   type: SoundGroupTypes
@@ -74,15 +74,6 @@ export interface ISoundGroup {
    */
   id: GroupID
 
-  /**
-   * An optional identifier for a category for this particular sound group. Note that this is not a
-   * required field. If the field is not specified, it implies that the sound group is
-   * "uncategorized", and should not be rendered visibly within any category container.
-   */
-  category: CategoryID
-}
-
-export interface ISoundGroupSource extends ISoundGroup {
   /**
    * A variant refers to the general behavior for a given sound group type. This will impact items
    * such as:
@@ -103,6 +94,11 @@ export interface ISoundGroupSource extends ISoundGroup {
    * The icon that will be displayed as the button for the sound effect.
    */
   icon: SoundIcon
+
+  /**
+   * Any tags related to this item. These are primarily used for searching and sorting.
+   */
+  tags: string[]
 }
 
 /**
@@ -110,7 +106,7 @@ export interface ISoundGroupSource extends ISoundGroup {
  * buttons on a soundboard. The effects contained by this group are meant to be a randomization of
  * possible sounds that the group might produce.
  */
-export interface SoundGroupSource extends ISoundGroupSource {
+export interface SoundGroupSource extends ISoundGroup {
   type: 'source'
 
   /**
@@ -118,12 +114,6 @@ export interface SoundGroupSource extends ISoundGroupSource {
    * evenly be played once the button is pressed.
    */
   effects: SoundEffect[]
-}
-
-export interface SoundGroupReference extends ISoundGroup {
-  type: 'reference'
-  id: GroupID
-  category: CategoryID
 }
 
 export type SoundGroupSequenceDelay = {
@@ -140,7 +130,7 @@ export type SoundGroupSequenceGroup = {
 
 export type SoundGroupSequenceElement = SoundGroupSequenceGroup | SoundGroupSequenceDelay
 
-export interface SoundGroupSequence extends ISoundGroupSource {
+export interface SoundGroupSequence extends ISoundGroup {
   type: 'sequence'
   sequence: SoundGroupSequenceElement[]
 }
@@ -158,70 +148,7 @@ export type SoundGroupSourceEditableFields = Omit<SoundGroupSource, 'id' | 'effe
   effects: SoundEffectEditableFields[]
 }
 
-export type SoundGroupReferenceEditableFields = Omit<SoundGroupReference, 'id' | 'type' | 'boardID'>
-
-/**
- * A sound category refers to a visual grouping of {@link SoundGroupSource} objects. These objects should
- * be rendered in close proximity, and ought to use some form of Gestalt psychology to make the
- * items appear related.
- */
-export type SoundCategory = {
-  /**
-   * The unique identifier for the category.
-   */
-  id: CategoryID
-
-  /**
-   * The name for the category that should be rendered visibly.
-   */
-  name: string
-}
-
 /**
  * A item that represents the editable fields for a given {@link SoundCategory} item.
  */
 export type SoundCategoryEditableFields = Omit<SoundCategory, 'id'>
-
-/**
- * Represents an individual sound board object. The sound board is the "root" container for all
- * sounds, and should change the entire view to represent its collection of sound effects, once the
- * board has been selected.
- *
- * A board contains groups, which themselves contain effects. The hierarchy being:
- * ```
- * board -> group A -> effect A
- *       |          |  effect B
- *       |
- *       -> group B -> effect C
- * ```
- */
-export type SoundBoard = {
-  /**
-   * The ID for the sound board.
-   */
-  id: BoardID
-
-  /**
-   * The name for the sound board. Used as the primary identifier for a given sound board.
-   */
-  name: string
-
-  /**
-   * The set of groups represented by this sound board. Each group should be represented as an
-   * individual button on a given soundboard.
-   */
-  groups: ISoundGroup[]
-
-  /**
-   * The set of sound categories that should be represented within this particular soundboard.
-   */
-  categories: [SoundCategory, ...SoundCategory[]]
-}
-
-/**
- * A set of editable fields as a subset of a {@link SoundBoard}.
- */
-export type SoundBoardEditableFields = Omit<
-  SoundBoard,
-  'id' | 'groups' | 'references' | 'categories'
->

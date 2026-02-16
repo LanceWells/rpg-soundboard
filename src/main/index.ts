@@ -7,7 +7,6 @@ import icon from '../../resources/icon.png?asset'
 import { AudProtocolPrefix } from '../apis/audProtocol/aud'
 import url from 'url'
 import { GetAppDataPath } from '../utils/paths'
-import { Extensions } from 'electron'
 
 function createWindow(): void {
   // Create the browser window.

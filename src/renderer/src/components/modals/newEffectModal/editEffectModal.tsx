@@ -4,15 +4,12 @@ import { useCallback, useMemo, useState } from 'react'
 import DeleteButton from '@renderer/components/generic/deleteButton'
 import { useShallow } from 'zustand/react/shallow'
 import { CreateRequest } from 'src/apis/audio/types/groups'
-import ChangeBoardSelect from './changeBoardSelect'
 
 export const EditEffectModalId = 'edit-effect-modal'
 
 export default function EditEffectModal() {
   const { updateGroup, editingMode, setEditingMode, deleteGroup } = useAudioStore(
     useShallow((state) => ({
-      // editingGroupID: state.editingGroupID,
-      // editingGroupID: state.editingElementsV2.board?.id,
       updateGroup: state.updateGroup,
       editingMode: state.editingMode,
       setEditingMode: state.setEditingMode,
@@ -29,13 +26,11 @@ export default function EditEffectModal() {
     if (editingGroupID) {
       updateGroup({
         type: 'source',
-        boardID: req.boardID,
         icon: req.icon,
         name: req.name,
         effects: req.effects,
         groupID: editingGroupID,
-        variant: req.variant,
-        category: req.category
+        variant: req.variant
       })
     }
   }
@@ -71,8 +66,6 @@ export default function EditEffectModal() {
     )
   }, [editingMode, onDelete, isConfirmingDelete])
 
-  const select = useMemo(() => <ChangeBoardSelect groupID={editingGroupID} />, [editingGroupID])
-
   return (
     <EffectModal
       modalTitle="Editing Effect"
@@ -82,7 +75,6 @@ export default function EditEffectModal() {
       handleClose={handleClose}
     >
       {deleteButton}
-      {select}
     </EffectModal>
   )
 }
