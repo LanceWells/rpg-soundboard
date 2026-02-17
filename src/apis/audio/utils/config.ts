@@ -2,8 +2,13 @@ import { produce } from 'immer'
 import { ConfigMigrations, MigratableConfigStorage } from '../../../utils/migratableConfigStorage'
 import { AudioApiConfig } from '../interface'
 import { GroupID } from '../types/groups'
-import { ISoundGroup } from '../types/items'
-import { AudioApiConfigV2, SoundGroupSource as SoundGroupSourceV2 } from './legacyV2Types'
+import { ISoundGroup, SoundGroupSequence, SoundGroupSource } from '../types/items'
+import {
+  AudioApiConfigV2,
+  CategoryID,
+  SoundGroupSource as SoundGroupSourceV2,
+  SoundGroupSequence as SoundGroupSequenceV2
+} from './legacyV2Types'
 
 /**
  * An instantiation of the config for information related to this audio API.
@@ -71,6 +76,30 @@ export class AudioConfigStorage extends MigratableConfigStorage<AudioApiConfig> 
             version: 3
           }
 
+          const boardNameMap = (inConfig as AudioApiConfigV2).boards.reduce((acc, curr) => {
+            curr.groups.forEach((g) => {
+              acc.set(g.id, curr.name)
+            })
+            return acc
+          }, new Map<GroupID, string>())
+
+          const categoryNameMap = (inConfig as AudioApiConfigV2).boards
+            .flatMap((b) => ({
+              groups: b.groups,
+              cateogires: b.categories
+            }))
+            .reduce((acc, curr) => {
+              const categories = curr.cateogires.reduce((acc, curr) => {
+                acc.set(curr.id, curr.name)
+                return acc
+              }, new Map<CategoryID, string>())
+              curr.groups.forEach((g) => {
+                acc.set(g.id, categories.get(g.category)!)
+              })
+
+              return acc
+            }, new Map<GroupID, string>())
+
           outConfig.Groups = (inConfig as AudioApiConfigV2).boards
             .flatMap((b) => b.groups)
             .filter((g) => g.type === 'reference')
@@ -80,9 +109,47 @@ export class AudioConfigStorage extends MigratableConfigStorage<AudioApiConfig> 
                 return {} as ISoundGroup
               }
 
+              const tags: string[] = []
+              if (boardNameMap.has(g.id)) {
+                tags.push(boardNameMap.get(g.id)!)
+              }
+
+              if (categoryNameMap.has(g.id)) {
+                tags.push(categoryNameMap.get(g.id)!)
+              }
+
               if (g.type === 'source') {
                 const tg = g as SoundGroupSourceV2
-                return {} as SoundGroupSou
+
+                return {
+                  effects: tg.effects,
+                  id: tg.id,
+                  name: tg.name,
+                  tags,
+                  type: 'source',
+                  variant: tg.variant,
+                  icon: {
+                    type: 'svg',
+                    foregroundColor: tg.icon.foregroundColor,
+                    name: tg.icon.name
+                  }
+                } as SoundGroupSource
+              } else {
+                const tg = g as SoundGroupSequenceV2
+
+                return {
+                  icon: {
+                    type: 'svg',
+                    foregroundColor: tg.icon.foregroundColor,
+                    name: tg.icon.name
+                  },
+                  id: tg.id,
+                  name: tg.name,
+                  sequence: tg.sequence,
+                  tags,
+                  type: 'sequence',
+                  variant: tg.variant
+                } as SoundGroupSequence
               }
             })
         }

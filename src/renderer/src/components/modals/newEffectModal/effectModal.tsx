@@ -105,8 +105,10 @@ export default function EffectModal(props: PropsWithChildren<EffectModalProps>) 
     [SoundVariant]
   )
 
-  const bgColor = editingGroup?.element?.icon.backgroundColor ?? 'grey'
-  const fgColor = editingGroup?.element?.icon.foregroundColor ?? 'grey'
+  const fgColor =
+    editingGroup?.element?.icon.type === 'svg'
+      ? (editingGroup?.element?.icon.foregroundColor ?? '#f0f0f0')
+      : '#f0f0f0'
   const iconName = editingGroup?.element?.icon.name ?? 'moon'
 
   return (
@@ -122,7 +124,9 @@ export default function EffectModal(props: PropsWithChildren<EffectModalProps>) 
             w-full
           `}
         >
-          <IconEffect className="[grid-area:icon]" icon={editingGroup?.element?.icon} />
+          {editingGroup?.element?.icon.type === 'svg' && (
+            <IconEffect className="[grid-area:icon]" icon={editingGroup?.element?.icon} />
+          )}
           <TextField
             required
             className="w-fit [grid-area:form]"
@@ -136,14 +140,13 @@ export default function EffectModal(props: PropsWithChildren<EffectModalProps>) 
           <FileSelectList className="[grid-area:files]" />
           <IconLookup
             className="[grid-area:lookup] min-h-84 max-h-84 w-full"
-            bgColor={bgColor}
             fgColor={fgColor}
             onClick={(name) =>
               editGroup({
                 icon: {
-                  backgroundColor: bgColor,
                   foregroundColor: fgColor,
-                  name
+                  name,
+                  type: 'svg'
                 }
               })
             }
@@ -154,22 +157,9 @@ export default function EffectModal(props: PropsWithChildren<EffectModalProps>) 
             onColorChange={function (hex: string): void {
               editGroup({
                 icon: {
-                  backgroundColor: bgColor,
                   foregroundColor: hex,
-                  name: iconName
-                }
-              })
-            }}
-          />
-          <ColorPicker
-            pickerID={`effect-background-${actionName}`}
-            color={bgColor}
-            onColorChange={function (hex: string): void {
-              editGroup({
-                icon: {
-                  backgroundColor: hex,
-                  foregroundColor: fgColor,
-                  name: iconName
+                  name: iconName,
+                  type: 'svg'
                 }
               })
             }}

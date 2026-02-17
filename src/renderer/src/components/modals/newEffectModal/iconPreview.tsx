@@ -11,7 +11,7 @@ export type IconPreviewProps = {
 }
 
 export function IconPreview(props: IconPreviewProps) {
-  const { icon, style, onClick, bgColor, fgColor } = props
+  const { icon, style, onClick, fgColor } = props
 
   // const { editingGroup, setSelectedIcon } = useAudioStore(
   //   useShallow((state) => ({
@@ -52,8 +52,8 @@ export function IconPreview(props: IconPreviewProps) {
     >
       <IconEffect
         icon={{
+          type: 'svg',
           name: icon.name,
-          backgroundColor: bgColor,
           foregroundColor: fgColor
         }}
       />

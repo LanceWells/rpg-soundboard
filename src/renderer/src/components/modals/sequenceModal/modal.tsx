@@ -189,9 +189,9 @@ export default function SequenceModal(props: PropsWithChildren<SequenceModalProp
     }
   }
 
-  const bgColor = editingSequence?.element?.icon.backgroundColor ?? 'grey'
-  const fgColor = editingSequence?.element?.icon.foregroundColor ?? 'grey'
-  const iconName = editingSequence?.element?.icon.name ?? 'moon'
+  // const fgColor = editingSequence?.element?.icon.foregroundColor ?? 'grey'
+  const fgColor = 'grey'
+  const iconName = editingSequence?.element?.icon.name ?? '#f0f0f0'
 
   return (
     <dialog id={id} className="modal">
@@ -226,37 +226,20 @@ export default function SequenceModal(props: PropsWithChildren<SequenceModalProp
             />
             <IconEffect
               className="[grid-area:icon] self-end"
-              icon={editingSequence?.element?.icon}
+              icon={
+                editingSequence?.element?.icon.type === 'svg'
+                  ? editingSequence?.element?.icon
+                  : undefined
+              }
             />
-            {/* <ForegroundPicker
-              className="[grid-area:foreground] w-full justify-self-start"
-              pickerID={`sequence-foreground-${actionName}`}
-            />
-            <BackgroundPicker
-              className="[grid-area:background] w-full justify-self-end"
-              pickerID={`sequence-background-${actionName}`}
-            /> */}
             <ColorPicker
               pickerID={`sequence-foreground-${actionName}`}
               color={fgColor}
               onColorChange={function (hex: string): void {
                 editSequence({
                   icon: {
-                    backgroundColor: bgColor,
+                    type: 'svg',
                     foregroundColor: hex,
-                    name: iconName
-                  }
-                })
-              }}
-            />
-            <ColorPicker
-              pickerID={`sequence-background-${actionName}`}
-              color={bgColor}
-              onColorChange={function (hex: string): void {
-                editSequence({
-                  icon: {
-                    backgroundColor: hex,
-                    foregroundColor: fgColor,
                     name: iconName
                   }
                 })
@@ -264,12 +247,11 @@ export default function SequenceModal(props: PropsWithChildren<SequenceModalProp
             />
           </div>
           <IconLookup
-            bgColor={bgColor}
             fgColor={fgColor}
             onClick={(name) =>
               editSequence({
                 icon: {
-                  backgroundColor: bgColor,
+                  type: 'svg',
                   foregroundColor: fgColor,
                   name
                 }

@@ -53,7 +53,7 @@ export default function GroupBase(props: GroupBaseProps) {
         }
       `}
     >
-      <IconEffect icon={group.icon} />
+      {group.icon.type === 'svg' && <IconEffect icon={group.icon} />}
       <GroupIcon variant={group.variant} />
       <span
         className={`

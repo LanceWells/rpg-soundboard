@@ -1,6 +1,6 @@
 import { soundboardIcons } from '@renderer/utils/fetchIcons'
 import { Parser, ProcessNodeDefinitions } from 'html-to-react'
-import { SoundIcon } from 'src/apis/audio/types/items'
+import { SvgSoundIcon } from 'src/apis/audio/types/items'
 import { twMerge } from 'tailwind-merge'
 
 /**
@@ -10,7 +10,7 @@ export type IconEffectProps = {
   /**
    * Information about the icon to be rendered.
    */
-  icon: SoundIcon | undefined
+  icon: SvgSoundIcon | undefined
 
   /**
    * Optional class name, will be rendered on the root element after other, required classes.
@@ -53,7 +53,6 @@ export function IconEffect(props: IconEffectProps) {
   return (
     <div
       style={{
-        backgroundColor: icon?.backgroundColor ?? 'white',
         color: icon?.foregroundColor ?? 'black'
       }}
       className={mergedClass}

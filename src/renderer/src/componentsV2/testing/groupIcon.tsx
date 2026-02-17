@@ -1,4 +1,4 @@
-import { SoundIcon } from 'src/apis/audio/types/items'
+import { SoundIcon, SvgSoundIcon } from 'src/apis/audio/types/items'
 import BookImage from '@renderer/assets/images/Book.png'
 import ScrollImage from '@renderer/assets/images/Scroll.png'
 import { memo, useEffect, useRef, useState } from 'react'
@@ -35,6 +35,19 @@ export type GroupIconProps = {
 }
 
 export function GroupIcon(props: GroupIconProps) {
+  const { icon } = props
+  if (icon.type === 'svg') {
+    return <GroupSvgIcon icon={icon} />
+  }
+
+  return null
+}
+
+export type GroupSvgIconProps = {
+  icon: SvgSoundIcon
+}
+
+export function GroupSvgIcon(props: GroupSvgIconProps) {
   const { icon } = props
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null)

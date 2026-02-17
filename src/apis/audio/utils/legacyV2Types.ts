@@ -88,6 +88,13 @@ export interface ISoundGroupV2 {
    * The ID for the group.
    */
   id: GroupID
+
+  /**
+   * An optional identifier for a category for this particular sound group. Note that this is not a
+   * required field. If the field is not specified, it implies that the sound group is
+   * "uncategorized", and should not be rendered visibly within any category container.
+   */
+  category: CategoryID
 }
 
 export interface ISoundGroupSource extends ISoundGroupV2 {
@@ -166,4 +173,25 @@ export const getGroupPath = (boardID: BoardID, groupID: GroupID): string => {
   const grpDir = path.join(getBoardPath(boardID), groupID)
 
   return grpDir
+}
+
+export type SequenceElementID = `seq-${string}-${string}-${string}-${string}-${string}`
+
+export type SoundGroupSequenceDelay = {
+  type: 'delay'
+  id: SequenceElementID
+  msToDelay: number
+}
+
+export type SoundGroupSequenceGroup = {
+  type: 'group'
+  id: SequenceElementID
+  groupID: GroupID
+}
+
+export type SoundGroupSequenceElement = SoundGroupSequenceGroup | SoundGroupSequenceDelay
+
+export interface SoundGroupSequence extends ISoundGroupSource {
+  type: 'sequence'
+  sequence: SoundGroupSequenceElement[]
 }

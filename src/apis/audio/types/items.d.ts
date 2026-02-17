@@ -8,7 +8,9 @@ import { GroupID } from './groups'
 /**
  * Represents the icon associated with an {@link SoundGroupSource}.
  */
-export type SoundIcon = {
+export type SvgSoundIcon = {
+  type: 'svg'
+
   /**
    * The name of the icon to use. This name refers to the name of the icon from the game-icons
    * repository.
@@ -16,15 +18,18 @@ export type SoundIcon = {
   name: string
 
   /**
-   * The hex code for the background color to use with the group's icon.
-   */
-  backgroundColor: string
-
-  /**
    * The hex code for the foreground color to use with the group's icon.
    */
   foregroundColor: string
 }
+
+export type PixelSoundIcon = {
+  type: 'pixel'
+
+  name: string
+}
+
+export type SoundIcon = SvgSoundIcon | PixelSoundIcon
 
 /**
  * Represents an independent sound effect, for use with picking a random sound from a

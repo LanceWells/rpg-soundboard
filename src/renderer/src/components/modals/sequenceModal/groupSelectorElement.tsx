@@ -33,7 +33,7 @@ export function SelectorElement(props: SelectorElementProps) {
         btn
         `}
     >
-      <IconEffect size={32} icon={g.icon} className="w-8 h-8" />
+      {g.icon.type === 'svg' && <IconEffect size={32} icon={g.icon} className="w-8 h-8" />}
       <span className="select-none">{g.name}</span>
     </button>
   )

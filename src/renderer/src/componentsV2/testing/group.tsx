@@ -92,13 +92,7 @@ export function GroupBase(props: GroupBaseProps) {
       `}
         src={Rat}
       /> */}
-      <MemoizedGroupIcon
-        icon={{
-          name: group.icon.name,
-          backgroundColor: 'black',
-          foregroundColor: group.icon.foregroundColor
-        }}
-      />
+      <MemoizedGroupIcon icon={group.icon} />
       <img
         className={`
           absolute

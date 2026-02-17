@@ -193,22 +193,24 @@ export const getDefaultGroup = (): Omit<SoundGroupSource, 'id'> => ({
   type: 'source',
   effects: [],
   icon: {
-    backgroundColor: ColorOptions.black,
+    type: 'svg',
     foregroundColor: ColorOptions.white,
     name: 'moon'
   },
   name: '',
-  variant: 'Default'
+  variant: 'Default',
+  tags: []
 })
 
 export const getDefaultSequence = (): SoundGroupSequenceEditableFields => ({
   type: 'sequence',
   icon: {
-    backgroundColor: ColorOptions.black,
+    type: 'svg',
     foregroundColor: ColorOptions.white,
     name: 'moon'
   },
   name: '',
   sequence: [],
-  variant: 'Sequence'
+  variant: 'Sequence',
+  tags: []
 })

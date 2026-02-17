@@ -30,7 +30,8 @@ export default function EditEffectModal() {
         name: req.name,
         effects: req.effects,
         groupID: editingGroupID,
-        variant: req.variant
+        variant: req.variant,
+        tags: req.tags
       })
     }
   }

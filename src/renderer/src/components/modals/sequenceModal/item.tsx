@@ -82,7 +82,7 @@ export function SequenceItemGroup(props: SequenceItemGroupProps) {
 
   return (
     <div className="flex flex-row items-center gap-2">
-      <IconEffect size={32} icon={group.icon} className="w-8 h-8" />
+      {group.icon.type === 'svg' && <IconEffect size={32} icon={group.icon} className="w-8 h-8" />}
       {group.name}
     </div>
   )
