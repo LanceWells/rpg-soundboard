@@ -1,47 +1,9 @@
-import { SoundIcon, SvgSoundIcon } from 'src/apis/audio/types/items'
 import BookImage from '@renderer/assets/images/Book.png'
 import ScrollImage from '@renderer/assets/images/Scroll.png'
-import { memo, useEffect, useRef, useState } from 'react'
-import { soundboardIcons } from '@renderer/utils/fetchIcons'
 import { svgToData } from '@iconify/utils'
-
-export type GroupImageProps = {
-  src: string
-}
-
-export function GroupImage(props: GroupImageProps) {
-  const { src } = props
-
-  return (
-    <img
-      className={`
-          absolute
-          top-2
-          w-[120px]
-          w-max-[120px]
-          h-[120px]
-          h-max-[120px]
-          z-10
-          left-1/2
-          transform-[translate(-50%,_0)]
-      `}
-      src={src}
-    />
-  )
-}
-
-export type GroupIconProps = {
-  icon: SoundIcon
-}
-
-export function GroupIcon(props: GroupIconProps) {
-  const { icon } = props
-  if (icon.type === 'svg') {
-    return <GroupSvgIcon icon={icon} />
-  }
-
-  return null
-}
+import { soundboardIcons } from '@renderer/utils/fetchIcons'
+import { useRef, useState, useEffect } from 'react'
+import { SvgSoundIcon } from 'src/apis/audio/types/items'
 
 export type GroupSvgIconProps = {
   icon: SvgSoundIcon
@@ -180,5 +142,3 @@ export function GroupSvgIcon(props: GroupSvgIconProps) {
     </div>
   )
 }
-
-export const MemoizedGroupIcon = memo(GroupIcon)

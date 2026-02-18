@@ -1,6 +1,10 @@
 import { v4 as uuidv4 } from 'uuid'
 import { IRpgAudioNode, RpgAudioNodeEvent } from '../types'
 
+/**
+ * A base to all audio nodes in the RPG Audio Engine. Provides fundamental structure for audio
+ * nodes.
+ */
 export abstract class AbstractRpgAudioNode implements IRpgAudioNode {
   protected _id: string
   protected _isLoaded: boolean = false

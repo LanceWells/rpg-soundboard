@@ -1,6 +1,12 @@
 import { IRpgAudioNode, IRpgAudioPlayableNode, RpgAudioNodeEvent } from '../types'
 import { AbstractRpgAudioNode } from './abstract'
 
+/**
+ * This node differs from an AbstractRpgAudioNode in that it provides controls for audio playback.
+ * Most nodes will be playable nodes, but certain nodes may be an exception to this rule, such as
+ * the convolver node. This is why we split the playable node out; so that we can still share that
+ * common base class without needing to include playback as part of the contract.
+ */
 export abstract class AbstractPlayableRpgAudioNode
   extends AbstractRpgAudioNode
   implements IRpgAudioPlayableNode

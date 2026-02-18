@@ -36,7 +36,8 @@ export interface GroupSlice {
     updatedFields: Partial<SoundGroupSequenceEditableFields>
   ) => void
   deleteGroup: (id: GroupID) => void
-  searchForGroups: (searchText: string, types: SoundGroupTypes[]) => ISoundGroup[]
+  searchForGroups: (searchText: string, types: SoundGroupTypes[]) => void
+  soughtGroups: ISoundGroup[]
 }
 
 export const createGroupSlice: StateCreator<GroupSlice & EditingSliceV2, [], [], GroupSlice> = (
@@ -161,11 +162,15 @@ export const createGroupSlice: StateCreator<GroupSlice & EditingSliceV2, [], [],
   editingGroup: null,
   editingGroupID: undefined,
   playingGroups: [],
+  soughtGroups: [],
   searchForGroups(searchText) {
     const allGroups = window.audio.Groups.GetAll().groups
 
     if (searchText === '') {
-      return allGroups.map((r) => r)
+      set({
+        soughtGroups: allGroups
+      })
+      return
     }
 
     const fuseSearch = new fuse(allGroups, {
@@ -185,7 +190,11 @@ export const createGroupSlice: StateCreator<GroupSlice & EditingSliceV2, [], [],
       return acc
     }, new Map<string, ISoundGroup>())
 
-    return results.map((r) => r.item)
+    const soughtGroups = results.map((r) => r.item)
+
+    set({
+      soughtGroups
+    })
   }
 })
 
