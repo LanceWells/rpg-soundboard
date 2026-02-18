@@ -1,49 +1,13 @@
-import {
-  createRootRoute,
-  createRoute,
-  createRouter,
-  Outlet,
-  RouterProvider
-} from '@tanstack/react-router'
-import { Nav } from '../nav/nav'
-import { Board } from '../board/board'
-import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
-import { CreateSoundForm } from '../forms/sound/create'
-import { EditSoundForm } from '../forms/sound/edit'
+import { createRouter, RouterProvider } from '@tanstack/react-router'
+import { routeTree } from '../../routeTree.gen'
 
 type RootLayoutProps = {}
 
-const rootRoute = createRootRoute({
-  component: () => (
-    <>
-      <Nav />
-      <Outlet />
-      <TanStackRouterDevtools />
-    </>
-  )
+const router = createRouter({
+  routeTree,
+  defaultPreload: 'intent',
+  scrollRestoration: true
 })
-
-const boardRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/',
-  component: () => <Board />
-})
-
-const createSoundRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/sound/create',
-  component: () => <CreateSoundForm />
-})
-
-const editSoundRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/sound/edit',
-  component: () => <EditSoundForm />
-})
-
-const routeTree = rootRoute.addChildren([boardRoute, createSoundRoute, editSoundRoute])
-
-const router = createRouter({ routeTree })
 
 declare module '@tanstack/react-router' {
   interface Register {

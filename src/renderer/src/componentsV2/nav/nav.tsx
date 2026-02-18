@@ -1,7 +1,10 @@
 import TownHero from '@renderer/assets/images/TownHero.png'
 import { useAudioStore } from '@renderer/stores/audio/audioStore'
-import { useMemo, useRef, useState } from 'react'
+import { Link } from '@tanstack/react-router'
+import { useEffect, useMemo, useState } from 'react'
 import { useDebounce } from 'use-debounce'
+import { Route as CreateSoundRoute } from '@renderer/routes/sound/create'
+import { Route as BoardRoute } from '@renderer/routes/'
 
 export type NavProps = {}
 
@@ -10,12 +13,10 @@ export function Nav(props: NavProps) {
 
   const [search, setSearch] = useState('')
   const [debouncedSearch] = useDebounce(search, 500)
-  const parentRef = useRef<HTMLDivElement | null>(null)
 
   const searchForGroups = useAudioStore((store) => store.searchForGroups)
 
-  useMemo(() => {
-    parentRef.current?.scrollTo({ top: 0 })
+  useEffect(() => {
     searchForGroups(debouncedSearch, ['source', 'sequence'])
   }, [debouncedSearch])
 
@@ -27,7 +28,7 @@ export function Nav(props: NavProps) {
       shop-wall
       grid
       h-dvh
-      [grid-template-areas:"header"_"hero"_"."_"search"]
+      [grid-template-areas:"header"_"hero"_"navbuttons"_"search"]
       grid-rows-[min-content_min-content_1fr_min-content]
     `}
     >
@@ -41,6 +42,14 @@ export function Nav(props: NavProps) {
         RPG Soundboard
       </h1>
       <img src={TownHero} />
+      <ul className="list-disc">
+        <li>
+          <Link to={BoardRoute.fullPath}>Board</Link>
+        </li>
+        <li>
+          <Link to={CreateSoundRoute.fullPath}>New Sound</Link>
+        </li>
+      </ul>
       <div
         className={`
         w-full

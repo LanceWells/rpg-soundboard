@@ -311,6 +311,9 @@
   .hidden {
     display: none;
   }
+  .list-item {
+    display: list-item;
+  }
   .table {
     display: table;
   }
@@ -449,6 +452,9 @@
   }
   .resize {
     resize: both;
+  }
+  .list-disc {
+    list-style-type: disc;
   }
   .grid-cols-3 {
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -757,6 +763,9 @@
   }
   .\[grid-template-areas\:\"header\"_\"hero\"_\"\.\"_\"search\"\] {
     grid-template-areas: "header" "hero" "." "search";
+  }
+  .\[grid-template-areas\:\"header\"_\"hero\"_\"navbuttons\"_\"search\"\] {
+    grid-template-areas: "header" "hero" "navbuttons" "search";
   }
   .\[grid-template-areas\:\"icon_form_fileselect\"_\"lookup_lookup_files\"_\"foreground_background_toggles\"\] {
     grid-template-areas: "icon form fileselect" "lookup lookup files" "foreground background toggles";

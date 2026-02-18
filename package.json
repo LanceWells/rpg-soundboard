@@ -41,7 +41,7 @@
     "@tailwindcss/vite": "^4.1.8",
     "@tanstack/react-router": "^1.160.2",
     "@tanstack/react-router-devtools": "^1.160.2",
-    "@tanstack/react-virtual": "^3.13.9",
+    "@tanstack/react-virtual": "^3.13.18",
     "@types/fluent-ffmpeg": "^2.1.25",
     "@types/howler": "^2.2.11",
     "@types/uuid": "^10.0.0",

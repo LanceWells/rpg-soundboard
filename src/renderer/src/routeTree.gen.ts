@@ -9,72 +9,58 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as MainRouteImport } from './routes/main'
-import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SoundEditRouteImport } from './routes/sound/edit'
+import { Route as SoundCreateRouteImport } from './routes/sound/create'
 
-const MainRoute = MainRouteImport.update({
-  id: '/main',
-  path: '/main',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AboutRoute = AboutRouteImport.update({
-  id: '/about',
-  path: '/about',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SoundEditRoute = SoundEditRouteImport.update({
+  id: '/sound/edit',
+  path: '/sound/edit',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SoundCreateRoute = SoundCreateRouteImport.update({
+  id: '/sound/create',
+  path: '/sound/create',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
-  '/main': typeof MainRoute
+  '/sound/create': typeof SoundCreateRoute
+  '/sound/edit': typeof SoundEditRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
-  '/main': typeof MainRoute
+  '/sound/create': typeof SoundCreateRoute
+  '/sound/edit': typeof SoundEditRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/about': typeof AboutRoute
-  '/main': typeof MainRoute
+  '/sound/create': typeof SoundCreateRoute
+  '/sound/edit': typeof SoundEditRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/main'
+  fullPaths: '/' | '/sound/create' | '/sound/edit'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/main'
-  id: '__root__' | '/' | '/about' | '/main'
+  to: '/' | '/sound/create' | '/sound/edit'
+  id: '__root__' | '/' | '/sound/create' | '/sound/edit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AboutRoute: typeof AboutRoute
-  MainRoute: typeof MainRoute
+  SoundCreateRoute: typeof SoundCreateRoute
+  SoundEditRoute: typeof SoundEditRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/main': {
-      id: '/main'
-      path: '/main'
-      fullPath: '/main'
-      preLoaderRoute: typeof MainRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/about': {
-      id: '/about'
-      path: '/about'
-      fullPath: '/about'
-      preLoaderRoute: typeof AboutRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
@@ -82,13 +68,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sound/edit': {
+      id: '/sound/edit'
+      path: '/sound/edit'
+      fullPath: '/sound/edit'
+      preLoaderRoute: typeof SoundEditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sound/create': {
+      id: '/sound/create'
+      path: '/sound/create'
+      fullPath: '/sound/create'
+      preLoaderRoute: typeof SoundCreateRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AboutRoute: AboutRoute,
-  MainRoute: MainRoute,
+  SoundCreateRoute: SoundCreateRoute,
+  SoundEditRoute: SoundEditRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
