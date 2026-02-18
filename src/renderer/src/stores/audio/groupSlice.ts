@@ -165,7 +165,7 @@ export const createGroupSlice: StateCreator<GroupSlice & EditingSliceV2, [], [],
     const allGroups = window.audio.Groups.GetAll().groups
 
     if (searchText === '') {
-      return allGroups.map((r) => r.group)
+      return allGroups.map((r) => r)
     }
 
     const fuseSearch = new fuse(allGroups, {
@@ -176,16 +176,16 @@ export const createGroupSlice: StateCreator<GroupSlice & EditingSliceV2, [], [],
     const results = fuseSearch.search(searchText)
 
     results.reduce((acc, curr) => {
-      if (acc.has(curr.item.group.id)) {
+      if (acc.has(curr.item.id)) {
         console.error('duplicate group')
       }
 
-      acc.set(curr.item.group.id, curr.item.group)
+      acc.set(curr.item.id, curr.item)
 
       return acc
     }, new Map<string, ISoundGroup>())
 
-    return results.map((r) => r.item.group)
+    return results.map((r) => r.item)
   }
 })
 

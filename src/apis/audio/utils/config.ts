@@ -102,7 +102,7 @@ export class AudioConfigStorage extends MigratableConfigStorage<AudioApiConfig> 
 
           outConfig.Groups = (inConfig as AudioApiConfigV2).boards
             .flatMap((b) => b.groups)
-            .filter((g) => g.type === 'reference')
+            .filter((g) => g.type !== 'reference')
             .map<ISoundGroup>((g) => {
               // Redundant, but trying to make the typecheck better.
               if (g.type === 'reference') {
@@ -152,6 +152,8 @@ export class AudioConfigStorage extends MigratableConfigStorage<AudioApiConfig> 
                 } as SoundGroupSequence
               }
             })
+
+          return outConfig
         }
       }
     ]

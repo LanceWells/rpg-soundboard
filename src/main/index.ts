@@ -83,13 +83,13 @@ app.whenReady().then(async () => {
 
   createWindow()
 
-  const reactDevToolsPath = path.join(
-    os.homedir(),
-    `AppData\\Local\\Google\\Chrome\\User Data\\Default\\Extensions\\fmkadmapgofadopljbjfkapdkoienihi\\7.0.0_0`
-  )
+  // const reactDevToolsPath = path.join(
+  //   os.homedir(),
+  //   `AppData\\Local\\Google\\Chrome\\User Data\\Default\\Extensions\\fmkadmapgofadopljbjfkapdkoienihi\\7.0.0_0`
+  // )
 
-  const ext = await session.defaultSession.extensions.loadExtension(reactDevToolsPath)
-  console.log(ext.id)
+  // const ext = await session.defaultSession.extensions.loadExtension(reactDevToolsPath)
+  // console.log(ext.id)
 
   app.on('activate', function () {
     // On macOS it's common to re-create a window in the app when the

@@ -140,14 +140,16 @@ export function GroupSvgIcon(props: GroupSvgIconProps) {
     >
       <span
         className={`
-          ${isLoading ? 'visible' : 'hidden'}
+          transition-opacity
+          ${isLoading ? 'opacity-100' : 'opacity-0'}
       `}
       >
         Loading
       </span>
       <div
         className={`
-          ${isLoading ? 'hidden' : 'visible'}
+          transition-opacity
+          ${isLoading ? 'opacity-0' : 'opacity-100'}
         `}
       >
         <img
