@@ -77,15 +77,20 @@ export class RpgAudio {
   }
 
   public stop() {
-    this._sourceNode
-      .stop()
-      .catch((err) => {
-        console.error('Error stopping', err)
-      })
-      .finally(() => {
-        this._sourceNode.disconnect()
-        this._gainNode.disconnect()
-      })
+    if (this.State === RpgAudioState.Playing) {
+      this._sourceNode
+        .stop()
+        .catch((err) => {
+          console.error('Error stopping', err)
+        })
+        .finally(() => {
+          this._sourceNode.disconnect()
+          this._gainNode.disconnect()
+        })
+    } else {
+      this._sourceNode.disconnect()
+      this._gainNode.disconnect()
+    }
   }
 
   public fade(newVolume: number, fadeOverMs: number) {

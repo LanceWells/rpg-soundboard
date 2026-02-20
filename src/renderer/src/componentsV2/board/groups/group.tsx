@@ -60,7 +60,16 @@ export function Group(props: GroupBaseProps) {
       `}
       onClick={onClickPlay}
     >
-      <MemoizedGroupIcon icon={group.icon} />
+      <div
+        className={`
+        absolute
+        left-1/2
+        top-2
+        transform-[translate(-50%,_0%)]
+      `}
+      >
+        <MemoizedGroupIcon icon={group.icon} />
+      </div>
       <img
         className={`
           absolute

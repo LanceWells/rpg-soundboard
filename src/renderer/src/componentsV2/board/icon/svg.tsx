@@ -75,7 +75,7 @@ export function GroupSvgIcon(props: GroupSvgIconProps) {
     svgImg.addEventListener('load', onload)
 
     svgImg.src = dataurl
-  }, [canvasRef.current, canvasRef.current?.getContext('2d')])
+  }, [icon.foregroundColor, icon.name, canvasRef.current, canvasRef.current?.getContext('2d')])
 
   const [r, g, b] = [
     icon.foregroundColor.substring(1, 3),
@@ -89,15 +89,11 @@ export function GroupSvgIcon(props: GroupSvgIconProps) {
   return (
     <div
       className={`
-      absolute
-      top-2
       w-[120px]
       w-max-[120px]
       h-[120px]
       h-max-[120px]
-      z-10
-      left-1/2
-      transform-[translate(-50%,_0)]
+      relative
     `}
     >
       <span

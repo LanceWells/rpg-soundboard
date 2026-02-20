@@ -174,7 +174,7 @@ export const createGroupSlice: StateCreator<GroupSlice & EditingSliceV2, [], [],
     }
 
     const fuseSearch = new fuse(allGroups, {
-      keys: ['name', 'tags'],
+      keys: ['name', 'tags', 'variant'],
       threshold: 0.1
     })
 

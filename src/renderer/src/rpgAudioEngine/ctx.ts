@@ -11,7 +11,16 @@ class AudioProcessingNodes {
   public readonly cave: RpgAudioConvolverNode
   public readonly caveRandom: RandomReverbNode
 
+  private readonly compressorNode: DynamicsCompressorNode
+
   constructor(ctx: AudioContext) {
+    this.compressorNode = ctx.createDynamicsCompressor()
+    this.compressorNode.threshold.setValueAtTime(-50, ctx.currentTime)
+    this.compressorNode.knee.setValueAtTime(40, ctx.currentTime)
+    this.compressorNode.ratio.setValueAtTime(12, ctx.currentTime)
+    this.compressorNode.attack.setValueAtTime(0, ctx.currentTime)
+    this.compressorNode.release.setValueAtTime(0.25, ctx.currentTime)
+
     this.cave = new RpgAudioConvolverNode(ctx, casaImpulse)
     this.cave.getNode().connect(ctx.destination)
 
@@ -24,7 +33,9 @@ class AudioProcessingNodes {
         new RpgAudioConvolverNode(ctx, batcave)
       ]
     })
-    this.caveRandom.connect(ctx.destination)
+
+    this.caveRandom.connect(this.compressorNode)
+    this.compressorNode.connect(ctx.destination)
   }
 }
 
