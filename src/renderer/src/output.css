@@ -21,6 +21,8 @@
     --text-sm--line-height: calc(1.25 / 0.875);
     --text-lg: 1.125rem;
     --text-lg--line-height: calc(1.75 / 1.125);
+    --text-xl: 1.25rem;
+    --text-xl--line-height: calc(1.75 / 1.25);
     --text-2xl: 1.5rem;
     --text-2xl--line-height: calc(2 / 1.5);
     --text-9xl: 8rem;
@@ -2040,9 +2042,6 @@
   .m-4 {
     margin: calc(var(--spacing) * 4);
   }
-  .m-8 {
-    margin: calc(var(--spacing) * 8);
-  }
   .filter {
     @layer daisyui.l1.l2.l3 {
       display: flex;
@@ -2164,6 +2163,9 @@
   }
   .mb-2 {
     margin-bottom: calc(var(--spacing) * 2);
+  }
+  .mb-4 {
+    margin-bottom: calc(var(--spacing) * 4);
   }
   .box-border {
     box-sizing: border-box;
@@ -2311,10 +2313,6 @@
       height: var(--size);
     }
   }
-  .size-min {
-    width: min-content;
-    height: min-content;
-  }
   .h-4 {
     height: calc(var(--spacing) * 4);
   }
@@ -2345,15 +2343,6 @@
   .h-full {
     height: 100%;
   }
-  .max-h-0 {
-    max-height: calc(var(--spacing) * 0);
-  }
-  .max-h-0\.5 {
-    max-height: calc(var(--spacing) * 0.5);
-  }
-  .max-h-1 {
-    max-height: calc(var(--spacing) * 1);
-  }
   .max-h-2 {
     max-height: calc(var(--spacing) * 2);
   }
@@ -2362,9 +2351,6 @@
   }
   .max-h-5 {
     max-height: calc(var(--spacing) * 5);
-  }
-  .max-h-10 {
-    max-height: calc(var(--spacing) * 10);
   }
   .max-h-12 {
     max-height: calc(var(--spacing) * 12);
@@ -2512,9 +2498,6 @@
   .grid-cols-3 {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
-  .grid-cols-\[1fr_80px\] {
-    grid-template-columns: 1fr 80px;
-  }
   .grid-cols-\[120px_1fr\] {
     grid-template-columns: 120px 1fr;
   }
@@ -2557,9 +2540,6 @@
   .flex-wrap {
     flex-wrap: wrap;
   }
-  .content-between {
-    align-content: space-between;
-  }
   .items-center {
     align-items: center;
   }
@@ -2598,9 +2578,6 @@
   }
   .overflow-hidden {
     overflow: hidden;
-  }
-  .overflow-scroll {
-    overflow: scroll;
   }
   .overflow-visible {
     overflow: visible;
@@ -2748,6 +2725,10 @@
   .text-sm {
     font-size: var(--text-sm);
     line-height: var(--tw-leading, var(--text-sm--line-height));
+  }
+  .text-xl {
+    font-size: var(--text-xl);
+    line-height: var(--tw-leading, var(--text-xl--line-height));
   }
   .font-bold {
     --tw-font-weight: var(--font-weight-bold);
@@ -3238,9 +3219,29 @@
       background-color: var(--color-black);
     }
   }
+  .\[\&\>fieldset\]\:w-\[320px\] {
+    &>fieldset {
+      width: 320px;
+    }
+  }
+  .\[\&\>fieldset\]\:w-\[400px\] {
+    &>fieldset {
+      width: 400px;
+    }
+  }
   .\[\&\>fieldset\]\:w-\[550px\] {
     &>fieldset {
       width: 550px;
+    }
+  }
+  .\[\&\>fieldset\]\:max-w-\[320px\] {
+    &>fieldset {
+      max-width: 320px;
+    }
+  }
+  .\[\&\>fieldset\]\:max-w-\[400px\] {
+    &>fieldset {
+      max-width: 400px;
     }
   }
   .\[\&\>fieldset\]\:max-w-\[550px\] {

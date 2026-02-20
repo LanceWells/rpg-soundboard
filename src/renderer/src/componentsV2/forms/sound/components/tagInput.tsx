@@ -2,15 +2,15 @@ import { useFormContext } from 'react-hook-form'
 import { FormInput } from '../types'
 import CloseIcon from '@renderer/assets/icons/close'
 import { useAudioStore } from '@renderer/stores/audio/audioStore'
-import { useEffect, useRef } from 'react'
+import { useRef } from 'react'
 
 export function TagInput() {
   const { watch, setValue } = useFormContext<FormInput>()
   const tags = watch('request.tags')
 
-  const searchForTags = useAudioStore((store) => store.searchForTags)
-  const soughtTags = useAudioStore((store) => store.soughtTags)
+  const getTags = useAudioStore((store) => store.getTags)
   const tagInputRef = useRef<HTMLInputElement | null>(null)
+  const allTags = getTags()
 
   function addTag(newTag: string) {
     const tagInput = tagInputRef.current
@@ -42,7 +42,6 @@ export function TagInput() {
         className="input"
         onKeyDown={(e) => {
           if (e.key !== 'Enter') {
-            searchForTags(e.currentTarget.value)
             return
           }
 
@@ -50,20 +49,13 @@ export function TagInput() {
           e.preventDefault()
         }}
         type="text"
+        list="tag-suggestions"
       />
-      <select
-        className="select"
-        id="tags-autocomplete"
-        onChange={(e) => addTag(e.currentTarget.value)}
-        /* https://stackoverflow.com/a/12404521 */
-        onFocus={(e) => (e.currentTarget.selectedIndex = -1)}
-      >
-        {soughtTags.map((t) => (
-          <option className="visible" value={t}>
-            {t}
-          </option>
+      <datalist id="tag-suggestions">
+        {[...allTags.values()].map((t) => (
+          <option key={t} value={t} />
         ))}
-      </select>
+      </datalist>
     </div>
   )
 }

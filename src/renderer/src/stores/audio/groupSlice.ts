@@ -37,9 +37,10 @@ export interface GroupSlice {
   ) => void
   deleteGroup: (id: GroupID) => void
   searchForGroups: (searchText: string, types: SoundGroupTypes[]) => void
-  searchForTags: (searchText: string) => void
+  // searchForTags: (searchText: string) => void
   soughtGroups: ISoundGroup[]
-  soughtTags: string[]
+  // soughtTags: string[]
+  getTags: () => Set<string>
 }
 
 export const createGroupSlice: StateCreator<GroupSlice & EditingSliceV2, [], [], GroupSlice> = (
@@ -47,6 +48,10 @@ export const createGroupSlice: StateCreator<GroupSlice & EditingSliceV2, [], [],
   get
 ) => ({
   groups: window.audio.Groups.GetAll().groups,
+  getTags() {
+    const allTags = new Set(window.audio.Groups.GetAll().groups.flatMap<string>((g) => g.tags))
+    return allTags
+  },
   addGroup(req) {
     const newGroup = window.audio.Groups.Create(req)
     set({
@@ -197,27 +202,27 @@ export const createGroupSlice: StateCreator<GroupSlice & EditingSliceV2, [], [],
     set({
       soughtGroups
     })
-  },
-  searchForTags(searchText) {
-    if (searchText.trim() === '') {
-      return
-    }
+  }
+  // searchForTags(searchText) {
+  //   if (searchText.trim() === '') {
+  //     return
+  //   }
 
-    const allTags = new Set(window.audio.Groups.GetAll().groups.flatMap<string>((g) => g.tags))
+  //   const allTags = new Set(window.audio.Groups.GetAll().groups.flatMap<string>((g) => g.tags))
 
-    const fuseSearch = new fuse([...allTags.values()], {
-      threshold: 0.2
-    })
+  //   const fuseSearch = new fuse([...allTags.values()], {
+  //     threshold: 0.2
+  //   })
 
-    const results = fuseSearch.search(searchText)
+  //   const results = fuseSearch.search(searchText)
 
-    const soughtTags = results.map((r) => r.item)
+  //   const soughtTags = results.map((r) => r.item)
 
-    set({
-      soughtTags
-    })
-  },
-  soughtTags: []
+  //   set({
+  //     soughtTags
+  //   })
+  // },
+  // soughtTags: []
 })
 
 export const getDefaultGroup = (): Omit<SoundGroupSource, 'id'> => ({

@@ -2,6 +2,7 @@ import { useRef, ChangeEventHandler } from 'react'
 import { useFieldArray } from 'react-hook-form'
 import { FormInput } from '../types'
 import { twMerge } from 'tailwind-merge'
+import { SoundEffectEditableFields } from 'src/apis/audio/types/items'
 
 export type FileSelectInputProps = {
   className?: string
@@ -29,7 +30,7 @@ export function FileSelectInput(props: FileSelectInputProps) {
       path: newPath,
       volume: 100,
       name: newFile.name
-    })
+    } as SoundEffectEditableFields)
   }
 
   return (
