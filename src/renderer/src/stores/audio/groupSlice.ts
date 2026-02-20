@@ -37,7 +37,9 @@ export interface GroupSlice {
   ) => void
   deleteGroup: (id: GroupID) => void
   searchForGroups: (searchText: string, types: SoundGroupTypes[]) => void
+  searchForTags: (searchText: string) => void
   soughtGroups: ISoundGroup[]
+  soughtTags: string[]
 }
 
 export const createGroupSlice: StateCreator<GroupSlice & EditingSliceV2, [], [], GroupSlice> = (
@@ -195,7 +197,27 @@ export const createGroupSlice: StateCreator<GroupSlice & EditingSliceV2, [], [],
     set({
       soughtGroups
     })
-  }
+  },
+  searchForTags(searchText) {
+    if (searchText.trim() === '') {
+      return
+    }
+
+    const allTags = new Set(window.audio.Groups.GetAll().groups.flatMap<string>((g) => g.tags))
+
+    const fuseSearch = new fuse([...allTags.values()], {
+      threshold: 0.2
+    })
+
+    const results = fuseSearch.search(searchText)
+
+    const soughtTags = results.map((r) => r.item)
+
+    set({
+      soughtTags
+    })
+  },
+  soughtTags: []
 })
 
 export const getDefaultGroup = (): Omit<SoundGroupSource, 'id'> => ({

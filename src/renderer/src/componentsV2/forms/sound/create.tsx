@@ -4,6 +4,7 @@ import { FormProvider, SubmitHandler, useForm, useFormContext } from 'react-hook
 import { FormInput, ColorOptions, GroupFormInput, SequenceFormInput } from './types'
 import { FileSelectInput } from './components/fileSelectInput'
 import { FileSelectList } from './components/fileSelectList'
+import { Tag, TagInput } from './components/tagInput'
 
 export function CreateSoundForm() {
   const methods = useForm<FormInput>({
@@ -31,11 +32,16 @@ export function CreateSoundForm() {
   }
 
   const formType = watch('type')
+  const tags = watch('request.tags')
 
   return (
     <div
       className={`
-       
+        p-8
+        h-dvh
+        max-h-dvh
+        overflow-y-scroll
+        relative
       `}
     >
       <FormProvider {...methods}>
@@ -43,25 +49,12 @@ export function CreateSoundForm() {
           className={`
             flex
             flex-col
-            m-4
-            justify-center
-            h-full
-            max-h-full
             items-center
             [&>fieldset]:max-w-[550px]
             [&>fieldset]:w-[550px]
           `}
           onSubmit={methods.handleSubmit(onSubmit)}
         >
-          <fieldset className="fieldset">
-            <legend className="fieldset-legend">Name</legend>
-            <input
-              placeholder="My Button"
-              type="text"
-              className="input"
-              {...register('request.name')}
-            />
-          </fieldset>
           <GroupIcon
             icon={{
               foregroundColor: watch('request.icon.foregroundColor'),
@@ -69,6 +62,16 @@ export function CreateSoundForm() {
               type: 'svg'
             }}
           />
+          <fieldset className="fieldset">
+            <legend className="fieldset-legend">Name</legend>
+            <input
+              placeholder="My Button"
+              type="text"
+              className="input"
+              required
+              {...register('request.name')}
+            />
+          </fieldset>
           <fieldset className="fieldset">
             <legend className="fieldset-legend">Color</legend>
             <select {...register('request.icon.foregroundColor')} className="select">
@@ -88,6 +91,24 @@ export function CreateSoundForm() {
             />
           </fieldset>
           <fieldset className="fieldset">
+            <legend className="fieldset-legend">Tags</legend>
+            <TagInput />
+            <div className="max-w-[320px] flex gap-1 flex-wrap">
+              {tags.map((t) => (
+                <Tag
+                  key={t}
+                  text={t}
+                  onRemove={(nt) =>
+                    setValue(
+                      'request.tags',
+                      tags.filter((t) => t !== nt)
+                    )
+                  }
+                />
+              ))}
+            </div>
+          </fieldset>
+          <fieldset className="fieldset">
             <legend className="fieldset-legend">Button Type</legend>
             <select {...register('type')} className="select">
               <option value="group">Group</option>
@@ -96,6 +117,7 @@ export function CreateSoundForm() {
           </fieldset>
           {formType === 'group' && <CreateGroupForm />}
           {formType === 'sequence' && <CreateSequenceForm />}
+          <input className="btn btn-primary" value="Create Button" type="submit" />
         </form>
       </FormProvider>
     </div>

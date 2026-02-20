@@ -51,6 +51,7 @@ export class RpgAudioBufferNode extends AbstractPlayableRpgAudioNode {
   }
 
   async play(): Promise<void> {
+    await this.awaitLoad()
     this._sourceNode.start()
     this.handlePlay()
   }
