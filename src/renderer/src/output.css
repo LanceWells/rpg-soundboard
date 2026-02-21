@@ -30,8 +30,6 @@
     --radius-lg: 0.5rem;
     --radius-xl: 0.75rem;
     --drop-shadow-lg: 0 4px 4px rgb(0 0 0 / 0.15);
-    --ease-out: cubic-bezier(0, 0, 0.2, 1);
-    --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
     --default-transition-duration: 150ms;
     --default-transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
     --default-font-family: var(--font-sans);
@@ -41,6 +39,7 @@
     --color-shop-200: #7a5343;
     --color-shop-300: #573d39;
     --animate-radialspin: radialspin 2s linear infinite;
+    --animate-drip: slide-in-down 1000ms ease forwards;
   }
 }
 @layer base {
@@ -1536,9 +1535,6 @@
   .z-50 {
     z-index: 50;
   }
-  .z-auto {
-    z-index: auto;
-  }
   .modal-box {
     @layer daisyui.l1.l2.l3 {
       grid-column-start: 1;
@@ -1890,6 +1886,9 @@
   }
   .transform-\[translate\(-50\%\,_0\)\] {
     transform: translate(-50%, 0);
+  }
+  .animate-drip {
+    animation: var(--animate-drip);
   }
   .cursor-pointer {
     cursor: pointer;
@@ -3036,6 +3035,14 @@ body {
   }
   75% {
     background-position: bottom left;
+  }
+}
+@keyframes slide-in-down {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(0);
   }
 }
 @layer properties {

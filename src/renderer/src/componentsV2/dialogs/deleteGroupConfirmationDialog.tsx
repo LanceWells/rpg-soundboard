@@ -35,11 +35,11 @@ export function DeleteGroupConfirmationDialog() {
               <img
                 className={`
                 absolute
-                top-2
+                bottom-0
                 right-1
                 z-50
                 transition-opacity
-                ${isNervous ? 'opacity-100' : 'opacity-0'}
+                ${isNervous ? 'opacity-100 animate-drip' : 'opacity-0'}
               `}
                 src={SweatDrop}
               />

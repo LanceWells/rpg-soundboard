@@ -133,4 +133,14 @@ body {
       background-position: bottom left;
     }
   }
+
+  --animate-drip: slide-in-down 1000ms ease forwards;
+  @keyframes slide-in-down {
+    from {
+      transform: translateY(-100%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
 }

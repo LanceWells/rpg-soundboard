@@ -79,7 +79,7 @@ export const GroupsAudioAPI: IGroups = {
       name: request.name,
       icon: request.icon,
       variant: request.variant,
-      tags: []
+      tags: request.tags
     }
 
     const newConfig = produce(AudioConfig.Config, (draft) => {
@@ -128,7 +128,7 @@ export const GroupsAudioAPI: IGroups = {
       name: request.name,
       sequence: newElements,
       variant: 'Sequence',
-      tags: []
+      tags: request.tags
     }
 
     const newConfig = produce(AudioConfig.Config, (draft) => {
@@ -181,7 +181,7 @@ export const GroupsAudioAPI: IGroups = {
       name: request.name,
       sequence: newElements,
       variant: 'Sequence',
-      tags: []
+      tags: request.tags
     }
 
     const newConfig = produce(AudioConfig.Config, (draft) => {
@@ -259,7 +259,7 @@ export const GroupsAudioAPI: IGroups = {
       name: request.name,
       icon: request.icon,
       variant: request.variant,
-      tags: []
+      tags: request.tags
     }
 
     const newConfig = produce(AudioConfig.Config, (draft) => {

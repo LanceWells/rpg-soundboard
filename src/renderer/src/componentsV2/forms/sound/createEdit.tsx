@@ -1,4 +1,4 @@
-import IconLookup from '@renderer/components/effect/iconLookup'
+// import IconLookup from '@renderer/components/effect/iconLookup'
 import { GroupIcon } from '@renderer/componentsV2/board/icon/base'
 import { FormProvider, useForm, useFormContext } from 'react-hook-form'
 import { FormInput, ColorOptions, GroupFormInput } from './types'
@@ -8,6 +8,7 @@ import { Tag, TagInput } from './components/tagInput'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { FormInputSchema } from './util/schema'
 import { SoundVariant } from '@renderer/utils/soundVariants'
+import { IconLookup } from '@renderer/componentsV2/board/icon/iconLookup'
 
 type CreateEditSoundFormProps = {
   onSubmit: (data: FormInput) => void
@@ -29,6 +30,7 @@ export function CreateEditSoundForm(props: CreateEditSoundFormProps) {
   const { register, watch, setValue, formState } = methods
   const formType = watch('type')
   const tags = watch('request.tags')
+  const fgColor = watch('request.icon.foregroundColor')
 
   return (
     <FormProvider {...methods}>
@@ -72,7 +74,7 @@ export function CreateEditSoundForm(props: CreateEditSoundFormProps) {
           <legend className="fieldset-legend">Color</legend>
           <select {...register('request.icon.foregroundColor')} className="select">
             {Object.entries(ColorOptions).map(([colorName, hex]) => (
-              <option value={hex} style={{ color: hex }}>
+              <option key={colorName} value={hex} style={{ color: hex }}>
                 {colorName}
               </option>
             ))}
@@ -82,7 +84,7 @@ export function CreateEditSoundForm(props: CreateEditSoundFormProps) {
           <legend className="fieldset-legend">Icon</legend>
           <input type="text" className="hidden" {...register('request.icon.name')} />
           <IconLookup
-            fgColor="white"
+            fgColor={fgColor}
             onClick={(newIcon) => setValue('request.icon.name', newIcon)}
           />
         </fieldset>
