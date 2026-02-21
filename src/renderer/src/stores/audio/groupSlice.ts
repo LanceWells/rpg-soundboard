@@ -54,6 +54,7 @@ export const createGroupSlice: StateCreator<GroupSlice & EditingSliceV2, [], [],
   },
   addGroup(req) {
     const newGroup = window.audio.Groups.Create(req)
+    get().searchForGroups('', ['sequence', 'source'])
     set({
       groups: window.audio.Groups.GetAll().groups
     })
@@ -64,6 +65,7 @@ export const createGroupSlice: StateCreator<GroupSlice & EditingSliceV2, [], [],
     const newGroup = window.audio.Groups.CreateSequence(req)
     const newGroups = window.audio.Groups.GetAll().groups
 
+    get().searchForGroups('', ['sequence', 'source'])
     set({
       groups: newGroups
     })
@@ -76,6 +78,8 @@ export const createGroupSlice: StateCreator<GroupSlice & EditingSliceV2, [], [],
     window.audio.Groups.Delete({
       groupID: id
     })
+
+    get().searchForGroups('', ['sequence', 'source'])
 
     set({
       groups: window.audio.Groups.GetAll().groups
@@ -116,6 +120,8 @@ export const createGroupSlice: StateCreator<GroupSlice & EditingSliceV2, [], [],
   updateGroup(req) {
     const updatedGroup = window.audio.Groups.Update(req)
 
+    get().searchForGroups('', ['sequence', 'source'])
+
     set({
       groups: window.audio.Groups.GetAll().groups
     })
@@ -139,6 +145,7 @@ export const createGroupSlice: StateCreator<GroupSlice & EditingSliceV2, [], [],
       groupID,
       ...newGroup
     })
+    get().searchForGroups('', ['sequence', 'source'])
 
     set({
       groups: window.audio.Groups.GetAll().groups
@@ -161,6 +168,7 @@ export const createGroupSlice: StateCreator<GroupSlice & EditingSliceV2, [], [],
       groupID,
       ...newGroup
     })
+    get().searchForGroups('', ['sequence', 'source'])
 
     set({
       groups: window.audio.Groups.GetAll().groups

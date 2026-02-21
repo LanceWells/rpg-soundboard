@@ -39,7 +39,7 @@ export function Group(props: GroupBaseProps) {
     }
   }, [group, isPlaying])
 
-  const popoverRef = useRef<HTMLDetailsElement | null>(null)
+  const popoverRef = useRef<HTMLDivElement | null>(null)
   const popoverId = `${id}-popover`
   const anchorId = `--anchor-${id.replaceAll('-', '')}`
 
@@ -52,7 +52,8 @@ export function Group(props: GroupBaseProps) {
       <button
         onContextMenu={() => {
           if (popoverRef?.current) {
-            popoverRef.current.open = true
+            popoverRef.current.focus()
+            // popoverRef.current.showPopover()
           }
         }}
         data-groupid={group.id}
@@ -133,24 +134,12 @@ export function Group(props: GroupBaseProps) {
         `}
         />
       </button>
-      {/* <div
-        className={`
-        dropdown
-        dropdown-center
-        menu
-        w-52
-        bg-base-100
-        shadow-sm
-      `}
-        ref={popoverRef}
-        popover="auto"
-        id={popoverId}
-        style={{
-          positionAnchor: anchorId
-        }}
-      > */}
-      <details ref={popoverRef} className="dropdown">
-        <ul className="menu dropdown bg-base-100">
+      <div className="dropdown absolute bottom-0 left-0">
+        <div tabIndex={0} role="button" ref={popoverRef}></div>
+        <ul
+          tabIndex={-1}
+          className="menu dropdown-content relative bg-base-100 z-50 shadow-pixel-md"
+        >
           <li>
             <button
               onClick={() =>
@@ -182,8 +171,7 @@ export function Group(props: GroupBaseProps) {
             </button>
           </li>
         </ul>
-      </details>
-      {/* </div> */}
+      </div>
     </div>
   )
 }
