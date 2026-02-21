@@ -38,7 +38,7 @@ export function newDefaultSequenceRequest(): SequenceFormInput {
   }
 }
 
-export function containerToRequest(group: ISoundGroup): FormInput {
+export function copyGroupForRequest(group: ISoundGroup): FormInput {
   switch (group.type) {
     case 'source': {
       const groupCopy = produce(group as SoundGroupSource, (draft) => draft)

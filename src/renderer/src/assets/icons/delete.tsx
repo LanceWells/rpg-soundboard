@@ -1,8 +1,12 @@
+import { twMerge } from 'tailwind-merge'
+
 export default function DeleteIcon(props: { className?: string }) {
   const { className } = props
 
+  const mergedClass = twMerge('fill-current w-8 h-8 stroke-current', className)
+
   return (
-    <svg className={`fill-current w-8 h-8 stroke-current ${className}`} viewBox="0 0 24 24">
+    <svg className={mergedClass} viewBox="0 0 24 24">
       <path d="M10 12V17" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
       <path d="M14 12V17" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
       <path d="M4 7H20" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />

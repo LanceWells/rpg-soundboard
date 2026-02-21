@@ -1,37 +1,40 @@
 import { useAudioStore } from '@renderer/stores/audio/audioStore'
 import { CreateEditSoundForm } from './createEdit'
 import { FormInput } from './types'
-import { containerToRequest as copyGroupForRequest, newDefaultGroupRequest } from './util/default'
+import { copyGroupForRequest } from './util/default'
+import { GroupID } from 'src/apis/audio/types/groups'
+import { useMemo } from 'react'
+import { useNavigate } from '@tanstack/react-router'
 
-export function CreateSoundForm() {
-  const addGroup = useAudioStore((store) => store.updateGroup)
-  const addSequence = useAudioStore((store) => store.updateSequencePartial)
-  const groupBeingEditedId = useAudioStore((store) => store.groupBeingEditedID)
+export type EditSoundFormProps = {
+  id: GroupID
+}
 
-  const defaultGroup = useAudioStore((store) => {
-    const groupBeingEditedId = store.groupBeingEditedID
-    if (groupBeingEditedId !== null) {
-      const groupBeingEdited = store.getGroup(groupBeingEditedId)
-      return copyGroupForRequest(groupBeingEdited)
-    }
+export function EditSoundForm(props: EditSoundFormProps) {
+  const { id } = props
 
-    return newDefaultGroupRequest()
-  })
+  const updateGroup = useAudioStore((store) => store.updateGroup)
+  const updateSequence = useAudioStore((store) => store.updateSequencePartial)
+  const getGroup = useAudioStore((store) => store.getGroup)
+  const nav = useNavigate()
+
+  const groupBeforeEdits = useMemo(() => {
+    const group = getGroup(id)
+    return copyGroupForRequest(group)
+  }, [id])
 
   const onSubmit = (data: FormInput) => {
-    if (groupBeingEditedId === null) {
-      console.error('Trying to edit without a group ID')
-      return
-    }
-
     if (data.type === 'group') {
-      addGroup({
-        groupID: groupBeingEditedId,
+      updateGroup({
+        groupID: id,
         ...data.request
       })
     } else if (data.type === 'sequence') {
-      addSequence(groupBeingEditedId, data.request)
+      updateSequence(id, data.request)
     }
+    nav({
+      to: '/'
+    })
   }
 
   return (
@@ -44,9 +47,8 @@ export function CreateSoundForm() {
         relative
       `}
     >
-      <h1 className="text-2xl text-center mb-4">Edit {defaultGroup.request.name}</h1>
-      <CreateEditSoundForm onSubmit={onSubmit} defaultValues={defaultGroup} />
-      <button>Delete</button>
+      <h1 className="text-2xl text-center mb-4">Edit {groupBeforeEdits.request.name}</h1>
+      <CreateEditSoundForm onSubmit={onSubmit} defaultValues={groupBeforeEdits} />
     </div>
   )
 }

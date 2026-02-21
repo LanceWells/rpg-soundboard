@@ -30,8 +30,6 @@ export function CreateEditSoundForm(props: CreateEditSoundFormProps) {
   const formType = watch('type')
   const tags = watch('request.tags')
 
-  const f = FormInputSchema.safeParse(formState['values'])
-
   return (
     <FormProvider {...methods}>
       <p
@@ -41,6 +39,7 @@ export function CreateEditSoundForm(props: CreateEditSoundFormProps) {
         `}
       >
         There were some problems with the form.
+        {formState.errors.root?.message ?? ''}
       </p>
       <form
         className={`
@@ -114,7 +113,7 @@ export function CreateEditSoundForm(props: CreateEditSoundFormProps) {
         </fieldset>
         {formType === 'group' && <CreateGroupForm />}
         {formType === 'sequence' && <CreateSequenceForm />}
-        <input className="btn btn-primary m-4" value="Create Button" type="submit" />
+        <input className="btn btn-primary m-4 w-50" value="Save" type="submit" />
       </form>
     </FormProvider>
   )

@@ -1,3 +1,4 @@
+import { DeleteGroupConfirmationDialog } from './componentsV2/dialogs/deleteGroupConfirmationDialog'
 import { RootLayout } from './componentsV2/layout/root'
 
 /**
@@ -6,6 +7,7 @@ import { RootLayout } from './componentsV2/layout/root'
 export default function App() {
   return (
     <div className="flex flex-col h-full w-full grow overflow-hidden">
+      <DeleteGroupConfirmationDialog />
       <RootLayout />
       {/* <NewSequenceModal />
       <EditSequenceModal />

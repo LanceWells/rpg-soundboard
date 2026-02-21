@@ -2,9 +2,13 @@ import WoodenShelf from '@renderer/assets/images/WoodShelf.png'
 import { GroupID } from 'src/apis/audio/types/groups'
 import { useAudioStore } from '@renderer/stores/audio/audioStore'
 import { useShallow } from 'zustand/shallow'
-import { useCallback } from 'react'
+import { useCallback, useRef } from 'react'
 import { MemoizedGroupIcon } from '../icon/base'
 import { VariantTag } from './variantTag'
+import PencilIcon from '@renderer/assets/icons/pencil'
+import DeleteIcon from '@renderer/assets/icons/delete'
+import { useNavigate } from '@tanstack/react-router'
+import { DeleteGroupConfirmationDialogId } from '@renderer/componentsV2/dialogs/deleteGroupConfirmationDialog'
 
 export type GroupBaseProps = {
   id: GroupID
@@ -14,7 +18,10 @@ export function Group(props: GroupBaseProps) {
   const { id } = props
 
   const getGroup = useAudioStore((store) => store.getGroup)
+  const setGroupToDelete = useAudioStore((store) => store.setGroupBeingDeletedID)
+
   const group = getGroup(id)
+  const nav = useNavigate()
 
   const { playGroup, stopGroup, isPlaying } = useAudioStore(
     useShallow((state) => ({
@@ -32,10 +39,24 @@ export function Group(props: GroupBaseProps) {
     }
   }, [group, isPlaying])
 
+  const popoverRef = useRef<HTMLDetailsElement | null>(null)
+  const popoverId = `${id}-popover`
+  const anchorId = `--anchor-${id.replaceAll('-', '')}`
+
   return (
-    <button
-      data-groupid={group.id}
-      className={`
+    <div
+      style={{
+        anchorName: anchorId
+      }}
+    >
+      <button
+        onContextMenu={() => {
+          if (popoverRef?.current) {
+            popoverRef.current.open = true
+          }
+        }}
+        data-groupid={group.id}
+        className={`
         cursor-pointer
         justify-items-center
         overflow-ellipsis
@@ -58,29 +79,29 @@ export function Group(props: GroupBaseProps) {
         hover:before:opacity-20
         rounded-md
       `}
-      onClick={onClickPlay}
-    >
-      <div
-        className={`
-        absolute
-        left-1/2
-        top-2
-        transform-[translate(-50%,_0%)]
-      `}
+        onClick={onClickPlay}
       >
-        <MemoizedGroupIcon icon={group.icon} />
-      </div>
-      <img
-        className={`
+        <div
+          className={`
+            absolute
+            left-1/2
+            top-2
+            transform-[translate(-50%,_0%)]
+          `}
+        >
+          <MemoizedGroupIcon icon={group.icon} />
+        </div>
+        <img
+          className={`
           absolute
           top-0
           left-1/2
           transform-[translate(-50%,_0)]
         `}
-        src={WoodenShelf}
-      />
-      <span
-        className={`
+          src={WoodenShelf}
+        />
+        <span
+          className={`
         max-w-3/4
         overflow-hidden
         overflow-ellipsis
@@ -99,18 +120,70 @@ export function Group(props: GroupBaseProps) {
             : 'text-white'
         }
         `}
-      >
-        {group.name}
-      </span>
-      <VariantTag
-        variant={group.variant}
-        className={`
+        >
+          {group.name}
+        </span>
+        <VariantTag
+          variant={group.variant}
+          className={`
           absolute
           bottom-0
           right-0
           z-20
         `}
-      />
-    </button>
+        />
+      </button>
+      {/* <div
+        className={`
+        dropdown
+        dropdown-center
+        menu
+        w-52
+        bg-base-100
+        shadow-sm
+      `}
+        ref={popoverRef}
+        popover="auto"
+        id={popoverId}
+        style={{
+          positionAnchor: anchorId
+        }}
+      > */}
+      <details ref={popoverRef} className="dropdown">
+        <ul className="menu dropdown bg-base-100">
+          <li>
+            <button
+              onClick={() =>
+                nav({
+                  to: '/sound/$groupId/edit',
+                  params: {
+                    groupId: id
+                  }
+                })
+              }
+              className="btn flex flex-row items-center"
+            >
+              <PencilIcon className="w-4 h-4" />
+              Edit
+            </button>
+          </li>
+          <li>
+            <button
+              onClick={() => {
+                setGroupToDelete(id)
+                ;(
+                  document.getElementById(DeleteGroupConfirmationDialogId) as HTMLDialogElement
+                ).showModal()
+              }}
+              className="btn btn-error flex flex-row items-center"
+            >
+              <DeleteIcon className="w-4 h-4" />
+              Delete
+            </button>
+          </li>
+        </ul>
+      </details>
+      {/* </div> */}
+    </div>
   )
 }
