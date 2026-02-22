@@ -3,7 +3,7 @@ import daisyui from 'daisyui'
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: ['./src/renderer/src/**/*.{js,ts,tsx,jsx}', './src/renderer/index.html'],
+  content: ['./src/renderer/**/*.{js,ts,tsx,jsx}', './src/renderer/index.html'],
   theme: {},
   plugins: [typography, daisyui]
 }
