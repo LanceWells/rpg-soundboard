@@ -1,7 +1,7 @@
 import TownHero from '@renderer/assets/images/TownHero.png'
 import { useAudioStore } from '@renderer/stores/audio/audioStore'
 import { Link } from '@tanstack/react-router'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useDebounce } from 'use-debounce'
 import { Route as CreateSoundRoute } from '@renderer/routes/sound/create'
 import { Route as BoardRoute } from '@renderer/routes/'

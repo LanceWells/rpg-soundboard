@@ -1,7 +1,5 @@
-import { app, shell, BrowserWindow, ipcMain, protocol, net, session } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, protocol, net } from 'electron'
 import { join } from 'path'
-import path from 'node:path'
-import os from 'node:os'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { AudProtocolPrefix } from '../apis/audProtocol/aud'

@@ -1,4 +1,4 @@
-import { CreateSoundForm } from '@renderer/componentsV2/forms/sound/create'
+import { CreateSoundForm } from '@renderer/components/forms/sound/create'
 import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/sound/create')({

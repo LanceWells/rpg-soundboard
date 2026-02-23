@@ -8,7 +8,7 @@ import { VariantTag } from './variantTag'
 import PencilIcon from '@renderer/assets/icons/pencil'
 import DeleteIcon from '@renderer/assets/icons/delete'
 import { useNavigate } from '@tanstack/react-router'
-import { DeleteGroupConfirmationDialogId } from '@renderer/componentsV2/dialogs/deleteGroupConfirmationDialog'
+import { DeleteGroupConfirmationDialogId } from '@renderer/components/dialogs/deleteGroupConfirmationDialog'
 
 export type GroupBaseProps = {
   id: GroupID
@@ -40,7 +40,6 @@ export function Group(props: GroupBaseProps) {
   }, [group, isPlaying])
 
   const popoverRef = useRef<HTMLDivElement | null>(null)
-  const popoverId = `${id}-popover`
   const anchorId = `--anchor-${id.replaceAll('-', '')}`
 
   return (

@@ -1,4 +1,4 @@
-import { Group } from '@renderer/componentsV2/board/groups/group'
+import { Group } from '@renderer/components/board/groups/group'
 import { useAudioStore } from '@renderer/stores/audio/audioStore'
 import { createFileRoute } from '@tanstack/react-router'
 import { useVirtualizer } from '@tanstack/react-virtual'

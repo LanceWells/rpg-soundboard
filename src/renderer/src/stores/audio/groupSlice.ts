@@ -10,10 +10,10 @@ import {
 } from 'src/apis/audio/types/items'
 import { StateCreator } from 'zustand'
 import { produce } from 'immer'
-import { ColorOptions } from '@renderer/components/icon/colorPicker'
 import { isSequenceGroup, isSourceGroup } from '@renderer/utils/typePredicates'
 import { EditingSliceV2 } from './editingSliceV2'
 import fuse from 'fuse.js'
+import { ColorOptions } from '@renderer/components/forms/sound/types'
 
 export interface GroupSlice {
   groups: ISoundGroup[]

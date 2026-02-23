@@ -1,4 +1,4 @@
-import { EditSoundForm } from '@renderer/componentsV2/forms/sound/edit'
+import { EditSoundForm } from '@renderer/components/forms/sound/edit'
 import { createFileRoute } from '@tanstack/react-router'
 import { GroupID } from 'src/apis/audio/types/groups'
 

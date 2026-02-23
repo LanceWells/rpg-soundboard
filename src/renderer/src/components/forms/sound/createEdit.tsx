@@ -1,5 +1,5 @@
 // import IconLookup from '@renderer/components/effect/iconLookup'
-import { GroupIcon } from '@renderer/componentsV2/board/icon/base'
+import { GroupIcon } from '@renderer/components/board/icon/base'
 import { FormProvider, useForm, useFormContext } from 'react-hook-form'
 import { FormInput, ColorOptions, GroupFormInput } from './types'
 import { FileSelectInput } from './components/fileSelectInput'
@@ -8,7 +8,7 @@ import { Tag, TagInput } from './components/tagInput'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { FormInputSchema } from './util/schema'
 import { SoundVariant } from '@renderer/utils/soundVariants'
-import { IconLookup } from '@renderer/componentsV2/board/icon/iconLookup'
+import { IconLookup } from '@renderer/components/board/icon/iconLookup'
 
 type CreateEditSoundFormProps = {
   onSubmit: (data: FormInput) => void

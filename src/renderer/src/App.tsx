@@ -1,5 +1,5 @@
-import { DeleteGroupConfirmationDialog } from './componentsV2/dialogs/deleteGroupConfirmationDialog'
-import { RootLayout } from './componentsV2/layout/root'
+import { DeleteGroupConfirmationDialog } from './components/dialogs/deleteGroupConfirmationDialog'
+import { RootLayout } from './components/layout/root'
 
 /**
  * The base of the application. This is the root of the tree and contains all base-level elements.
