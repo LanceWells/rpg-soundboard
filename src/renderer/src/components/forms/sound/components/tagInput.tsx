@@ -1,8 +1,8 @@
 import { useFormContext } from 'react-hook-form'
 import { FormInput } from '../types'
-import CloseIcon from '@renderer/assets/icons/close'
 import { useAudioStore } from '@renderer/stores/audio/audioStore'
 import { useRef } from 'react'
+import { CloseIcon } from '@renderer/assets/icons'
 
 export function TagInput() {
   const { watch, setValue } = useFormContext<FormInput>()

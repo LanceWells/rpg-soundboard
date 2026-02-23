@@ -1,12 +1,12 @@
-export default function CloseIcon(props: { className?: string }) {
+import { twMerge } from 'tailwind-merge'
+
+export function CloseIcon(props: { className?: string }) {
   const { className } = props
 
+  const mergedClass = twMerge('stroke-current fill-current w-8 h-8', className)
+
   return (
-    <svg
-      className={`fill-current w-8 h-8 ${className}`}
-      viewBox="0 0 24 24"
-      xmlns="http://www.w3.org/2000/svg"
-    >
+    <svg className={mergedClass} viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
       <g id="Menu / Close_MD">
         <path
           stroke="#000000"

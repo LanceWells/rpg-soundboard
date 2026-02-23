@@ -1,4 +1,4 @@
-import TownHero from '@renderer/assets/images/TownHero.png'
+import TownHero from '@renderer/assets/images/Layout/TownHero.png'
 import { useAudioStore } from '@renderer/stores/audio/audioStore'
 import { Link } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'

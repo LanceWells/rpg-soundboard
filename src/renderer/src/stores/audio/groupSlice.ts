@@ -11,7 +11,6 @@ import {
 import { StateCreator } from 'zustand'
 import { produce } from 'immer'
 import { isSequenceGroup, isSourceGroup } from '@renderer/utils/typePredicates'
-import { EditingSliceV2 } from './editingSliceV2'
 import fuse from 'fuse.js'
 import { ColorOptions } from '@renderer/components/forms/sound/types'
 
@@ -43,10 +42,7 @@ export interface GroupSlice {
   getTags: () => Set<string>
 }
 
-export const createGroupSlice: StateCreator<GroupSlice & EditingSliceV2, [], [], GroupSlice> = (
-  set,
-  get
-) => ({
+export const createGroupSlice: StateCreator<GroupSlice, [], [], GroupSlice> = (set, get) => ({
   groups: window.audio.Groups.GetAll().groups,
   getTags() {
     const allTags = new Set(window.audio.Groups.GetAll().groups.flatMap<string>((g) => g.tags))
@@ -69,8 +65,6 @@ export const createGroupSlice: StateCreator<GroupSlice & EditingSliceV2, [], [],
     set({
       groups: newGroups
     })
-
-    get().updateEditingSequenceV2({})
 
     return newGroup
   },

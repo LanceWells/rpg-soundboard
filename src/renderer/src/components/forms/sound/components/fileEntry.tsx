@@ -1,6 +1,4 @@
-import CloseIcon from '@renderer/assets/icons/close'
-import SoundIcon from '@renderer/assets/icons/sound'
-import StopIcon from '@renderer/assets/icons/stop'
+import { CloseIcon, SoundIcon, StopIcon } from '@renderer/assets/icons'
 import { ISoundContainer } from '@renderer/utils/soundContainer/interface'
 import { NewSoundContainer } from '@renderer/utils/soundContainer/util'
 import { useState, useRef, useEffect, useCallback, ChangeEventHandler } from 'react'

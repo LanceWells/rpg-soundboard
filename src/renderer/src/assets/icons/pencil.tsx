@@ -1,6 +1,6 @@
 import { twMerge } from 'tailwind-merge'
 
-export default function PencilIcon(props: { className?: string }) {
+export function PencilIcon(props: { className?: string }) {
   const { className } = props
 
   const mergedClass = twMerge('fill-current w-8 h-8', className)

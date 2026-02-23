@@ -1,6 +1,6 @@
 import { twMerge } from 'tailwind-merge'
 
-export default function BarsIcon(props: { className?: string }) {
+export function BarsIcon(props: { className?: string }) {
   const { className } = props
 
   const mergedClass = twMerge('stroke-current fill-current w-8 h-8', className)

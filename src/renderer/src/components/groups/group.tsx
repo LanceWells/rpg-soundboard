@@ -1,14 +1,13 @@
-import WoodenShelf from '@renderer/assets/images/WoodShelf.png'
+import WoodenShelf from '@renderer/assets/images/Layout/WoodShelf.png'
 import { GroupID } from 'src/apis/audio/types/groups'
 import { useAudioStore } from '@renderer/stores/audio/audioStore'
 import { useShallow } from 'zustand/shallow'
 import { useCallback, useRef } from 'react'
 import { MemoizedGroupIcon } from '../icon/base'
 import { VariantTag } from './variantTag'
-import PencilIcon from '@renderer/assets/icons/pencil'
-import DeleteIcon from '@renderer/assets/icons/delete'
 import { useNavigate } from '@tanstack/react-router'
 import { DeleteGroupConfirmationDialogId } from '@renderer/components/dialogs/deleteGroupConfirmationDialog'
+import { PencilIcon, DeleteIcon } from '@renderer/assets/icons'
 
 export type GroupBaseProps = {
   id: GroupID

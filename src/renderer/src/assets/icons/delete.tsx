@@ -1,6 +1,6 @@
 import { twMerge } from 'tailwind-merge'
 
-export default function DeleteIcon(props: { className?: string }) {
+export function DeleteIcon(props: { className?: string }) {
   const { className } = props
 
   const mergedClass = twMerge('fill-current w-8 h-8 stroke-current', className)

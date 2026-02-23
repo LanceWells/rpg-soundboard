@@ -1,8 +1,8 @@
 import { useAudioStore } from '@renderer/stores/audio/audioStore'
 import { useMemo, useState } from 'react'
-import { GroupIcon } from '../board/icon/base'
-import SweatDrop from '@renderer/assets/images/SweatDrop.png'
-import CloseIcon from '@renderer/assets/icons/close'
+import { GroupIcon } from '../icon/base'
+import SweatDrop from '@renderer/assets/images/Buttons/SweatDrop.png'
+import { CloseIcon } from '@renderer/assets/icons'
 
 export const DeleteGroupConfirmationDialogId = 'DeleteGroupConfirmationDialog'
 

@@ -1,6 +1,6 @@
 import { twMerge } from 'tailwind-merge'
 
-export default function GroupIcon(props: { className?: string }) {
+export function GroupIcon(props: { className?: string }) {
   const { className } = props
 
   const mergedClass = twMerge('fill-current stroke-current w-8 h-8', className)

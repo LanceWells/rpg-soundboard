@@ -1,5 +1,5 @@
-import BookImage from '@renderer/assets/images/Book.png'
-import ScrollImage from '@renderer/assets/images/Scroll.png'
+import BookImage from '@renderer/assets/images/Buttons/Book.png'
+import ScrollImage from '@renderer/assets/images/Buttons/Scroll.png'
 import { svgToData } from '@iconify/utils'
 import { soundboardIcons } from '@renderer/utils/fetchIcons'
 import { useRef, useState, useEffect } from 'react'

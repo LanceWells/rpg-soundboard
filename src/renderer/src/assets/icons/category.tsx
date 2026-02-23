@@ -1,8 +1,12 @@
-export default function CategoryIcon(props: { className?: string }) {
+import { twMerge } from 'tailwind-merge'
+
+export function CategoryIcon(props: { className?: string }) {
   const { className } = props
 
+  const mergedClass = twMerge('stroke-current fill-current w-8 h-8', className)
+
   return (
-    <svg className={`fill-current w-8 h-8 ${className}`} viewBox="0 0 16 16">
+    <svg className={mergedClass} viewBox="0 0 16 16">
       <g>
         <path d="M6.5 7.25a.75.75 0 01.75-.75h4a.75.75 0 010 1.5h-4a.75.75 0 01-.75-.75zM4.75 3.5a.75.75 0 000 1.5h.01a.75.75 0 000-1.5h-.01zM4 7.25a.75.75 0 01.75-.75h.01a.75.75 0 010 1.5h-.01A.75.75 0 014 7.25zM4.75 9.5a.75.75 0 000 1.5h.01a.75.75 0 000-1.5h-.01zM6.5 4.25a.75.75 0 01.75-.75h2.5a.75.75 0 010 1.5h-2.5a.75.75 0 01-.75-.75zM7.25 9.5a.75.75 0 000 1.5h3a.75.75 0 000-1.5h-3z" />
 

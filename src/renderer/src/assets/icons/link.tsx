@@ -1,6 +1,6 @@
 import { twMerge } from 'tailwind-merge'
 
-export default function LinkIcon(props: { className?: string }) {
+export function LinkIcon(props: { className?: string }) {
   const { className } = props
 
   const mergedClass = twMerge('stroke-current w-8 h-8', className)

@@ -1,8 +1,12 @@
-export default function PistolIcon(props: { className?: string }) {
+import { twMerge } from 'tailwind-merge'
+
+export function PistolIcon(props: { className?: string }) {
   const { className } = props
 
+  const mergedClass = twMerge('fill-current w-8 h-8', className)
+
   return (
-    <svg className={`fill-current w-8 h-8 ${className}`} viewBox="0 0 512 512">
+    <svg className={mergedClass} viewBox="0 0 512 512">
       <g>
         <g>
           <path

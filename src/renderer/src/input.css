@@ -39,7 +39,7 @@ body {
     border-image-width: 60px 60px 60px 60px;
     border-image-outset: 0px 0px 0px 0px;
     border-image-repeat: repeat repeat;
-    border-image-source: url('./assets/images/WoodPaneling.png');
+    border-image-source: url('./assets/images/Layout/WoodPaneling.png');
     border-style: solid;
     border-style: var(--tw-border-style);
     border-width: 34px;
@@ -62,12 +62,12 @@ body {
   }
 
   .shop-shelf {
-    background-image: url('./assets/images/BareShelf.png');
+    background-image: url('./assets/images/Layout/BareShelf.png');
   }
 
   .shop-wall {
     background-repeat: repeat;
-    background-image: url('./assets/images/Wall.png');
+    background-image: url('./assets/images/Layout/Wall.png');
   }
 
   .input {
