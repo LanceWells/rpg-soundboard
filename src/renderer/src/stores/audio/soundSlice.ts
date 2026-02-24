@@ -3,16 +3,23 @@ import { EffectID } from 'src/apis/audio/types/effects'
 import { GetSoundsResponse, GroupID } from 'src/apis/audio/types/groups'
 import { StateCreator, StoreApi } from 'zustand'
 import { GroupSlice } from './groupSlice'
-import { ISoundContainer } from '@renderer/utils/soundContainer/interface'
+import {
+  Handler,
+  ISoundContainer,
+  ISoundtrackContainer
+} from '@renderer/utils/soundContainer/interface'
 import { SequenceSoundContainer } from '@renderer/utils/soundContainer/variants/sequence'
-import { isSequenceGroup } from '@renderer/utils/typePredicates'
-import { ISoundGroup, SoundGroupSequence } from 'src/apis/audio/types/items'
+import { isSequenceGroup, isSoundtrackContainer } from '@renderer/utils/typePredicates'
+import { ISoundGroup, SoundGroupSequence, SoundIcon } from 'src/apis/audio/types/items'
 import { Ctx } from '@renderer/rpgAudioEngine'
 
 export interface SoundSlice {
   playGroup: (groupID: GroupID) => Promise<void>
   stopGroup: (groupID: GroupID) => void
   getSounds: (groupID: GroupID) => Promise<GetSoundsResponse>
+  activeSoundtrack: SoundTrackDetails | null
+  playNextSong: () => void
+  setMusicVolume: (newVolume: number) => void
   toggleInCave: () => void
   soundCtx(): Ctx
   isInCave: boolean
@@ -21,6 +28,13 @@ export interface SoundSlice {
 const GroupHandles: Map<GroupID, Array<ISoundContainer>> = new Map()
 
 const RepeatSoundIDs: Map<GroupID, EffectID> = new Map()
+
+export type SoundTrackDetails = {
+  icon: SoundIcon
+  groupName: string
+  effectName: string
+  groupID: GroupID
+}
 
 export const createSoundSlice: StateCreator<SoundSlice & GroupSlice, [], [], SoundSlice> = (
   set,
@@ -32,10 +46,32 @@ export const createSoundSlice: StateCreator<SoundSlice & GroupSlice, [], [], Sou
       groupID
     })
   },
+  activeSoundtrack: null,
+  playNextSong() {
+    const activeSoundtracks = getActiveSongs(get)
+
+    activeSoundtracks
+      .flatMap((a) => GroupHandles.get(a.id))
+      .filter((a) => a !== undefined && isSoundtrackContainer(a))
+      .forEach(async (a) => await a.playNextSong())
+  },
+  setMusicVolume(newVolume) {
+    const activeSoundtracks = getActiveSongs(get)
+
+    activeSoundtracks
+      .flatMap((a) => GroupHandles.get(a.id))
+      .filter((a) => a !== undefined)
+      .forEach(async (a) => a.ChangeVolume(newVolume))
+  },
   async playGroup(groupID) {
     const group = window.audio.Groups.Get({
       groupID
     })
+
+    if (group.group === undefined) {
+      console.error(`Tried to play a group with ID ${groupID}, but it's not in the config.`)
+      return
+    }
 
     let sound: ISoundContainer
     if (isSequenceGroup(group.group)) {
@@ -50,7 +86,7 @@ export const createSoundSlice: StateCreator<SoundSlice & GroupSlice, [], [], Sou
           effectGroups,
           stoppedHandler: {
             id: groupID,
-            handler: (groupID: string) => handleHowlStop(groupID as GroupID, set, get)
+            handler: (groupID: string) => handleGroupStop(groupID as GroupID, set, get)
           }
         },
         get().soundCtx()
@@ -67,12 +103,23 @@ export const createSoundSlice: StateCreator<SoundSlice & GroupSlice, [], [], Sou
           effects: audio.sounds,
           stopHandler: {
             id: groupID,
-            handler: (groupID: string) => handleHowlStop(groupID as GroupID, set, get)
+            handler: (groupID: string) => handleGroupStop(groupID as GroupID, set, get)
           }
         },
         undefined,
         get().soundCtx()
       )
+
+      if (isSoundtrackContainer(sound)) {
+        const handler: Handler<string, ISoundContainer & ISoundtrackContainer> = {
+          id: groupID,
+          handler(groupID, container) {
+            handleNextSong(groupID as GroupID, container, set, get)
+          }
+        }
+
+        sound.on('playNext', handler)
+      }
     }
 
     const playingSoundTracks = get()
@@ -117,8 +164,18 @@ export const createSoundSlice: StateCreator<SoundSlice & GroupSlice, [], [], Sou
     sound.Play()
   },
   stopGroup(groupID) {
-    if (GroupHandles.has(groupID)) {
-      GroupHandles.get(groupID)?.forEach((handle) => handle.Stop())
+    if (!GroupHandles.has(groupID)) {
+      return
+    }
+
+    const activeSoundtracks = getActiveSongs(get)
+    const groups = GroupHandles.get(groupID)!
+    if (groups) GroupHandles.get(groupID)?.forEach((handle) => handle.Stop())
+
+    if (activeSoundtracks.some((ast) => ast.id === groupID)) {
+      set({
+        activeSoundtrack: null
+      })
     }
   },
   toggleInCave() {
@@ -136,7 +193,13 @@ export const createSoundSlice: StateCreator<SoundSlice & GroupSlice, [], [], Sou
   }
 })
 
-function handleHowlStop(
+function getActiveSongs(get: StoreApi<SoundSlice & GroupSlice>['getState']) {
+  return get()
+    .playingGroups.map((g) => get().getGroup(g))
+    .filter((g) => isSoundtrack(g, get))
+}
+
+function handleGroupStop(
   groupID: GroupID,
   set: StoreApi<SoundSlice & GroupSlice>['setState'],
   get: StoreApi<SoundSlice & GroupSlice>['getState']
@@ -168,6 +231,25 @@ function handleHowlStop(
     const newGroups = [...GroupHandles.keys()]
     return {
       playingGroups: newGroups
+    }
+  })
+}
+
+function handleNextSong(
+  groupID: GroupID,
+  sound: ISoundtrackContainer,
+  set: StoreApi<SoundSlice & GroupSlice>['setState'],
+  get: StoreApi<SoundSlice & GroupSlice>['getState']
+) {
+  const group = get().getGroup(groupID)
+  const activeSong = sound.getActiveSong()
+
+  set({
+    activeSoundtrack: {
+      groupID: groupID,
+      icon: group.icon,
+      groupName: group.name,
+      effectName: activeSong.name
     }
   })
 }

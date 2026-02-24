@@ -4,7 +4,8 @@ import type {
   SoundEffect,
   SoundGroupReferenceEditableFields,
   SoundGroupSequenceEditableFields,
-  SoundGroupSequence
+  SoundGroupSequence,
+  ISoundGroup
 } from './items'
 import type { EffectID } from './effects'
 import type { SupportedFileTypes } from '../supportedFileTypes'

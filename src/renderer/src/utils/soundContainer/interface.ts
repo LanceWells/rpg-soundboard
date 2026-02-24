@@ -1,3 +1,4 @@
+import { RpgAudio } from '@renderer/rpgAudioEngine'
 import { EffectID } from 'src/apis/audio/types/effects'
 import { SoundEffectWithPlayerDetails } from 'src/apis/audio/types/groups'
 import { SoundVariants } from 'src/apis/audio/types/soundVariants'
@@ -26,9 +27,9 @@ export type StopHandler = {
   handler: (groupID: string) => void
 }
 
-export type Handler<T extends string> = {
+export type Handler<T extends string, C = ISoundContainer> = {
   id: T
-  handler: (groupID: T, container: ISoundContainer) => void
+  handler: (groupID: T, container: C) => void
 }
 
 /**
@@ -60,6 +61,12 @@ export type SoundContainerSetup<
   playingHandler?: Handler<TPlaying>
 }
 
+export type RpgAudioContainer = {
+  targetVolume: number
+  name: string
+  audio: RpgAudio
+}
+
 export interface ISoundContainer {
   Variant: SoundVariants
   Play(): void
@@ -68,4 +75,16 @@ export interface ISoundContainer {
   Fade(ratio: number, fadeTime?: number): void
   GetDuration(): Promise<number>
   readonly LoadedEffectID: EffectID | undefined
+}
+
+export const SoundtrackEvents = {
+  playNext: 'playNext'
+}
+
+export type SoundtrackEvents = keyof typeof SoundtrackEvents
+
+export interface ISoundtrackContainer {
+  playNextSong(): Promise<void>
+  getActiveSong(): RpgAudioContainer
+  on(event: SoundtrackEvents, handler: Handler<string, ISoundContainer & ISoundtrackContainer>)
 }

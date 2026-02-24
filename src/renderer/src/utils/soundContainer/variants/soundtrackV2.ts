@@ -1,26 +1,29 @@
 import { SoundVariants } from 'src/apis/audio/types/soundVariants'
-import { Handler, ISoundContainer, SoundContainerSetup } from '../interface'
+import {
+  Handler,
+  ISoundContainer,
+  ISoundtrackContainer,
+  RpgAudioContainer,
+  SoundContainerSetup,
+  SoundtrackEvents
+} from '../interface'
 import { Ctx, ListenerType, RpgAudio, RpgAudioState } from '@renderer/rpgAudioEngine'
 import { getRandomInt } from '@renderer/utils/random'
 import { SoundEffectWithPlayerDetails } from 'src/apis/audio/types/groups'
 import { produce } from 'immer'
 
-type RpgAudioContainer = {
-  targetVolume: number
-  audio: RpgAudio
-}
-
-export class SoundtrackSoundContainerV2 implements ISoundContainer {
+export class SoundtrackSoundContainerV2 implements ISoundContainer, ISoundtrackContainer {
   public Variant: SoundVariants = 'Soundtrack'
 
   private readonly crossfadeTime: number = 12500
   private _fadeTime: number = 2500
   private _isActive: boolean = true
 
-  private _audioQueue: [RpgAudioContainer, ...RpgAudioContainer[]]
+  private _audioQueue: RpgAudioContainer[]
   private ctx: Ctx
   private _loadedHandler: Handler<string> | undefined
   private _stopHandler: Handler<string> | undefined
+  private _nextHandlers: Handler<string, ISoundContainer & ISoundtrackContainer>[] = []
 
   private _effects: SoundEffectWithPlayerDetails[]
   private _effectsPointer: number = 0
@@ -76,8 +79,20 @@ export class SoundtrackSoundContainerV2 implements ISoundContainer {
     this._audioQueue = [initialAudio]
   }
 
+  public on(
+    event: SoundtrackEvents,
+    handler: Handler<string, ISoundContainer & ISoundtrackContainer>
+  ) {
+    switch (event) {
+      case 'playNext': {
+        this._nextHandlers.push(handler)
+      }
+    }
+  }
+
   private createAudio(effect: SoundEffectWithPlayerDetails): RpgAudioContainer {
     return {
+      name: effect.name,
       targetVolume: effect.volume / 100,
       audio: new RpgAudio({
         ctx: this.ctx,
@@ -91,6 +106,7 @@ export class SoundtrackSoundContainerV2 implements ISoundContainer {
 
   private async playSong(container: RpgAudioContainer, fadeInTime: number) {
     return new Promise<void>(async (res) => {
+      this._nextHandlers.forEach((h) => h.handler(h.id, this))
       container.audio.on(ListenerType.Stop, () => {
         res()
       })
@@ -109,6 +125,10 @@ export class SoundtrackSoundContainerV2 implements ISoundContainer {
       const fadeTimeout = setTimeout(
         (() => {
           this.timeouts.delete(fadeTimeout)
+          if (container.audio.State !== RpgAudioState.Playing) {
+            return
+          }
+
           container.audio.fade(0, fadeOverMs)
 
           const endFadeTimeout = setTimeout(
@@ -136,10 +156,23 @@ export class SoundtrackSoundContainerV2 implements ISoundContainer {
     await this.playSong(this._audioQueue[0], 0)
 
     while (this._isActive) {
-      const nextEffect = this.getNextEffect()
-      this._audioQueue.push(this.createAudio(nextEffect))
-      await this.playSong(this._audioQueue[0], this.crossfadeTime)
+      await this.playNextSongInternal()
     }
+  }
+
+  public async playNextSong() {
+    this.stopInternal()
+    this._audioQueue.shift()
+  }
+
+  private async playNextSongInternal() {
+    const nextEffect = this.getNextEffect()
+    this._audioQueue.push(this.createAudio(nextEffect))
+    await this.playSong(this._audioQueue[0], this.crossfadeTime)
+  }
+
+  public getActiveSong(): RpgAudioContainer {
+    return this._audioQueue[0]
   }
 
   Play(): void {
@@ -150,7 +183,13 @@ export class SoundtrackSoundContainerV2 implements ISoundContainer {
 
   Stop(): void {
     this._isActive = false
+    this.stopInternal()
+    if (this._stopHandler) {
+      this._stopHandler.handler(this._stopHandler.id, this)
+    }
+  }
 
+  private stopInternal(): void {
     this._audioQueue.forEach((a) => {
       if (a.audio.State === RpgAudioState.Playing) {
         a.audio.fade(0, this._fadeTime)
@@ -160,15 +199,11 @@ export class SoundtrackSoundContainerV2 implements ISoundContainer {
       }
     })
 
-    if (this._stopHandler) {
-      this._stopHandler.handler(this._stopHandler.id, this)
-    }
-
     this.timeouts.forEach((timeout) => clearTimeout(timeout))
   }
 
   ChangeVolume(volume: number): void {
-    this._audioQueue[0].audio.setVolume(volume)
+    this._audioQueue[0].audio.setVolume(volume / 100)
   }
 
   Fade(ratio: number, fadeTime?: number): void {

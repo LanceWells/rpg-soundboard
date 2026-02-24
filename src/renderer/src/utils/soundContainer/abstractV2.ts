@@ -82,7 +82,7 @@ export abstract class AbstractSoundContainerV2<
   }
 
   ChangeVolume(volume: number): void {
-    this.rpgAudio.setVolume(volume)
+    this.rpgAudio.setVolume(volume / 100)
   }
 
   Fade(ratio: number, fadeTime: number = this.fadeTime): void {

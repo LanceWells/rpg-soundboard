@@ -89,21 +89,20 @@ export function GroupSvgIcon(props: GroupSvgIconProps) {
   return (
     <div
       className={`
-      max-w-[120px]
-      min-w-[120px]
-      max-h-[120px]
-      min-h-[120px]
+      w-[120px]
+      h-[120px]
       relative
     `}
     >
-      <span
+      <div
         className={`
+          w-[120px]
+          h-[120px]
           transition-opacity
+          skeleton
           ${isLoading ? 'opacity-100' : 'opacity-0'}
       `}
-      >
-        Loading
-      </span>
+      ></div>
       <div
         className={`
           transition-opacity

@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import { useDebounce } from 'use-debounce'
 import { Route as CreateSoundRoute } from '@renderer/routes/sound/create'
 import { Route as BoardRoute } from '@renderer/routes/'
+import { Playback } from '../playback/playback'
 
 export type NavProps = {}
 
@@ -28,8 +29,8 @@ export function Nav(props: NavProps) {
       shop-wall
       grid
       h-dvh
-      [grid-template-areas:"header"_"hero"_"navbuttons"_"search"]
-      grid-rows-[min-content_min-content_1fr_min-content]
+      [grid-template-areas:"header"_"hero"_"navbuttons"_"playback"_"search"]
+      grid-rows-[min-content_min-content_1fr_min-content_min-content]
     `}
     >
       <h1
@@ -50,6 +51,7 @@ export function Nav(props: NavProps) {
           <Link to={CreateSoundRoute.fullPath}>New Sound</Link>
         </li>
       </ul>
+      <Playback />
       <div
         className={`
         w-full

@@ -127,7 +127,13 @@ export class RpgAudio {
       return
     }
 
-    this._gainNode.gain.value = newVolume
+    try {
+      this._gainNode.gain.value = newVolume
+    } catch (err) {
+      // honestly, it's just a pain to try to track fading time on top of everything else, but if
+      // the effect is fading, we'll get an error thrown. This here is so that we don't get either
+      // a failure or an error in the logs if we attempt to set volume during a fade.
+    }
   }
 
   private genWaveArray(newVolume: number): Float32Array {
