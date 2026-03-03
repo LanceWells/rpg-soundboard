@@ -128,6 +128,7 @@ export class RpgAudio {
     }
 
     try {
+      this._gainNode.gain.cancelScheduledValues(this.getCtx().currentTime)
       this._gainNode.gain.value = newVolume
     } catch (err) {
       // honestly, it's just a pain to try to track fading time on top of everything else, but if
