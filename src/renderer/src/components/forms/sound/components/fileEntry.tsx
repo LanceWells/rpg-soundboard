@@ -161,7 +161,8 @@ export function FileEntry(props: FileEntryProps) {
       >
         {file.name}
       </span>
-      <button
+      <div
+        role="button"
         onClick={onClickRemove}
         className={`
         btn
@@ -171,7 +172,7 @@ export function FileEntry(props: FileEntryProps) {
         `}
       >
         <CloseIcon />
-      </button>
+      </div>
       <input
         type="range"
         min="0"
@@ -181,7 +182,8 @@ export function FileEntry(props: FileEntryProps) {
         value={file.volume}
         onChange={onChangeVolume}
       />
-      <button
+      <div
+        role="button"
         onClick={onClickTest}
         className={`
           btn
@@ -193,7 +195,7 @@ export function FileEntry(props: FileEntryProps) {
         <SoundIcon className={playState === 'Stopped' ? 'visible' : 'hidden'} />
         <StopIcon className={playState === 'Playing' ? 'visible' : 'hidden'} />
         <span className={playState === 'Loading' ? 'visible loading' : 'hidden'} />
-      </button>
+      </div>
     </div>
   )
 }

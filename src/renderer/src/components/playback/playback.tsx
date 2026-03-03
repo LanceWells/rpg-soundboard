@@ -54,6 +54,7 @@ export function Playback(props: PlaybackProps) {
           min={0}
           max={200}
           step={10}
+          value={soundtrack.volume ?? 100}
           onChange={(e) => {
             const newVolume = Number.parseInt(e.currentTarget.value)
             setMusicVolume(newVolume)

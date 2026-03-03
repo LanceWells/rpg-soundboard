@@ -39,7 +39,12 @@ export class RpgAudioElementNode extends AbstractPlayableRpgAudioNode {
       return duration * 1000
     }
 
-    console.error('Could not get a duration in time')
+    // If we didn't get the time, that's typically something to do with the metadata for the file.
+    // Even though plenty of files will have the time in the metadata, there's something with wav
+    // files that we can't read the duration.
+    //
+    // Good news though, is that this just impacts crossfade. It won't sound as professional, but we
+    // can just return 0 here and we'll not get a crossfade.
 
     return 0
   }
@@ -81,6 +86,7 @@ export class RpgAudioElementNode extends AbstractPlayableRpgAudioNode {
     if (audioElement === null) {
       const newAudioElement = document.createElement('audio')
       newAudioElement.id = this._id
+      newAudioElement.preload = 'metadata'
 
       // This crossorigin setting is (still, I almost don't believe it), critical. There's some
       // problem where loading a sound file with the same URL back-to-back will fail to load on

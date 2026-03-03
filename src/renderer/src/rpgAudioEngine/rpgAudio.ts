@@ -136,6 +136,14 @@ export class RpgAudio {
     }
   }
 
+  public getVolume(): number {
+    if (this._gainNode === null) {
+      return 0
+    }
+
+    return this._gainNode.gain.value * 100
+  }
+
   private genWaveArray(newVolume: number): Float32Array {
     const arr = new Float32Array(2)
     arr[0] = this._gainNode?.gain.value ?? this._config.volume

@@ -34,6 +34,7 @@ export type SoundTrackDetails = {
   groupName: string
   effectName: string
   groupID: GroupID
+  volume: number
 }
 
 export const createSoundSlice: StateCreator<SoundSlice & GroupSlice, [], [], SoundSlice> = (
@@ -62,6 +63,20 @@ export const createSoundSlice: StateCreator<SoundSlice & GroupSlice, [], [], Sou
       .flatMap((a) => GroupHandles.get(a.id))
       .filter((a) => a !== undefined)
       .forEach(async (a) => a.ChangeVolume(newVolume))
+
+    set(() => {
+      const activeSoundtrack = get().activeSoundtrack
+      if (activeSoundtrack === null) {
+        return {}
+      }
+
+      return {
+        activeSoundtrack: {
+          ...activeSoundtrack,
+          volume: newVolume
+        }
+      }
+    })
   },
   async playGroup(groupID) {
     const group = window.audio.Groups.Get({
@@ -249,7 +264,8 @@ function handleNextSong(
       groupID: groupID,
       icon: group.icon,
       groupName: group.name,
-      effectName: activeSong.name
+      effectName: activeSong.name,
+      volume: activeSong.targetVolume * 100
     }
   })
 }

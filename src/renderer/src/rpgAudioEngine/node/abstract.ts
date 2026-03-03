@@ -65,7 +65,7 @@ export abstract class AbstractRpgAudioNode implements IRpgAudioNode {
           this.on('errr', () => rej())
         }).bind(this)
       ),
-      new Promise<void>((_res, rej) => setTimeout(() => rej('Could not load in time'), 5000))
+      new Promise<void>((_res, rej) => setTimeout(() => rej('Could not load in time'), 10000))
     ])
   }
 }

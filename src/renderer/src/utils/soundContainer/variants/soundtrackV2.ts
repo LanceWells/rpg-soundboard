@@ -27,6 +27,7 @@ export class SoundtrackSoundContainerV2 implements ISoundContainer, ISoundtrackC
 
   private _effects: SoundEffectWithPlayerDetails[]
   private _effectsPointer: number = 0
+  private _volumeOverride: number | undefined
 
   private timeouts: Set<NodeJS.Timeout> = new Set()
 
@@ -93,7 +94,7 @@ export class SoundtrackSoundContainerV2 implements ISoundContainer, ISoundtrackC
   private createAudio(effect: SoundEffectWithPlayerDetails): RpgAudioContainer {
     return {
       name: effect.name,
-      targetVolume: effect.volume / 100,
+      targetVolume: (this._volumeOverride ?? effect.volume) / 100,
       audio: new RpgAudio({
         ctx: this.ctx,
         isLargeFile: effect.useHtml5,
@@ -104,16 +105,52 @@ export class SoundtrackSoundContainerV2 implements ISoundContainer, ISoundtrackC
     }
   }
 
-  private async playSong(container: RpgAudioContainer, fadeInTime: number) {
+  private async playSong(
+    container: RpgAudioContainer,
+    fadeInTime: number,
+    fadeOutTime: {
+      inMs: number
+      overMs: number
+    } | null
+  ) {
     return new Promise<void>(async (res) => {
       this._nextHandlers.forEach((h) => h.handler(h.id, this))
+
       container.audio.on(ListenerType.Stop, () => {
+        if (fadeOutTime === null) {
+          this._audioQueue.shift()
+        }
         res()
       })
 
-      const activeMs = await container.audio.getDuration()
-      const fadeOverMs = Math.min(activeMs / 10, this.crossfadeTime)
-      const fadeInMs = activeMs - fadeOverMs
+      if (fadeOutTime !== null) {
+        const fadeTimeout = setTimeout(
+          (() => {
+            this.timeouts.delete(fadeTimeout)
+            if (container.audio.State !== RpgAudioState.Playing) {
+              return
+            }
+
+            container.audio.fade(0, fadeOutTime.overMs)
+
+            const endFadeTimeout = setTimeout(
+              (() => {
+                this.timeouts.delete(endFadeTimeout)
+                container.audio.stop()
+              }).bind(this),
+              fadeOutTime.overMs
+            )
+
+            this.timeouts.add(endFadeTimeout)
+
+            // We can play the next song now, so go ahead and fulfill this promise.
+            this._audioQueue.shift()
+            res()
+          }).bind(this),
+          fadeOutTime.inMs
+        )
+        this.timeouts.add(fadeTimeout)
+      }
 
       container.audio.play()
       if (fadeInTime > 0) {
@@ -121,39 +158,21 @@ export class SoundtrackSoundContainerV2 implements ISoundContainer, ISoundtrackC
       } else {
         container.audio.setVolume(container.targetVolume)
       }
-
-      const fadeTimeout = setTimeout(
-        (() => {
-          this.timeouts.delete(fadeTimeout)
-          if (container.audio.State !== RpgAudioState.Playing) {
-            return
-          }
-
-          container.audio.fade(0, fadeOverMs)
-
-          const endFadeTimeout = setTimeout(
-            (() => {
-              this.timeouts.delete(endFadeTimeout)
-              container.audio.stop()
-            }).bind(this),
-            fadeOverMs
-          )
-
-          this.timeouts.add(endFadeTimeout)
-
-          // We can play the next song now, so go ahead and fulfill this promise.
-          this._audioQueue.shift()
-          res()
-        }).bind(this),
-        fadeInMs
-      )
-
-      this.timeouts.add(fadeTimeout)
     })
   }
 
   private async playQueue() {
-    await this.playSong(this._audioQueue[0], 0)
+    const firstSong = this._audioQueue[0]
+    const duration = await firstSong.audio.getDuration()
+    const fadeDetails =
+      Number.isFinite(duration) && duration > 0
+        ? {
+            inMs: duration - Math.min(duration / 10, this.crossfadeTime),
+            overMs: Math.min(duration / 10, this.crossfadeTime)
+          }
+        : null
+
+    await this.playSong(this._audioQueue[0], 0, fadeDetails)
 
     while (this._isActive) {
       await this.playNextSongInternal()
@@ -167,8 +186,18 @@ export class SoundtrackSoundContainerV2 implements ISoundContainer, ISoundtrackC
 
   private async playNextSongInternal() {
     const nextEffect = this.getNextEffect()
-    this._audioQueue.push(this.createAudio(nextEffect))
-    await this.playSong(this._audioQueue[0], this.crossfadeTime)
+    const nextSong = this.createAudio(nextEffect)
+    const duration = await nextSong.audio.getDuration()
+    const fadeDetails =
+      Number.isFinite(duration) && duration > 0
+        ? {
+            inMs: duration - Math.min(duration / 10, this.crossfadeTime),
+            overMs: Math.min(duration / 10, this.crossfadeTime)
+          }
+        : null
+
+    this._audioQueue.push(nextSong)
+    await this.playSong(this._audioQueue[0], this.crossfadeTime, fadeDetails)
   }
 
   public getActiveSong(): RpgAudioContainer {
@@ -203,6 +232,7 @@ export class SoundtrackSoundContainerV2 implements ISoundContainer, ISoundtrackC
   }
 
   ChangeVolume(volume: number): void {
+    this._volumeOverride = volume
     this._audioQueue[0].audio.setVolume(volume / 100)
   }
 
