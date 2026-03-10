@@ -61,7 +61,8 @@ export abstract class AbstractSoundContainerV2<
       volume: this.targetVolume,
       onLoad,
       onStop,
-      isLargeFile: this._loadedEffect.useHtml5
+      isLargeFile: this._loadedEffect.useHtml5,
+      format: this._loadedEffect.format
     })
   }
 

@@ -1,3 +1,4 @@
+import { SupportedFileTypes } from 'src/apis/audio/supportedFileTypes'
 import { RpgAudioConvolverNode } from './node/convolver'
 import { RpgAudio } from './rpgAudio'
 
@@ -19,6 +20,7 @@ export type RpgAudioConfig = {
   loop: boolean
   ctx: Ctx
   isLargeFile: boolean
+  format: SupportedFileTypes
   onLoad?: (audio: RpgAudio) => void
   onPlay?: (audio: RpgAudio) => void
   onStop?: (audio: RpgAudio) => void

@@ -48,13 +48,12 @@ export type SoundEffect = {
   path: string
 
   /**
-   * The file type associated with this given sound effect. Used with howler to determine how to
-   * play the given audio, considering that the audio will be translated into a base64 data URL.
+   * The file type associated with this given sound effect.
    */
   format: SupportedFileTypes
 
   /**
-   * The volume associated with the sound effect. Represented by a number from 0 to 100, where 100
+   * The volume associated with the sound effect. Represented by a number from 0 to 200, where 100
    * is the original volume of the audio.
    */
   volume: number

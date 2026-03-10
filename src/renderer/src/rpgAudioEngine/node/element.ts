@@ -1,27 +1,30 @@
+import { SupportedFileTypes } from 'src/apis/audio/supportedFileTypes'
 import { AbstractPlayableRpgAudioNode } from '.'
 
 export class RpgAudioElementNode extends AbstractPlayableRpgAudioNode {
   private _sourceNode: MediaElementAudioSourceNode
 
-  constructor(ctx: AudioContext, path: string, loop: boolean) {
+  constructor(ctx: AudioContext, path: string, loop: boolean, format: SupportedFileTypes) {
     super()
 
     const audioElement = this.getAudioElement()
     const sourceElement = this.getSourceElement()
-    // audioElement.src = path
+
     sourceElement.src = path
-    audioElement.loop = loop
+    sourceElement.loop = loop
 
     this._sourceNode = ctx.createMediaElementSource(audioElement)
 
     audioElement.addEventListener('ended', this.handleStop.bind(this))
     audioElement.addEventListener('pause', this.handleStop.bind(this))
-    audioElement.addEventListener('loadeddata', this.handleLoad.bind(this))
+    audioElement.addEventListener('canplay', this.handleLoad.bind(this))
     audioElement.addEventListener('play', this.handlePlay.bind(this))
     audioElement.addEventListener('error', this.handleErrr.bind(this))
     audioElement.addEventListener('error', (ev) => {
       console.error(ev)
     })
+
+    audioElement.load()
     sourceElement.addEventListener('error', (ev) => {
       console.error(ev)
     })

@@ -100,7 +100,8 @@ export class SoundtrackSoundContainerV2 implements ISoundContainer, ISoundtrackC
         isLargeFile: effect.useHtml5,
         loop: false,
         path: effect.path,
-        volume: 0
+        volume: 0,
+        format: effect.format
       })
     }
   }
