@@ -1,5 +1,5 @@
 import { AudioCtx, AudioProcessing } from './ctx'
-import { RpgAudioBufferNode, RpgAudioElementNode } from './node'
+import { RpgAudioBufferNode } from './node'
 import { RpgAudioConfig, ListenerType, Ctx, IRpgAudioPlayableNode, RpgAudioState } from './types'
 
 /**

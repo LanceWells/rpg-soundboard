@@ -4,7 +4,7 @@ import { AbstractPlayableRpgAudioNode } from '.'
 export class RpgAudioElementNode extends AbstractPlayableRpgAudioNode {
   private _sourceNode: MediaElementAudioSourceNode
 
-  constructor(ctx: AudioContext, path: string, loop: boolean, format: SupportedFileTypes) {
+  constructor(ctx: AudioContext, path: string, loop: boolean, _format: SupportedFileTypes) {
     super()
 
     const audioElement = this.getAudioElement()
