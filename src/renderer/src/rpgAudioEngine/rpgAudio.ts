@@ -54,7 +54,7 @@ export class RpgAudio {
     this._sourceNode.on('errr', this.handleError.bind(this))
 
     this._gainNode = this.getCtx().createGain()
-    this._gainNode.gain.value = config.volume
+    this._gainNode.gain.value = config.volume / 100
     this._sourceNode.connect(this._gainNode)
     this._gainNode.connect(this.getDestinationNode())
   }
@@ -134,7 +134,7 @@ export class RpgAudio {
 
     try {
       this._gainNode.gain.cancelScheduledValues(this.getCtx().currentTime)
-      this._gainNode.gain.value = newVolume
+      this._gainNode.gain.value = newVolume / 100
     } catch (err) {
       // honestly, it's just a pain to try to track fading time on top of everything else, but if
       // the effect is fading, we'll get an error thrown. This here is so that we don't get either
@@ -153,7 +153,7 @@ export class RpgAudio {
   private genWaveArray(newVolume: number): Float32Array {
     const arr = new Float32Array(2)
     arr[0] = this._gainNode?.gain.value ?? this._config.volume
-    arr[1] = newVolume
+    arr[1] = newVolume / 100
     return arr
   }
 

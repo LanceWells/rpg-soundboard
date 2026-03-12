@@ -75,6 +75,10 @@ export class SequenceSoundContainer implements ISoundContainer {
     this.stoppedHandler = setup.stoppedHandler
   }
 
+  get Volume() {
+    return 1
+  }
+
   async GetDuration(): Promise<number> {
     return [...this.durationMap.values()].reduce((acc, curr) => curr + acc, 0)
   }

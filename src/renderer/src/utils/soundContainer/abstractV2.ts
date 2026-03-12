@@ -40,7 +40,7 @@ export abstract class AbstractSoundContainerV2<
     this.ctx = ctx ?? Ctx.Effectless
     this._lastEffectID = lastEffectID
     this._loadedEffect = this.SelectEffect(effects)
-    this.targetVolume = this._loadedEffect.volume / 100
+    this.targetVolume = this._loadedEffect.volume
 
     const onLoad = loadedHandler
       ? (() => {
@@ -66,6 +66,10 @@ export abstract class AbstractSoundContainerV2<
     })
   }
 
+  get Volume() {
+    return this.targetVolume
+  }
+
   Play(): void {
     this.rpgAudio.play()
   }
@@ -83,7 +87,7 @@ export abstract class AbstractSoundContainerV2<
   }
 
   ChangeVolume(volume: number): void {
-    this.rpgAudio.setVolume(volume / 100)
+    this.rpgAudio.setVolume(volume)
   }
 
   Fade(ratio: number, fadeTime: number = this.fadeTime): void {

@@ -113,7 +113,7 @@ export type GetSoundResponse = {
   format: SupportedFileType
 
   /**
-   * The volume of the effect to play. Will range from 0 to 100.
+   * The volume of the effect to play. Will range from 0 to 200.
    */
   volume: number
 

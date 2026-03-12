@@ -252,7 +252,7 @@ function handleGroupStop(
 
 function handleNextSong(
   groupID: GroupID,
-  sound: ISoundtrackContainer,
+  sound: ISoundtrackContainer & ISoundContainer,
   set: StoreApi<SoundSlice & GroupSlice>['setState'],
   get: StoreApi<SoundSlice & GroupSlice>['getState']
 ) {
@@ -264,8 +264,8 @@ function handleNextSong(
       groupID: groupID,
       icon: group.icon,
       groupName: group.name,
-      effectName: activeSong.name,
-      volume: activeSong.targetVolume * 100
+      effectName: activeSong?.name ?? '<unknown song>',
+      volume: sound.Volume
     }
   })
 }

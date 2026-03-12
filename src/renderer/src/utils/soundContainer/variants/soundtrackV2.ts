@@ -11,6 +11,7 @@ import { Ctx, ListenerType, RpgAudio, RpgAudioState } from '@renderer/rpgAudioEn
 import { getRandomInt } from '@renderer/utils/random'
 import { SoundEffectWithPlayerDetails } from 'src/apis/audio/types/groups'
 import { produce } from 'immer'
+import { VolumeManager } from '../volumeManager'
 
 export class SoundtrackSoundContainerV2 implements ISoundContainer, ISoundtrackContainer {
   public Variant: SoundVariants = 'Soundtrack'
@@ -27,9 +28,14 @@ export class SoundtrackSoundContainerV2 implements ISoundContainer, ISoundtrackC
 
   private _effects: SoundEffectWithPlayerDetails[]
   private _effectsPointer: number = 0
-  private _volumeOverride: number | undefined
+  private _containerVolume: number = 100
+  private _volumeManager: VolumeManager = new VolumeManager(0.13)
 
   private timeouts: Set<NodeJS.Timeout> = new Set()
+
+  get Volume() {
+    return this._containerVolume
+  }
 
   private shuffleEffects() {
     // This elipses is actually pretty important. It turns out that the array returned by the
@@ -94,7 +100,7 @@ export class SoundtrackSoundContainerV2 implements ISoundContainer, ISoundtrackC
   private createAudio(effect: SoundEffectWithPlayerDetails): RpgAudioContainer {
     return {
       name: effect.name,
-      targetVolume: (this._volumeOverride ?? effect.volume) / 100,
+      targetVolume: effect.volume,
       audio: new RpgAudio({
         ctx: this.ctx,
         isLargeFile: effect.useHtml5,
@@ -154,10 +160,15 @@ export class SoundtrackSoundContainerV2 implements ISoundContainer, ISoundtrackC
       }
 
       container.audio.play()
+      const actualVolume = this._volumeManager.getVolume(
+        container.targetVolume,
+        this._containerVolume
+      )
+
       if (fadeInTime > 0) {
-        container.audio.fade(container.targetVolume, fadeInTime)
+        container.audio.fade(actualVolume, fadeInTime)
       } else {
-        container.audio.setVolume(container.targetVolume)
+        container.audio.setVolume(actualVolume)
       }
     })
   }
@@ -201,7 +212,7 @@ export class SoundtrackSoundContainerV2 implements ISoundContainer, ISoundtrackC
     await this.playSong(this._audioQueue[0], this.crossfadeTime, fadeDetails)
   }
 
-  public getActiveSong(): RpgAudioContainer {
+  public getActiveSong(): RpgAudioContainer | undefined {
     return this._audioQueue[0]
   }
 
@@ -233,12 +244,31 @@ export class SoundtrackSoundContainerV2 implements ISoundContainer, ISoundtrackC
   }
 
   ChangeVolume(volume: number): void {
-    this._volumeOverride = volume
-    this._audioQueue[0].audio.setVolume(volume / 100)
+    this._containerVolume = volume
+
+    const activeSong = this.getActiveSong()
+    if (activeSong === undefined) {
+      return
+    }
+
+    const actualVolume = this._volumeManager.getVolume(
+      activeSong.targetVolume,
+      this._containerVolume
+    )
+
+    activeSong.audio.setVolume(actualVolume)
   }
 
   Fade(ratio: number, fadeTime?: number): void {
-    this._audioQueue[0].audio.fade(ratio, fadeTime ?? this._fadeTime)
+    const activeSong = this.getActiveSong()
+    if (activeSong === undefined) {
+      return
+    }
+
+    const newVolume =
+      this._volumeManager.getVolume(activeSong.targetVolume, this._containerVolume) * ratio
+
+    activeSong.audio.fade(newVolume, fadeTime ?? this._fadeTime)
   }
 
   GetDuration(): Promise<number> {

@@ -28,7 +28,7 @@ export type PreviewSoundResponse = {
   format: SupportedFileTypes
 
   /**
-   * The volume to play for the sound effect. Will range from 0 to 100.
+   * The volume to play for the sound effect. Will range from 0 to 200.
    */
   volume: number
 

@@ -69,6 +69,7 @@ export type RpgAudioContainer = {
 
 export interface ISoundContainer {
   Variant: SoundVariants
+  Volume: number
   Play(): void
   Stop(): void
   ChangeVolume(volume: number): void
@@ -85,6 +86,6 @@ export type SoundtrackEvents = keyof typeof SoundtrackEvents
 
 export interface ISoundtrackContainer {
   playNextSong(): Promise<void>
-  getActiveSong(): RpgAudioContainer
+  getActiveSong(): RpgAudioContainer | undefined
   on(event: SoundtrackEvents, handler: Handler<string, ISoundContainer & ISoundtrackContainer>)
 }
