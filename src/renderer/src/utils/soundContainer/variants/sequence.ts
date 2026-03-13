@@ -243,9 +243,27 @@ export class SequenceSoundContainer implements ISoundContainer {
   ) {
     return elements.map<Promise<EffectGroup>>(async (e) => {
       if (e.type === 'delay') {
+        // I found that, coming from a form, the delay can get converted into a string instead of a
+        // number. Ensure that we have the right conversion here because JS is obnoxiuos and will
+        // keep going without any issues if we send it a string instead.
+        const getTimeAsNum = () => {
+          if (typeof e.msToDelay === 'number') {
+            return e.msToDelay
+          }
+          if (typeof e.msToDelay === 'string') {
+            const parsedNum = Number.parseInt(e.msToDelay)
+            if (!Number.isFinite(parsedNum)) {
+              console.error(`Invalid delay number ${e.msToDelay}`)
+              return 0
+            }
+            return parsedNum
+          }
+          return 0
+        }
+
         return {
           type: 'delay',
-          delayInMs: e.msToDelay,
+          delayInMs: getTimeAsNum(),
           id: e.id
         }
       }

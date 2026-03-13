@@ -1,4 +1,3 @@
-// import IconLookup from '@renderer/components/effect/iconLookup'
 import { GroupIcon } from '@renderer/components/icon/base'
 import { FormProvider, useForm, useFormContext } from 'react-hook-form'
 import { FormInput, ColorOptions, GroupFormInput } from './types'
@@ -9,6 +8,8 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { FormInputSchema } from './util/schema'
 import { SoundVariant } from '@renderer/utils/soundVariants'
 import { IconLookup } from '@renderer/components/icon/iconLookup'
+import { SequenceListLookup } from './components/sequenceListLookup'
+import { SequenceList } from './components/sequenceList'
 
 type CreateEditSoundFormProps = {
   onSubmit: (data: FormInput) => void
@@ -109,7 +110,7 @@ export function CreateEditSoundForm(props: CreateEditSoundFormProps) {
         <fieldset className="fieldset">
           <legend className="fieldset-legend">Button Type</legend>
           <select {...register('type')} className="select">
-            <option value="group">Group</option>
+            <option value="source">Group</option>
             <option value="sequence">Sequence</option>
           </select>
         </fieldset>
@@ -147,16 +148,17 @@ function CreateGroupForm() {
 }
 
 function CreateSequenceForm() {
-  // const { register } = useFormContext<SequenceFormInput>()
+  // const { register, formState } = useFormContext<SequenceFormInput>()
 
   return (
     <>
-      <fieldset className="grid grid-cols-[120px_1fr] gap-y-4 my-4">
-        <legend>Details</legend>
-        <label htmlFor="name">Name</label>
-        <select>
-          <option>df</option>
-        </select>
+      <fieldset className="fieldset">
+        <legend className="fieldset-legend">SequenceList</legend>
+        <SequenceList />
+      </fieldset>
+      <fieldset className="fieldset">
+        <legend className="fieldset-legend">Group Lookup</legend>
+        <SequenceListLookup />
       </fieldset>
     </>
   )

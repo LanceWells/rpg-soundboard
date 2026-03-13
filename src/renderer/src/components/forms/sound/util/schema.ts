@@ -2,13 +2,11 @@ import { CreateRequest, GroupID, CreateSequenceRequest } from 'src/apis/audio/ty
 import {
   SvgSoundIcon,
   SoundEffectEditableFields,
-  SoundGroupSequenceGroup,
   SequenceElementID,
-  SoundGroupSequenceDelay,
   SoundGroupSequenceElement
 } from 'src/apis/audio/types/items'
 import * as z from 'zod'
-import { GroupFormInput, SequenceFormInput, FormInput } from '../types'
+import { FormInput } from '../types'
 
 const SvgIconSchema: z.ZodType<SvgSoundIcon> = z.object({
   foregroundColor: z.string().regex(/^#[a-f0-9]{6}/),
@@ -25,49 +23,39 @@ const EffectSchema: z.ZodType<SoundEffectEditableFields> = z.object({
 const CreateRequestSchema: z.ZodType<CreateRequest> = z.object({
   effects: z.array(EffectSchema).min(1),
   type: z.literal('source'),
-  variant: z.enum(['Default', 'Looping', 'Rapid', 'Soundtrack', 'Sequence']),
+  variant: z.enum(['Default', 'Looping', 'Rapid', 'Soundtrack']),
   name: z.string(),
   icon: z.union([SvgIconSchema]),
   tags: z.array(z.string()).min(0)
 })
 
-const SoundGroupSequenceGroupSchema: z.ZodType<SoundGroupSequenceGroup> = z.object({
-  groupID: z.string() as z.ZodType<GroupID>,
-  id: z.string() as z.ZodType<SequenceElementID>,
-  type: z.literal('group')
-})
-
-const SoundGroupSequenceDelaySchema: z.ZodType<SoundGroupSequenceDelay> = z.object({
-  id: z.string() as z.ZodType<SequenceElementID>,
-  type: z.literal('delay'),
-  msToDelay: z.number()
-})
-
-const SoundGroupElementSchema: z.ZodType<SoundGroupSequenceElement> = z.union([
-  SoundGroupSequenceGroupSchema,
-  SoundGroupSequenceDelaySchema
+const SoundGroupElementSchema: z.ZodType<SoundGroupSequenceElement> = z.discriminatedUnion('type', [
+  z.object({
+    type: z.literal('group'),
+    groupID: z.string() as z.ZodType<GroupID>,
+    id: z.string() as z.ZodType<SequenceElementID>
+  }),
+  z.object({
+    type: z.literal('delay'),
+    id: z.string() as z.ZodType<SequenceElementID>,
+    msToDelay: z.string().pipe(z.transform((val) => Number.parseInt(val)))
+  })
 ])
 
 const CreateSequenceSchema: z.ZodType<CreateSequenceRequest> = z.object({
   icon: z.union([SvgIconSchema]),
   name: z.string(),
   tags: z.array(z.string()).min(0),
-  variant: z.enum(['Default', 'Looping', 'Rapid', 'Soundtrack', 'Sequence']),
-  type: z.literal('sequence'),
   sequence: z.array(SoundGroupElementSchema)
 })
 
-const GroupFormInputSchema: z.ZodType<GroupFormInput> = z.object({
-  type: z.literal('group'),
-  request: CreateRequestSchema
-})
-
-const SequenceFormInputSchema: z.ZodType<SequenceFormInput> = z.object({
-  type: z.literal('sequence'),
-  request: CreateSequenceSchema
-})
-
-export const FormInputSchema: z.ZodType<FormInput, any> = z.union([
-  GroupFormInputSchema,
-  SequenceFormInputSchema
+export const FormInputSchema: z.ZodType<FormInput, any> = z.discriminatedUnion('type', [
+  z.object({
+    type: z.literal('group'),
+    request: CreateRequestSchema
+  }),
+  z.object({
+    type: z.literal('sequence'),
+    request: CreateSequenceSchema
+  })
 ])

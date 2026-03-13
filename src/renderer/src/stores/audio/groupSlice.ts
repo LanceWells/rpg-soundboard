@@ -205,26 +205,6 @@ export const createGroupSlice: StateCreator<GroupSlice, [], [], GroupSlice> = (s
       soughtGroups
     })
   }
-  // searchForTags(searchText) {
-  //   if (searchText.trim() === '') {
-  //     return
-  //   }
-
-  //   const allTags = new Set(window.audio.Groups.GetAll().groups.flatMap<string>((g) => g.tags))
-
-  //   const fuseSearch = new fuse([...allTags.values()], {
-  //     threshold: 0.2
-  //   })
-
-  //   const results = fuseSearch.search(searchText)
-
-  //   const soughtTags = results.map((r) => r.item)
-
-  //   set({
-  //     soughtTags
-  //   })
-  // },
-  // soughtTags: []
 })
 
 export const getDefaultGroup = (): Omit<SoundGroupSource, 'id'> => ({
@@ -241,7 +221,6 @@ export const getDefaultGroup = (): Omit<SoundGroupSource, 'id'> => ({
 })
 
 export const getDefaultSequence = (): SoundGroupSequenceEditableFields => ({
-  type: 'sequence',
   icon: {
     type: 'svg',
     foregroundColor: ColorOptions.white,
@@ -249,6 +228,5 @@ export const getDefaultSequence = (): SoundGroupSequenceEditableFields => ({
   },
   name: '',
   sequence: [],
-  variant: 'Sequence',
   tags: []
 })

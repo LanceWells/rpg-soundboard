@@ -139,7 +139,7 @@ export interface SoundGroupSequence extends ISoundGroup {
   sequence: SoundGroupSequenceElement[]
 }
 
-export type SoundGroupSequenceEditableFields = Omit<SoundGroupSequence, 'id'>
+export type SoundGroupSequenceEditableFields = Omit<SoundGroupSequence, 'id' | 'variant' | 'type'>
 
 /**
  * An extraction of editable fields for {@link SoundGroupSource}.
