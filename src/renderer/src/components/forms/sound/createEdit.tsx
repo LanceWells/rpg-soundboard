@@ -110,7 +110,7 @@ export function CreateEditSoundForm(props: CreateEditSoundFormProps) {
         <fieldset className="fieldset">
           <legend className="fieldset-legend">Button Type</legend>
           <select {...register('type')} className="select">
-            <option value="source">Group</option>
+            <option value="group">Group</option>
             <option value="sequence">Sequence</option>
           </select>
         </fieldset>
