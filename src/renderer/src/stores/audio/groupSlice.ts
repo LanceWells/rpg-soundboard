@@ -13,6 +13,26 @@ import { produce } from 'immer'
 import { isSequenceGroup, isSourceGroup } from '@renderer/utils/typePredicates'
 import fuse from 'fuse.js'
 import { ColorOptions } from '@renderer/components/forms/sound/types'
+import { SoundVariants } from 'src/apis/audio/types/soundVariants'
+
+export const SortType = {
+  name: 0
+}
+
+export type SortType = keyof typeof SortType
+
+export type SortOrder = 'asc' | 'desc'
+
+export type SortVals = {
+  type: SortType
+  order: SortOrder
+}
+
+export type SortFilterVal = {
+  sorting?: SortVals
+  soundTypes: SoundVariants[]
+  search: string
+}
 
 export interface GroupSlice {
   groups: ISoundGroup[]
@@ -20,6 +40,7 @@ export interface GroupSlice {
    * The set of IDs for groups that are actively playing a sound effect.
    */
   playingGroups: GroupID[]
+  sorting: SortFilterVal
   getGroup: (groupID: GroupID) => ISoundGroup
   getGroupSource: (groupID: GroupID) => SoundGroupSource
   getGroupSequence: (groupID: GroupID) => SoundGroupSequence
@@ -40,10 +61,18 @@ export interface GroupSlice {
   soughtGroups: ISoundGroup[]
   // soughtTags: string[]
   getTags: () => Set<string>
+  toggleVariantFilter: (variant: SoundVariants) => void
+  setSorting: (sorting: SortVals | undefined) => void
+  updateSorting: () => void
 }
 
 export const createGroupSlice: StateCreator<GroupSlice, [], [], GroupSlice> = (set, get) => ({
   groups: window.audio.Groups.GetAll().groups,
+  sorting: {
+    order: 'asc',
+    soundTypes: [],
+    search: ''
+  },
   getTags() {
     const allTags = new Set(window.audio.Groups.GetAll().groups.flatMap<string>((g) => g.tags))
     return allTags
@@ -173,36 +202,49 @@ export const createGroupSlice: StateCreator<GroupSlice, [], [], GroupSlice> = (s
   playingGroups: [],
   soughtGroups: [],
   searchForGroups(searchText) {
-    const allGroups = window.audio.Groups.GetAll().groups
-
-    if (searchText === '') {
-      set({
-        soughtGroups: allGroups
+    set({
+      sorting: produce(get().sorting, (draft) => {
+        draft.search = searchText
       })
-      return
-    }
-
-    const fuseSearch = new fuse(allGroups, {
-      keys: ['name', 'tags', 'variant'],
-      threshold: 0.1
     })
 
-    const results = fuseSearch.search(searchText)
+    get().updateSorting()
+  },
+  setSorting(sorting: SortVals | undefined) {
+    set({
+      sorting: produce(get().sorting, (draft) => {
+        draft.sorting = sorting
+      })
+    })
 
-    results.reduce((acc, curr) => {
-      if (acc.has(curr.item.id)) {
-        console.error('duplicate group')
-      }
+    get().updateSorting()
+  },
+  toggleVariantFilter(variant) {
+    set({
+      sorting: produce(get().sorting, (draft) => {
+        const hasVariant = new Set(draft.soundTypes).has(variant)
+        if (!hasVariant) {
+          draft.soundTypes.push(variant)
+        } else {
+          draft.soundTypes = draft.soundTypes.filter((v) => v !== variant)
+        }
+      })
+    })
 
-      acc.set(curr.item.id, curr.item)
+    get().updateSorting()
+  },
+  updateSorting() {
+    const searchText = get().sorting.search
+    const soughtGroups = searchGroups(searchText)
 
-      return acc
-    }, new Map<string, ISoundGroup>())
-
-    const soughtGroups = results.map((r) => r.item)
+    const sorting = get().sorting
+    const filteredGroups = soughtGroups.filter(filterToVariants(sorting.soundTypes))
+    const sortedGroups = sorting.sorting
+      ? filteredGroups.toSorted(sortGroups(sorting.sorting.order, sorting.sorting.type))
+      : filteredGroups
 
     set({
-      soughtGroups
+      soughtGroups: sortedGroups
     })
   }
 })
@@ -230,3 +272,68 @@ export const getDefaultSequence = (): SoundGroupSequenceEditableFields => ({
   sequence: [],
   tags: []
 })
+
+function filterToVariants(variants: SoundVariants[] | undefined): (group: ISoundGroup) => boolean {
+  return (group) => {
+    if (variants === undefined || variants.length === 0) {
+      return true
+    }
+
+    return variants.includes(group.variant)
+  }
+}
+
+function sortGroups(
+  order: SortOrder,
+  type: SortType | undefined
+): (a: ISoundGroup, b: ISoundGroup) => number {
+  const moreVal = order === 'asc' ? -1 : 1
+  const lessVal = order === 'asc' ? 1 : -1
+
+  switch (type) {
+    case 'name': {
+      return (a, b) => {
+        const upperA = a.name.toUpperCase()
+        const upperB = b.name.toUpperCase()
+        if (upperA > upperB) {
+          return lessVal
+        }
+        if (upperA < upperB) {
+          return moreVal
+        }
+        return 0
+      }
+    }
+    default: {
+      return () => 0
+    }
+  }
+}
+
+function searchGroups(searchText: string) {
+  const allGroups = window.audio.Groups.GetAll().groups
+
+  if (searchText === '') {
+    return allGroups
+  }
+
+  const fuseSearch = new fuse(allGroups, {
+    keys: ['name', 'tags', 'variant'],
+    threshold: 0.1
+  })
+
+  const results = fuseSearch.search(searchText)
+
+  results.reduce((acc, curr) => {
+    if (acc.has(curr.item.id)) {
+      console.error('duplicate group')
+    }
+
+    acc.set(curr.item.id, curr.item)
+
+    return acc
+  }, new Map<string, ISoundGroup>())
+
+  const soughtGroups = results.map((r) => r.item)
+  return soughtGroups
+}

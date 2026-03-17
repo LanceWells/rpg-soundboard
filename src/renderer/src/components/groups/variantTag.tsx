@@ -6,7 +6,7 @@ import SequenceTag from '@renderer/assets/images/Tags/Sequence.png'
 
 export type VariantTagProps = {
   variant: SoundVariants
-  className: string
+  className?: string
 }
 
 export function VariantTag(props: VariantTagProps) {
