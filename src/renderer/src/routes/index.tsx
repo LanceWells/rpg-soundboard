@@ -90,7 +90,7 @@ function RouteComponent() {
               `}
               key={item.id}
             >
-              <Group id={item.id} />
+              <Group id={item.id} key={item.id} />
             </div>
           )
         })}

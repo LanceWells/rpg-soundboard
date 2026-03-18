@@ -1,4 +1,3 @@
-import { soundboardIcons } from '@renderer/utils/fetchIcons'
 import { JSX } from 'react'
 import VirtualizedSearch from './virtualizedSearch'
 import { IconPreview, IconPreviewProps } from './iconPreview'
@@ -13,7 +12,7 @@ export function IconLookup(props: IconLookupProps) {
   const { className, fgColor, onClick } = props
 
   const onSearch = (searchText: string) =>
-    soundboardIcons.SearchIcons(searchText).map((i) => ({
+    window.audio.Icons.Search({ search: searchText }).icons.map((i) => ({
       icon: {
         foregroundColor: fgColor,
         name: i.name,

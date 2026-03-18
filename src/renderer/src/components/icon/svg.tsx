@@ -1,7 +1,6 @@
 import BookImage from '@renderer/assets/images/Buttons/Book.png'
 import ScrollImage from '@renderer/assets/images/Buttons/Scroll.png'
 import { svgToData } from '@iconify/utils'
-import { soundboardIcons } from '@renderer/utils/fetchIcons'
 import { useRef, useState, useEffect } from 'react'
 import { SvgSoundIcon } from 'src/apis/audio/types/items'
 
@@ -38,7 +37,7 @@ export function GroupSvgIcon(props: GroupSvgIconProps) {
 
     ctx.canvas.style.imageRendering = 'pixelated'
 
-    const iconBody = soundboardIcons.GetIcon(icon.name ?? 'moon')!.body
+    const iconBody = window.audio.Icons.GetIcon({ iconName: icon.name ?? 'moon' }).icon!.body
 
     const dataurl = svgToData(iconBody)
 

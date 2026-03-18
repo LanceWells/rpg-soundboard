@@ -1,5 +1,6 @@
 import { IAudioApi } from './interface'
 import { GroupsAudioAPI } from './methods/groups'
+import { IconsApi } from './methods/icons'
 import { SoundsAudioAPI } from './methods/sounds'
 
 /**
@@ -14,5 +15,7 @@ export const audioApi: IAudioApi = {
   /**
    * An accessor object for the audio APIs related to non-object specific methods.
    */
-  Sounds: SoundsAudioAPI
+  Sounds: SoundsAudioAPI,
+
+  Icons: IconsApi
 }

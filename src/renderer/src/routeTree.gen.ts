@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SoundCreateRouteImport } from './routes/sound/create'
+import { Route as SoundBulkUploadRouteImport } from './routes/sound/bulkUpload'
 import { Route as SoundGroupIdEditRouteImport } from './routes/sound/$groupId/edit'
 
 const IndexRoute = IndexRouteImport.update({
@@ -23,6 +24,11 @@ const SoundCreateRoute = SoundCreateRouteImport.update({
   path: '/sound/create',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SoundBulkUploadRoute = SoundBulkUploadRouteImport.update({
+  id: '/sound/bulkUpload',
+  path: '/sound/bulkUpload',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SoundGroupIdEditRoute = SoundGroupIdEditRouteImport.update({
   id: '/sound/$groupId/edit',
   path: '/sound/$groupId/edit',
@@ -31,30 +37,43 @@ const SoundGroupIdEditRoute = SoundGroupIdEditRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/sound/bulkUpload': typeof SoundBulkUploadRoute
   '/sound/create': typeof SoundCreateRoute
   '/sound/$groupId/edit': typeof SoundGroupIdEditRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/sound/bulkUpload': typeof SoundBulkUploadRoute
   '/sound/create': typeof SoundCreateRoute
   '/sound/$groupId/edit': typeof SoundGroupIdEditRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/sound/bulkUpload': typeof SoundBulkUploadRoute
   '/sound/create': typeof SoundCreateRoute
   '/sound/$groupId/edit': typeof SoundGroupIdEditRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/sound/create' | '/sound/$groupId/edit'
+  fullPaths:
+    | '/'
+    | '/sound/bulkUpload'
+    | '/sound/create'
+    | '/sound/$groupId/edit'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/sound/create' | '/sound/$groupId/edit'
-  id: '__root__' | '/' | '/sound/create' | '/sound/$groupId/edit'
+  to: '/' | '/sound/bulkUpload' | '/sound/create' | '/sound/$groupId/edit'
+  id:
+    | '__root__'
+    | '/'
+    | '/sound/bulkUpload'
+    | '/sound/create'
+    | '/sound/$groupId/edit'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  SoundBulkUploadRoute: typeof SoundBulkUploadRoute
   SoundCreateRoute: typeof SoundCreateRoute
   SoundGroupIdEditRoute: typeof SoundGroupIdEditRoute
 }
@@ -75,6 +94,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SoundCreateRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sound/bulkUpload': {
+      id: '/sound/bulkUpload'
+      path: '/sound/bulkUpload'
+      fullPath: '/sound/bulkUpload'
+      preLoaderRoute: typeof SoundBulkUploadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/sound/$groupId/edit': {
       id: '/sound/$groupId/edit'
       path: '/sound/$groupId/edit'
@@ -87,6 +113,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  SoundBulkUploadRoute: SoundBulkUploadRoute,
   SoundCreateRoute: SoundCreateRoute,
   SoundGroupIdEditRoute: SoundGroupIdEditRoute,
 }

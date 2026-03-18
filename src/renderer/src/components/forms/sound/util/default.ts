@@ -31,9 +31,7 @@ export function newDefaultSequenceRequest(): SequenceFormInput {
       },
       name: '',
       tags: [],
-      variant: 'Default',
-      sequence: [],
-      type: 'sequence'
+      sequence: []
     }
   }
 }

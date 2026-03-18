@@ -4,6 +4,7 @@ import { SupportedFileTypes } from './supportedFileTypes'
 import type { IGroups } from './types/groups'
 import type { ISounds } from './types/sounds'
 import type { ISoundGroup } from './types/items'
+import { IIcons } from './types/icons'
 
 /**
  * The root object for the audio API, and the storage for all soundboards.
@@ -30,4 +31,6 @@ export interface IAudioApi {
    * An accessor object for the audio APIs related to non-object specific methods.
    */
   Sounds: ISounds
+
+  Icons: IIcons
 }

@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import { useDebounce } from 'use-debounce'
 import { Route as CreateSoundRoute } from '@renderer/routes/sound/create'
 import { Route as BoardRoute } from '@renderer/routes/'
+import { Route as BulkUploadRoute } from '@renderer/routes/sound/bulkUpload'
 import { Playback } from '../playback/playback'
 
 export type NavProps = {}
@@ -49,6 +50,9 @@ export function Nav(props: NavProps) {
         </li>
         <li>
           <Link to={CreateSoundRoute.fullPath}>New Sound</Link>
+        </li>
+        <li>
+          <Link to={BulkUploadRoute.fullPath}>Bulk Upload</Link>
         </li>
       </ul>
       <Playback />
