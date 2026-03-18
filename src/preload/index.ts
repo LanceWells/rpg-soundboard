@@ -1,4 +1,4 @@
-import { contextBridge } from 'electron'
+import { contextBridge, webUtils } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
 import { audioApi } from '../apis/audio/audioApi'
 
@@ -13,6 +13,13 @@ if (process.contextIsolated) {
     contextBridge.exposeInMainWorld('electron', electronAPI)
     contextBridge.exposeInMainWorld('api', api)
     contextBridge.exposeInMainWorld('audio', audioApi)
+    contextBridge.exposeInMainWorld('electronApi', {
+      getFilePath(file: File) {
+        const path = webUtils.getPathForFile(file)
+
+        return path
+      }
+    })
   } catch (error) {
     console.error(error)
   }

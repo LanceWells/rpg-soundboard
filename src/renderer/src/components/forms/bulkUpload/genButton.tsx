@@ -13,9 +13,18 @@ export function GenButtonLoaded(props: GenButtonLoadedProps) {
   const { button } = props
 
   return (
-    <div className="flex">
-      <GroupIcon icon={button.icon} />
-      {button.name}
+    <div
+      className={`
+        grid
+        items-center
+        [grid-template-areas:"icon_name"_"icon_sounds"]
+      `}
+    >
+      <div className="[grid-area:icon]">
+        <GroupIcon icon={button.icon} />
+      </div>
+      <span className="[grid-area:name]">{button.name}</span>
+      <span className="[grid-area:sounds]">{button.effects.length} Effects</span>
     </div>
   )
 }
