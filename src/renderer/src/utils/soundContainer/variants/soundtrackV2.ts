@@ -29,7 +29,7 @@ export class SoundtrackSoundContainerV2 implements ISoundContainer, ISoundtrackC
   private _effects: SoundEffectWithPlayerDetails[]
   private _effectsPointer: number = 0
   private _containerVolume: number = 100
-  private _volumeManager: VolumeManager = new VolumeManager(0.13)
+  private _volumeManager: VolumeManager = new VolumeManager(0.35)
 
   private timeouts: Set<NodeJS.Timeout> = new Set()
 
@@ -184,7 +184,7 @@ export class SoundtrackSoundContainerV2 implements ISoundContainer, ISoundtrackC
           }
         : null
 
-    await this.playSong(this._audioQueue[0], 0, fadeDetails)
+    await this.playSong(this._audioQueue[0], this._fadeTime, fadeDetails)
 
     while (this._isActive) {
       await this.playNextSongInternal()
