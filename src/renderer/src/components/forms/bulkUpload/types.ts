@@ -1,4 +1,4 @@
-import { SoundGroupSourceEditableFields } from 'src/apis/audio/types/items'
+import { CreateRequest } from 'src/apis/audio/types/groups'
 
 export type BulkButtonLoading = {
   state: 'loading'
@@ -9,9 +9,14 @@ export type BulkButtonLoading = {
 export type BulkButtonLoaded = {
   state: 'loaded'
   name: string
-  button: SoundGroupSourceEditableFields
+  button: CreateRequest
 }
 
 export type BulkButton = BulkButtonLoading | BulkButtonLoaded
 
 export type BulkButtonStates = Record<string, BulkButton>
+
+export type FormInput = {
+  bulkSounds: BulkButton[]
+  tags: string[]
+}

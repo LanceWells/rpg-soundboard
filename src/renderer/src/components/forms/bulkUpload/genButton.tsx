@@ -1,3 +1,4 @@
+import { VariantTag } from '@renderer/components/groups/variantTag'
 import { GroupIcon } from '@renderer/components/icon/base'
 import { SoundGroupSourceEditableFields } from 'src/apis/audio/types/items'
 
@@ -20,8 +21,13 @@ export function GenButtonLoaded(props: GenButtonLoadedProps) {
         [grid-template-areas:"icon_name"_"icon_sounds"]
       `}
     >
-      <div className="[grid-area:icon]">
-        <GroupIcon icon={button.icon} />
+      <div className="relative [grid-area:icon]">
+        <div className="relative z-0">
+          <GroupIcon icon={button.icon} />
+        </div>
+        <div className="absolute top-0 right-0 -translate-x-4 z-10">
+          <VariantTag variant={button.variant} />
+        </div>
       </div>
       <span className="[grid-area:name]">{button.name}</span>
       <span className="[grid-area:sounds]">{button.effects.length} Effects</span>

@@ -30,18 +30,17 @@ export function BulkFiles(props: BulkFilesProps) {
     }
 
     const acceptedFilesAsButtons: BulkButtonStates = files.reduce<BulkButtonStates>((acc, curr) => {
-      const f = event['dataTransfer']
-      console.log(f)
-
       const { webUtils } = require('electron')
       const path = webUtils.getPathForFile(curr)
       const nonNumberedName = curr.name
         // Extension
-        .replace(/\.\w+/g, '')
+        .replace(/\.[\w]+/g, '')
         // Ending numbers
         .replace(/\s*[0-9]+$/g, '')
         // Prefixed category name
-        .replace(/(^\w+\s?-\s?)/g, '')
+        .replace(/(^[\w\s]+\s?-\s?)/g, '')
+        // Replace underscores with spaces
+        .replaceAll('_', ' ')
         // Any missed whitespace on the edge
         .trim()
 

@@ -7,6 +7,7 @@ import {
   SearchIconsRequest,
   SearchIconsResponse
 } from '../types/icons'
+import { SoundVariants } from '../types/soundVariants'
 import { soundboardIcons } from '../utils/fetchIcons'
 
 export const IconsApi: IIcons = {
@@ -18,6 +19,15 @@ export const IconsApi: IIcons = {
   ): Promise<BulkGenGroupInputsResponse> {
     const { filePaths, name } = request
     const bestIcon = await soundboardIcons.GetBestIcon(name)
+
+    function guessVariant(): SoundVariants {
+      if (filePaths.length > 2) {
+        return 'Rapid'
+      }
+      return 'Default'
+    }
+
+    const variant = guessVariant()
 
     return {
       group: {
@@ -34,7 +44,7 @@ export const IconsApi: IIcons = {
         name: name,
         tags: name.split(/\s/g),
         type: 'source',
-        variant: 'Default'
+        variant
       }
     }
   },

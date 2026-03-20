@@ -56,7 +56,6 @@
     "fuse.js": "^7.1.0",
     "html-to-react": "^1.7.0",
     "immer": "^10.1.1",
-    "react-dropzone": "^15.0.0",
     "react-hook-form": "^7.71.1",
     "tailwind-merge": "^3.3.0",
     "thesaurus": "^0.0.1",

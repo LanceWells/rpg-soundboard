@@ -28,7 +28,9 @@ import {
   GetSoundRequest,
   GetSoundsResponse,
   SoundEffectWithPlayerDetails,
-  CreateSequenceRequest
+  CreateSequenceRequest,
+  CreateBulkResponse,
+  CreateBulkRequest
 } from '../types/groups'
 import { isSequenceGroup, isSourceGroup } from './typePredicates'
 
@@ -51,6 +53,27 @@ export const GroupsAudioAPI: IGroups = {
     return {
       groups: AudioConfig.getAllGroups()
     }
+  },
+  async CreateBulk(request: CreateBulkRequest): Promise<CreateBulkResponse> {
+    const { commonTags, groups } = request
+
+    for (const group of groups) {
+      const withTags = produce(group, (draft) => {
+        const allTags = new Set([...draft.tags, ...commonTags])
+        const formattedTags = [...allTags.values()].map((t) => t.toLowerCase())
+        draft.tags = formattedTags
+      })
+
+      // await new Promise<void>((res) => setTimeout(() => res(), 1000))
+      await new Promise<void>(
+        ((res) => {
+          this.Create(withTags)
+          res()
+        }).bind(this)
+      )
+    }
+
+    return {}
   },
   /**
    * @inheritdoc

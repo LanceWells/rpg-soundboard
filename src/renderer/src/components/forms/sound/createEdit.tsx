@@ -91,7 +91,7 @@ export function CreateEditSoundForm(props: CreateEditSoundFormProps) {
         </fieldset>
         <fieldset className="fieldset">
           <legend className="fieldset-legend">Tags</legend>
-          <TagInput />
+          <TagInput tags={tags} setTags={(newTags) => setValue('request.tags', newTags)} />
           <div className="max-w-[320px] flex gap-1 flex-wrap">
             {tags.map((t) => (
               <Tag
@@ -148,8 +148,6 @@ function CreateGroupForm() {
 }
 
 function CreateSequenceForm() {
-  // const { register, formState } = useFormContext<SequenceFormInput>()
-
   return (
     <>
       <fieldset className="fieldset">

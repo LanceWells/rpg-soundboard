@@ -155,7 +155,9 @@ export class SoundboardIcons {
 
   async GetBestIcon(searchTerm: string): Promise<IconBody> {
     const getSearchWords = (term: string) => {
-      const set = new Set(term.split(/\s/g).map((s) => s.toLowerCase().trim()))
+      const splitTerm = term.split(/\s/g)
+      const nonMultiples = splitTerm.map((t) => t.replaceAll(/s$/g, ''))
+      const set = new Set([...splitTerm, ...nonMultiples].map((s) => s.toLowerCase().trim()))
       const uniqueWords = [...set.values()]
       const bestWords = uniqueWords.filter((s) => s.length > 2 && !BANNED_WORDS.includes(s))
       const longestWordsFirst = bestWords.toSorted((a, b) => b.length - a.length)

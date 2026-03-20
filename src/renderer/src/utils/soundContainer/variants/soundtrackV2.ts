@@ -29,7 +29,7 @@ export class SoundtrackSoundContainerV2 implements ISoundContainer, ISoundtrackC
   private _effects: SoundEffectWithPlayerDetails[]
   private _effectsPointer: number = 0
   private _containerVolume: number = 100
-  private _volumeManager: VolumeManager = new VolumeManager(0.35)
+  private _volumeManager: VolumeManager = new VolumeManager(0.25)
 
   private timeouts: Set<NodeJS.Timeout> = new Set()
 

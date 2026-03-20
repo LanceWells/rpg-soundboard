@@ -1,12 +1,14 @@
-import { useFormContext } from 'react-hook-form'
-import { FormInput } from '../types'
 import { useAudioStore } from '@renderer/stores/audio/audioStore'
 import { useRef } from 'react'
 import { CloseIcon } from '@renderer/assets/icons'
 
-export function TagInput() {
-  const { watch, setValue } = useFormContext<FormInput>()
-  const tags = watch('request.tags')
+export type TagInput = {
+  tags: string[]
+  setTags: (newTags: string[]) => void
+}
+
+export function TagInput(props: TagInput) {
+  const { setTags, tags } = props
 
   const getTags = useAudioStore((store) => store.getTags)
   const tagInputRef = useRef<HTMLInputElement | null>(null)
@@ -29,7 +31,7 @@ export function TagInput() {
       return
     }
 
-    setValue('request.tags', [...tags, sanitizedTag])
+    setTags([...tags, sanitizedTag])
 
     tagInput.value = ''
   }

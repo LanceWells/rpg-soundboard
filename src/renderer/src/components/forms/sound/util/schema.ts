@@ -20,7 +20,7 @@ const EffectSchema: z.ZodType<SoundEffectEditableFields> = z.object({
   name: z.string()
 })
 
-const CreateRequestSchema: z.ZodType<CreateRequest> = z.object({
+export const CreateRequestSchema: z.ZodType<CreateRequest> = z.object({
   effects: z.array(EffectSchema).min(1),
   type: z.literal('source'),
   variant: z.enum(['Default', 'Looping', 'Rapid', 'Soundtrack']),

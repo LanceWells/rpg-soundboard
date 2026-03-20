@@ -26,6 +26,13 @@ export type CreateResponse = {
   group: SoundGroupSource
 }
 
+export type CreateBulkRequest = {
+  groups: SoundGroupSourceEditableFields[]
+  commonTags: string[]
+}
+
+export type CreateBulkResponse = {}
+
 export type CreateSequenceRequest = SoundGroupSequenceEditableFields
 
 export type CreateSequenceResponse = {
@@ -189,6 +196,8 @@ export interface IGroups {
   Get(request: GetRequest): GetResponse
 
   GetAll(): GetAllResponse
+
+  CreateBulk(request: CreateBulkRequest): Promise<CreateBulkResponse>
 
   /**
    * Creates a new group using the provided set of parameters.
