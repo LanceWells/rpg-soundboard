@@ -57,13 +57,13 @@ export interface GroupSlice {
   ) => void
   deleteGroup: (id: GroupID) => void
   searchForGroups: (searchText: string, types: SoundGroupTypes[]) => void
-  // searchForTags: (searchText: string) => void
   soughtGroups: ISoundGroup[]
-  // soughtTags: string[]
   getTags: () => Set<string>
   toggleVariantFilter: (variant: SoundVariants) => void
   setSorting: (sorting: SortVals | undefined) => void
   updateSorting: () => void
+  pinnedSearches: string[]
+  updatePinnedSearches: (newSearches: string[]) => void
 }
 
 export const createGroupSlice: StateCreator<GroupSlice, [], [], GroupSlice> = (set, get) => ({
@@ -79,7 +79,8 @@ export const createGroupSlice: StateCreator<GroupSlice, [], [], GroupSlice> = (s
   },
   addGroup(req) {
     const newGroup = window.audio.Groups.Create(req)
-    get().searchForGroups('', ['sequence', 'source'])
+    // get().searchForGroups('', ['sequence', 'source'])
+    get().updateSorting()
     set({
       groups: window.audio.Groups.GetAll().groups
     })
@@ -90,7 +91,8 @@ export const createGroupSlice: StateCreator<GroupSlice, [], [], GroupSlice> = (s
     const newGroup = window.audio.Groups.CreateSequence(req)
     const newGroups = window.audio.Groups.GetAll().groups
 
-    get().searchForGroups('', ['sequence', 'source'])
+    // get().searchForGroups('', ['sequence', 'source'])
+    get().updateSorting()
     set({
       groups: newGroups
     })
@@ -102,7 +104,8 @@ export const createGroupSlice: StateCreator<GroupSlice, [], [], GroupSlice> = (s
       groupID: id
     })
 
-    get().searchForGroups('', ['sequence', 'source'])
+    // get().searchForGroups('', ['sequence', 'source'])
+    get().updateSorting()
 
     set({
       groups: window.audio.Groups.GetAll().groups
@@ -143,7 +146,8 @@ export const createGroupSlice: StateCreator<GroupSlice, [], [], GroupSlice> = (s
   updateGroup(req) {
     const updatedGroup = window.audio.Groups.Update(req)
 
-    get().searchForGroups('', ['sequence', 'source'])
+    // get().searchForGroups('', ['sequence', 'source'])
+    get().updateSorting()
 
     set({
       groups: window.audio.Groups.GetAll().groups
@@ -191,7 +195,8 @@ export const createGroupSlice: StateCreator<GroupSlice, [], [], GroupSlice> = (s
       groupID,
       ...newGroup
     })
-    get().searchForGroups('', ['sequence', 'source'])
+    // get().searchForGroups('', ['sequence', 'source'])
+    get().updateSorting()
 
     set({
       groups: window.audio.Groups.GetAll().groups
@@ -244,8 +249,20 @@ export const createGroupSlice: StateCreator<GroupSlice, [], [], GroupSlice> = (s
       : filteredGroups
 
     set({
-      soughtGroups: sortedGroups
+      soughtGroups: sortedGroups,
+      pinnedSearches: window.audio.Groups.GetPinnedSearches({}).pinnedSearches
     })
+  },
+  pinnedSearches: window.audio.Groups.GetPinnedSearches({}).pinnedSearches,
+  updatePinnedSearches(newSearches) {
+    window.audio.Groups.UpdatePinnedSearches({
+      newPinnedSearches: newSearches
+    })
+
+    set({
+      groups: window.audio.Groups.GetAll().groups
+    })
+    get().updateSorting()
   }
 })
 
@@ -336,4 +353,14 @@ function searchGroups(searchText: string) {
 
   const soughtGroups = results.map((r) => r.item)
   return soughtGroups
+}
+
+function debounce<T extends (...args: any) => any>(callback: T, wait: number) {
+  let timeoutId: number | undefined = undefined
+  return (...args: Parameters<T>) => {
+    window.clearTimeout(timeoutId)
+    timeoutId = window.setTimeout(() => {
+      callback(...args)
+    }, wait)
+  }
 }

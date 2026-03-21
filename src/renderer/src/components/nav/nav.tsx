@@ -1,27 +1,13 @@
 import TownHero from '@renderer/assets/images/Layout/TownHero.png'
-import { useAudioStore } from '@renderer/stores/audio/audioStore'
 import { Link } from '@tanstack/react-router'
-import { useEffect, useState } from 'react'
-import { useDebounce } from 'use-debounce'
 import { Route as CreateSoundRoute } from '@renderer/routes/sound/create'
 import { Route as BoardRoute } from '@renderer/routes/'
 import { Route as BulkUploadRoute } from '@renderer/routes/sound/bulkUpload'
 import { Playback } from '../playback/playback'
+import { SearchBox } from '../search/search'
+import { SearchPins } from '../search/pins'
 
-export type NavProps = {}
-
-export function Nav(props: NavProps) {
-  const {} = props
-
-  const [search, setSearch] = useState('')
-  const [debouncedSearch] = useDebounce(search, 500)
-
-  const searchForGroups = useAudioStore((store) => store.searchForGroups)
-
-  useEffect(() => {
-    searchForGroups(debouncedSearch, ['source', 'sequence'])
-  }, [debouncedSearch])
-
+export function Nav() {
   return (
     <div
       className={`
@@ -30,8 +16,8 @@ export function Nav(props: NavProps) {
       shop-wall
       grid
       h-dvh
-      [grid-template-areas:"header"_"hero"_"navbuttons"_"playback"_"search"]
-      grid-rows-[min-content_min-content_1fr_min-content_min-content]
+      [grid-template-areas:"header"_"hero"_"navbuttons"_"playback"_"pins"_"search"]
+      grid-rows-[min-content_min-content_1fr_min-content_min-content_min-content]
     `}
     >
       <h1
@@ -56,32 +42,8 @@ export function Nav(props: NavProps) {
         </li>
       </ul>
       <Playback />
-      <div
-        className={`
-        w-full
-        shadow-pixel-md
-        grid
-        grid-rows-2
-        bg-shop-200
-        p-2
-        [grid-area:search]
-      `}
-      >
-        <span>Whatchu want?</span>
-        <input
-          onChange={(e) => {
-            setSearch(e.target.value)
-          }}
-          placeholder="Search"
-          type="text"
-          className={`
-          bg-black
-          p-1
-          border-4
-          border-shop-100
-        `}
-        />
-      </div>
+      <SearchPins />
+      <SearchBox />
     </div>
   )
 }

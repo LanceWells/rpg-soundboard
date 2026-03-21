@@ -176,6 +176,18 @@ export type DeleteRequest = {
  */
 export type DeleteResponse = {}
 
+export type GetPinnedSearchesRequest = {}
+
+export type GetPinnedSearchesResponse = {
+  pinnedSearches: string[]
+}
+
+export type UpdatePinnedSearchesRequest = {
+  newPinnedSearches: string[]
+}
+
+export type UpdatePinnedSearchesResponse = {}
+
 /**
  * An ID that refers to a particular sound group.
  */
@@ -222,4 +234,8 @@ export interface IGroups {
   CreateSequence(request: CreateSequenceRequest): CreateSequenceResponse
 
   UpdateSequence(request: UpdateSequenceRequest): UpdateSequenceResponse
+
+  GetPinnedSearches(request: GetPinnedSearchesRequest): GetPinnedSearchesResponse
+
+  UpdatePinnedSearches(request: UpdatePinnedSearchesRequest): UpdatePinnedSearchesResponse
 }

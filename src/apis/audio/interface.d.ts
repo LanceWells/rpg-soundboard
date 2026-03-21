@@ -15,6 +15,8 @@ export type AudioApiConfig = {
    */
   Groups: ISoundGroup[]
 
+  pinnedSearches: string[]
+
   version: number
 }
 

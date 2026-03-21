@@ -1,4 +1,4 @@
-import { BulkUploadFiles } from '@renderer/components/forms/bulkUpload/formV2'
+import { BulkUploadFiles } from '@renderer/components/forms/bulkUpload/form'
 import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/sound/bulkUpload')({

@@ -71,12 +71,13 @@ export function Tag(props: TagProps) {
   const { onRemove, text } = props
 
   return (
-    <button
+    <div
+      role="button"
       onClick={() => onRemove(text)}
       className="badge cursor-pointer flex justify-between badge-soft badge-primary"
     >
       <span>{text}</span>
       <CloseIcon className="max-h-5" />
-    </button>
+    </div>
   )
 }

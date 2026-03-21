@@ -30,7 +30,11 @@ import {
   SoundEffectWithPlayerDetails,
   CreateSequenceRequest,
   CreateBulkResponse,
-  CreateBulkRequest
+  CreateBulkRequest,
+  UpdatePinnedSearchesRequest,
+  UpdatePinnedSearchesResponse,
+  GetPinnedSearchesRequest,
+  GetPinnedSearchesResponse
 } from '../types/groups'
 import { isSequenceGroup, isSourceGroup } from './typePredicates'
 
@@ -364,6 +368,21 @@ export const GroupsAudioAPI: IGroups = {
     return {
       variant: group.variant,
       sounds: effects
+    }
+  },
+  UpdatePinnedSearches: function (
+    request: UpdatePinnedSearchesRequest
+  ): UpdatePinnedSearchesResponse {
+    const newConfig = produce(AudioConfig.Config, (draft) => {
+      draft.pinnedSearches = request.newPinnedSearches.toSpliced(0, 0)
+    })
+
+    AudioConfig.Config = newConfig
+    return {}
+  },
+  GetPinnedSearches: function (_request: GetPinnedSearchesRequest): GetPinnedSearchesResponse {
+    return {
+      pinnedSearches: (AudioConfig.Config.pinnedSearches ?? []).toSpliced(0, 0)
     }
   }
 }

@@ -73,7 +73,8 @@ export class AudioConfigStorage extends MigratableConfigStorage<AudioApiConfig> 
           console.log('Version 3 migration')
           const outConfig: AudioApiConfig = {
             Groups: [],
-            version: 3
+            version: 3,
+            pinnedSearches: []
           }
 
           const boardNameMap = (inConfig as AudioApiConfigV2).boards.reduce((acc, curr) => {
@@ -165,7 +166,7 @@ export class AudioConfigStorage extends MigratableConfigStorage<AudioApiConfig> 
    * @inheritdoc
    */
   constructor() {
-    super('audio', { Groups: [], version: 3 })
+    super('audio', { Groups: [], version: 3, pinnedSearches: [] })
 
     this._groupMap = new Map()
 
