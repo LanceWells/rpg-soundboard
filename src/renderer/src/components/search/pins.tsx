@@ -18,7 +18,6 @@ export function SearchPins() {
       `}
     >
       {pinnedSearchTags}
-      {/* <PinnedClear /> */}
     </div>
   )
 }
@@ -30,7 +29,7 @@ type PinnedSearchProps = {
 function PinnedSearch(props: PinnedSearchProps) {
   const { text } = props
 
-  const searchForGroups = useAudioStore((store) => store.searchForGroups)
+  const setSearchText = useAudioStore((store) => store.setSearchText)
   const activeSearch = useAudioStore(useShallow((store) => store.sorting.search))
   const updatePinnedSearches = useAudioStore((store) => store.updatePinnedSearches)
   const pinnedSearches = useAudioStore((store) => store.pinnedSearches)
@@ -47,27 +46,11 @@ function PinnedSearch(props: PinnedSearchProps) {
           cursor-pointer
         `}
         role="button"
-        onClick={() => searchForGroups(text, ['source', 'sequence'])}
+        onClick={() => setSearchText(text, true)}
       >
         {text}
       </span>
       <button onClick={removePin} className="btn btn-circle btn-xs">
-        <CloseIcon className="max-h-5 stroke-white fill-white" />
-      </button>
-    </Pin>
-  )
-}
-
-function PinnedClear() {
-  const searchForGroups = useAudioStore((store) => store.searchForGroups)
-  const clearSearch = () => {
-    searchForGroups('', ['source', 'sequence'])
-  }
-
-  return (
-    <Pin className="bg-red-900">
-      <span>Clear</span>
-      <button onClick={clearSearch} className="btn btn-circle btn-xs btn-error">
         <CloseIcon className="max-h-5 stroke-white fill-white" />
       </button>
     </Pin>

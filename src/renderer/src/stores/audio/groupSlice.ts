@@ -64,6 +64,8 @@ export interface GroupSlice {
   updateSorting: () => void
   pinnedSearches: string[]
   updatePinnedSearches: (newSearches: string[]) => void
+  searchText: string
+  setSearchText: (newText: string, skipDebounce?: boolean) => void
 }
 
 export const createGroupSlice: StateCreator<GroupSlice, [], [], GroupSlice> = (set, get) => ({
@@ -79,7 +81,6 @@ export const createGroupSlice: StateCreator<GroupSlice, [], [], GroupSlice> = (s
   },
   addGroup(req) {
     const newGroup = window.audio.Groups.Create(req)
-    // get().searchForGroups('', ['sequence', 'source'])
     get().updateSorting()
     set({
       groups: window.audio.Groups.GetAll().groups
@@ -91,7 +92,6 @@ export const createGroupSlice: StateCreator<GroupSlice, [], [], GroupSlice> = (s
     const newGroup = window.audio.Groups.CreateSequence(req)
     const newGroups = window.audio.Groups.GetAll().groups
 
-    // get().searchForGroups('', ['sequence', 'source'])
     get().updateSorting()
     set({
       groups: newGroups
@@ -104,7 +104,6 @@ export const createGroupSlice: StateCreator<GroupSlice, [], [], GroupSlice> = (s
       groupID: id
     })
 
-    // get().searchForGroups('', ['sequence', 'source'])
     get().updateSorting()
 
     set({
@@ -146,7 +145,6 @@ export const createGroupSlice: StateCreator<GroupSlice, [], [], GroupSlice> = (s
   updateGroup(req) {
     const updatedGroup = window.audio.Groups.Update(req)
 
-    // get().searchForGroups('', ['sequence', 'source'])
     get().updateSorting()
 
     set({
@@ -195,7 +193,6 @@ export const createGroupSlice: StateCreator<GroupSlice, [], [], GroupSlice> = (s
       groupID,
       ...newGroup
     })
-    // get().searchForGroups('', ['sequence', 'source'])
     get().updateSorting()
 
     set({
@@ -263,6 +260,18 @@ export const createGroupSlice: StateCreator<GroupSlice, [], [], GroupSlice> = (s
       groups: window.audio.Groups.GetAll().groups
     })
     get().updateSorting()
+  },
+  searchText: '',
+  setSearchText(newText, skipDebounce) {
+    set({
+      searchText: newText
+    })
+
+    if (skipDebounce) {
+      get().searchForGroups(newText, ['source', 'sequence'])
+    } else {
+      debouncedSearch(get, newText)
+    }
   }
 })
 
@@ -364,3 +373,7 @@ function debounce<T extends (...args: any) => any>(callback: T, wait: number) {
     }, wait)
   }
 }
+
+const debouncedSearch = debounce((get: () => GroupSlice, newText: string) => {
+  get().searchForGroups(newText, ['source', 'sequence'])
+}, 500)

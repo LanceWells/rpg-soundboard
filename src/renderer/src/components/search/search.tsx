@@ -1,27 +1,19 @@
 import { useAudioStore } from '@renderer/stores/audio/audioStore'
-import { useEffect, useState } from 'react'
-import { useDebounce } from 'use-debounce'
 
 export function SearchBox() {
-  const [search, setSearch] = useState('')
-  const [debouncedSearch] = useDebounce(search, 500)
-
-  const searchForGroups = useAudioStore((store) => store.searchForGroups)
+  const search = useAudioStore((store) => store.searchText)
+  const setSearch = useAudioStore((store) => store.setSearchText)
   const updatePinnedSearches = useAudioStore((store) => store.updatePinnedSearches)
   const pinnedSearches = useAudioStore((store) => store.pinnedSearches)
 
   const addPin = () => {
-    if (!debouncedSearch || debouncedSearch.length === 0) {
+    if (!search || search.length === 0) {
       return
     }
 
-    const pins = new Set([...pinnedSearches, debouncedSearch]).values()
+    const pins = new Set([...pinnedSearches, search]).values()
     updatePinnedSearches([...pins])
   }
-
-  useEffect(() => {
-    searchForGroups(debouncedSearch, ['source', 'sequence'])
-  }, [debouncedSearch])
 
   return (
     <div
@@ -46,6 +38,7 @@ export function SearchBox() {
           setSearch(e.target.value)
         }}
         placeholder="Search"
+        value={search}
         type="text"
         className={`
           bg-black
