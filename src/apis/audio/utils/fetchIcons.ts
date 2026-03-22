@@ -1,5 +1,4 @@
 import thesaurus from 'thesaurus'
-import fuse from 'fuse.js'
 import { icons } from '@iconify-json/game-icons/index.js'
 import { iconToSVG, parseIconSet, validateIconSet } from '@iconify/utils'
 
@@ -43,7 +42,6 @@ const BANNED_WORDS = [
 export class SoundboardIcons {
   private _iconLookup: Map<string, string[]>
   private _iconRef: Map<string, string>
-  private _fuseSearch: fuse<string>
 
   /**
    * Creates a new instance of a {@link SoundboardIcons}.
@@ -109,13 +107,6 @@ export class SoundboardIcons {
 
     this._iconRef = iconRef
     this._iconLookup = iconLookup
-
-    this._fuseSearch = new fuse([...this._iconRef.keys()], {
-      includeScore: true,
-      threshold: 0.07,
-      ignoreDiacritics: true,
-      isCaseSensitive: false
-    })
   }
 
   /**
