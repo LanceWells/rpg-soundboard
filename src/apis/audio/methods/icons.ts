@@ -24,6 +24,9 @@ export const IconsApi: IIcons = {
       if (filePaths.length > 2) {
         return 'Rapid'
       }
+      if (filePaths.some((fp) => fp.match(/[\s_]loop/g))) {
+        return 'Looping'
+      }
       return 'Default'
     }
 

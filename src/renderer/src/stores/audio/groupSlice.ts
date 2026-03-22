@@ -202,7 +202,7 @@ export const createGroupSlice: StateCreator<GroupSlice, [], [], GroupSlice> = (s
   editingGroup: null,
   editingGroupID: undefined,
   playingGroups: [],
-  soughtGroups: [],
+  soughtGroups: window.audio.Groups.GetAll().groups,
   searchForGroups(searchText) {
     set({
       sorting: produce(get().sorting, (draft) => {
