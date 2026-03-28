@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { AudProtocolPrefix } from './aud'
+import { AudProtocolPrefix } from '../aud'
 
 describe('AudProtocolPrefix', () => {
   it('equals "aud"', () => {
