@@ -7,16 +7,22 @@ import type { ISoundGroup } from './types/items'
 import { IIcons } from './types/icons'
 
 /**
- * The root object for the audio API, and the storage for all soundboards.
+ * The root object for the audio API config, storing all sound groups and user preferences.
  */
 export type AudioApiConfig = {
   /**
-   * The set of soundboards that are stored in the relevant config file.
+   * The set of sound groups stored in the relevant config file.
    */
   Groups: ISoundGroup[]
 
+  /**
+   * The list of search terms the user has pinned for quick access.
+   */
   pinnedSearches: string[]
 
+  /**
+   * The schema version of this config. Used to determine which migrations need to be applied.
+   */
   version: number
 }
 
@@ -25,7 +31,7 @@ export type AudioApiConfig = {
  */
 export interface IAudioApi {
   /**
-   * An accessor object for the audio APIs related to SoundCategory objects.
+   * An accessor object for the audio APIs related to SoundGroup objects.
    */
   Groups: IGroups
 
@@ -34,5 +40,8 @@ export interface IAudioApi {
    */
   Sounds: ISounds
 
+  /**
+   * An accessor object for the audio APIs related to icon searching and group input generation.
+   */
   Icons: IIcons
 }

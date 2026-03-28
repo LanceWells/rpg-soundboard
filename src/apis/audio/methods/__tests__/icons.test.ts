@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 
-vi.mock('../utils/fetchIcons', () => ({
+vi.mock('../../utils/fetchIcons', () => ({
   soundboardIcons: {
     GetBestIcon: vi.fn(),
     SearchIcons: vi.fn(),

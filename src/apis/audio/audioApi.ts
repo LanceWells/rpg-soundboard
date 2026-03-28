@@ -17,5 +17,8 @@ export const audioApi: IAudioApi = {
    */
   Sounds: SoundsAudioAPI,
 
+  /**
+   * An accessor object for the audio APIs related to icon searching and group input generation.
+   */
   Icons: IconsApi
 }

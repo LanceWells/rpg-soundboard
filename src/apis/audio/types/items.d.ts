@@ -23,12 +23,21 @@ export type SvgSoundIcon = {
   foregroundColor: string
 }
 
+/**
+ * Represents an icon sourced from a pixel-art image file rather than an SVG.
+ */
 export type PixelSoundIcon = {
   type: 'pixel'
 
+  /**
+   * The filename or identifier of the pixel icon to render.
+   */
   name: string
 }
 
+/**
+ * A union of all icon variants that can be associated with a sound group.
+ */
 export type SoundIcon = SvgSoundIcon | PixelSoundIcon
 
 /**
@@ -58,6 +67,9 @@ export type SoundEffect = {
    */
   volume: number
 
+  /**
+   * A human-readable label for the sound effect, displayed in the UI.
+   */
   name: string
 }
 
@@ -66,11 +78,20 @@ export type SoundEffect = {
  */
 export type SoundEffectEditableFields = Omit<SoundEffect, 'id' | 'format'>
 
+/**
+ * An ID that refers to a particular element within a {@link SoundGroupSequence}.
+ */
 export type SequenceElementID = `seq-${string}-${string}-${string}-${string}-${string}`
 
+/**
+ * The discriminant values for the different sound group subtypes.
+ */
 export type SoundGroupTypes = 'sequence' | 'source'
 
 export interface ISoundGroup {
+  /**
+   * Discriminant field identifying which subtype of {@link ISoundGroup} this object represents.
+   */
   type: SoundGroupTypes
 
   /**
@@ -120,25 +141,52 @@ export interface SoundGroupSource extends ISoundGroup {
   effects: SoundEffect[]
 }
 
+/**
+ * A sequence element that pauses playback for a fixed duration before continuing.
+ */
 export type SoundGroupSequenceDelay = {
   type: 'delay'
+  /**
+   * The unique identifier for this sequence element.
+   */
   id: SequenceElementID
+  /**
+   * The number of milliseconds to wait before the next element in the sequence is triggered.
+   */
   msToDelay: number
 }
 
+/**
+ * A sequence element that triggers a particular sound group when reached.
+ */
 export type SoundGroupSequenceGroup = {
   type: 'group'
+  /**
+   * The unique identifier for this sequence element.
+   */
   id: SequenceElementID
+  /**
+   * The ID of the sound group to trigger.
+   */
   groupID: GroupID
 }
 
+/**
+ * A union of all possible element types that can appear within a {@link SoundGroupSequence}.
+ */
 export type SoundGroupSequenceElement = SoundGroupSequenceGroup | SoundGroupSequenceDelay
 
 export interface SoundGroupSequence extends ISoundGroup {
   type: 'sequence'
+  /**
+   * The ordered list of elements to play when this sequence group is triggered.
+   */
   sequence: SoundGroupSequenceElement[]
 }
 
+/**
+ * An extraction of editable fields for {@link SoundGroupSequence}.
+ */
 export type SoundGroupSequenceEditableFields = Omit<SoundGroupSequence, 'id' | 'variant' | 'type'>
 
 /**

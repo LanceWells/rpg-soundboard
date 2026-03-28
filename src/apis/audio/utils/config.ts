@@ -14,6 +14,9 @@ import {
  * An instantiation of the config for information related to this audio API.
  */
 export class AudioConfigStorage extends MigratableConfigStorage<AudioApiConfig> {
+  /**
+   * Returns the set of migrations to apply when upgrading an older config to the current schema.
+   */
   getMigrations(): ConfigMigrations {
     return [
       {
@@ -192,17 +195,24 @@ export class AudioConfigStorage extends MigratableConfigStorage<AudioApiConfig> 
 
   /**
    * Gets a group using the provided ID.
-   * @param boardID The ID for the group to fetch from the stored configuration object.
+   * @param groupID The ID for the group to fetch from the stored configuration object.
    * @returns The group whose ID matches, if one was found. Otherwise, `undefined`.
    */
   getGroup(groupID: GroupID): ISoundGroup | undefined {
     return this._groupMap.get(groupID)
   }
 
+  /**
+   * Returns all groups currently stored in the configuration.
+   */
   getAllGroups(): ISoundGroup[] {
     return [...this._groupMap.values()]
   }
 
+  /**
+   * Clears and rebuilds the internal group map from the current config state. Should be called
+   * whenever {@link Config} is updated to keep lookups consistent.
+   */
   private _reloadMaps() {
     this._groupMap.clear()
 
@@ -212,4 +222,7 @@ export class AudioConfigStorage extends MigratableConfigStorage<AudioApiConfig> 
   }
 }
 
+/**
+ * The singleton instance of {@link AudioConfigStorage} used throughout the audio API.
+ */
 export const AudioConfig = new AudioConfigStorage()

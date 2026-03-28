@@ -29,8 +29,24 @@ export const SoundVariants = {
    */
   Rapid: 'Rapid',
 
+  /**
+   * Useful for longer-form audio, such as background music. Behaves similarly to {@link Looping}
+   * but is intended for full tracks rather than short ambient loops.
+   *
+   * Soundtrack types have some additional features:
+   *
+   *    1. Only one soundtrack is audible at any given point. Starting a new soundtrack will cause
+   *       the active soundtrack to fade out.
+   *    2. Soundtracks will "shuffle" their playlist on each playthrough, meaning that each song in
+   *       a soundtrack effect will play, but the order will be randomized.
+   *    3. Soundtracks will apply a crossfade between each song.
+   */
   Soundtrack: 'Soundtrack',
 
+  /**
+   * A special variant reserved for {@link SoundGroupSequence} groups. Sequence groups play a
+   * series of effects and delays in a defined order, rather than a single random effect.
+   */
   Sequence: 'Sequence'
 }
 

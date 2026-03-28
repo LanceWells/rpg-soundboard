@@ -76,7 +76,7 @@ export type UpdateSequenceRequest = {
  */
 export type UpdateSequenceResponse = {
   /**
-   * The sequence that has been created.
+   * The sequence that has been updated.
    */
   sequence: SoundGroupSequence
 }

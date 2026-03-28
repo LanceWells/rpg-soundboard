@@ -38,6 +38,10 @@ import {
 } from '../types/groups'
 import { isSequenceGroup, isSourceGroup } from './typePredicates'
 
+/**
+ * Files larger than this threshold (in MB) will use HTML5 audio instead of the Web Audio API,
+ * since large files need to be streamed rather than fully buffered.
+ */
 const html5ThresholdSizeMb = 2
 
 export const GroupsAudioAPI: IGroups = {

@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll } from 'vitest'
-import { SoundboardIcons } from './fetchIcons'
+import { SoundboardIcons } from '../fetchIcons'
 
 let icons: SoundboardIcons
 

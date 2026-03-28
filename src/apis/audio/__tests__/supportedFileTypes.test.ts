@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { SupportedFileTypes } from './supportedFileTypes'
+import { SupportedFileTypes } from '../supportedFileTypes'
 
 describe('SupportedFileTypes', () => {
   it('contains all expected audio formats', () => {

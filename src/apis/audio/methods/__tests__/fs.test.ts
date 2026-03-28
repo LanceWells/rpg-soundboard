@@ -20,7 +20,7 @@ vi.mock('node:fs', () => ({
   }
 }))
 
-vi.mock('../../../utils/paths', () => ({
+vi.mock('../../../../utils/paths', () => ({
   GetAppDataPath: vi.fn(() => TEST_APP_DATA)
 }))
 

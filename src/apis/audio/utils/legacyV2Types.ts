@@ -13,6 +13,9 @@ export type AudioApiConfigV2 = {
    */
   boards: SoundBoard[]
 
+  /**
+   * The schema version of this config. Used to determine which migrations need to be applied.
+   */
   version: number
 }
 
@@ -79,9 +82,15 @@ export type SoundCategory = {
  */
 export type CategoryID = `cat-${string}-${string}-${string}-${string}-${string}`
 
+/**
+ * The discriminant values for the different sound group subtypes in the v2 schema.
+ */
 export type SoundGroupTypes = 'sequence' | 'source' | 'reference'
 
 export interface ISoundGroupV2 {
+  /**
+   * Discriminant field identifying which subtype of {@link ISoundGroupV2} this object represents.
+   */
   type: SoundGroupTypes
 
   /**
@@ -135,6 +144,10 @@ export interface SoundGroupSource extends ISoundGroupSource {
   effects: SoundEffect[]
 }
 
+/**
+ * A v2 "reference" group — a placeholder that points to another group on a different board.
+ * Reference groups are not carried forward during the v3 migration.
+ */
 export interface SoundGroupReference extends ISoundGroupV2 {
   type: 'reference'
   id: GroupID
@@ -162,6 +175,10 @@ export type SoundIconV2 = {
   foregroundColor: string
 }
 
+/**
+ * Returns the filesystem path to the directory for a given board in the app data folder.
+ * @param boardID The ID of the board.
+ */
 const getBoardPath = (boardID: BoardID): string => {
   const appDataPath = GetAppDataPath()
   const boardDir = path.join(appDataPath, 'board-data', boardID)
@@ -169,29 +186,64 @@ const getBoardPath = (boardID: BoardID): string => {
   return boardDir
 }
 
+/**
+ * Returns the filesystem path to the directory for a given group within a board.
+ * @param boardID The ID of the board containing the group.
+ * @param groupID The ID of the group.
+ */
 export const getGroupPath = (boardID: BoardID, groupID: GroupID): string => {
   const grpDir = path.join(getBoardPath(boardID), groupID)
 
   return grpDir
 }
 
+/**
+ * An ID that refers to a particular element within a {@link SoundGroupSequence}.
+ */
 export type SequenceElementID = `seq-${string}-${string}-${string}-${string}-${string}`
 
+/**
+ * A sequence element that pauses playback for a fixed duration before continuing.
+ */
 export type SoundGroupSequenceDelay = {
   type: 'delay'
+  /**
+   * The unique identifier for this sequence element.
+   */
   id: SequenceElementID
+  /**
+   * The number of milliseconds to wait before the next element in the sequence is triggered.
+   */
   msToDelay: number
 }
 
+/**
+ * A sequence element that triggers a particular sound group when reached.
+ */
 export type SoundGroupSequenceGroup = {
   type: 'group'
+  /**
+   * The unique identifier for this sequence element.
+   */
   id: SequenceElementID
+  /**
+   * The ID of the sound group to trigger.
+   */
   groupID: GroupID
 }
 
+/**
+ * A union of all possible element types that can appear within a {@link SoundGroupSequence}.
+ */
 export type SoundGroupSequenceElement = SoundGroupSequenceGroup | SoundGroupSequenceDelay
 
+/**
+ * A v2 sound group that plays a series of effects and delays in a defined order.
+ */
 export interface SoundGroupSequence extends ISoundGroupSource {
   type: 'sequence'
+  /**
+   * The ordered list of elements to play when this sequence group is triggered.
+   */
   sequence: SoundGroupSequenceElement[]
 }

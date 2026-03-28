@@ -7,7 +7,7 @@ const mockState = vi.hoisted<{ config: AudioApiConfig }>(() => ({
   config: { Groups: [], version: 3, pinnedSearches: [] }
 }))
 
-vi.mock('../utils/config', () => ({
+vi.mock('../../utils/config', () => ({
   AudioConfig: {
     get Config(): AudioApiConfig {
       return mockState.config
@@ -24,7 +24,7 @@ vi.mock('../utils/config', () => ({
   }
 }))
 
-vi.mock('./fs', () => ({
+vi.mock('../fs', () => ({
   saveSoundEffect: vi.fn((_groupID: string, srcPath: string) => ({
     path: `aud://board-data/fake-group/${srcPath.split(/[\\/]/).pop()}`,
     format: '.mp3' as const
@@ -33,7 +33,7 @@ vi.mock('./fs', () => ({
   getFileSize: vi.fn().mockResolvedValue(1.0)
 }))
 
-vi.mock('../../../utils/paths', () => ({
+vi.mock('../../../../utils/paths', () => ({
   GetAppDataPath: vi.fn(() => 'C:\\TestAppData\\rpg-soundboard')
 }))
 

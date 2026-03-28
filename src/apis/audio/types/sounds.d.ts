@@ -49,5 +49,10 @@ export type PreviewSoundResponse = {
  * These items refer to sound-related actions that are not part of a particular container type.
  */
 export interface ISounds {
+  /**
+   * Generates a short base64-encoded preview of the provided sound effect using ffmpeg.
+   * The preview is trimmed to 30 seconds and encoded as ogg/vorbis.
+   * @param request See {@link PreviewSoundRequest}.
+   */
   Preview(request: PreviewSoundRequest): Promise<PreviewSoundResponse>
 }

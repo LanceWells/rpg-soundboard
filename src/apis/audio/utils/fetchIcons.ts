@@ -18,6 +18,9 @@ export type IconBody = {
   body: string
 }
 
+/**
+ * Words excluded from icon searches because they are too generic to produce useful results.
+ */
 const BANNED_WORDS = [
   'of',
   'at',
@@ -40,7 +43,16 @@ const BANNED_WORDS = [
  * Generally used in a singleton pattern.
  */
 export class SoundboardIcons {
+  /**
+   * Maps each word found in an icon's hyphen-delimited name to the list of icon names containing
+   * that word. Used to efficiently find icons by partial word prefix during searches.
+   */
   private _iconLookup: Map<string, string[]>
+
+  /**
+   * Maps each icon name to its fully-rendered SVG string. The primary source of truth for icon
+   * data once the icon set has been parsed.
+   */
   private _iconRef: Map<string, string>
 
   /**
@@ -144,6 +156,13 @@ export class SoundboardIcons {
     return iconBodies
   }
 
+  /**
+   * Finds the single best-matching icon for the provided search term. First searches directly
+   * against the icon set, then falls back to thesaurus synonyms if no direct match is found.
+   * If no match is found at all, returns the "moon" icon as a default.
+   * @param searchTerm The text to use when searching for a relevant icon.
+   * @returns The best-matching icon, or the "moon" icon if nothing matches.
+   */
   async GetBestIcon(searchTerm: string): Promise<IconBody> {
     const getSearchWords = (term: string) => {
       const splitTerm = term.split(/\s/g)
@@ -202,4 +221,7 @@ export class SoundboardIcons {
   }
 }
 
+/**
+ * The singleton instance of {@link SoundboardIcons} used throughout the audio API.
+ */
 export const soundboardIcons = new SoundboardIcons()
