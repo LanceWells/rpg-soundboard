@@ -20,7 +20,8 @@
     "build:win": "npm run build && electron-builder --win",
     "build:mac": "electron-vite build && electron-builder --mac",
     "build:linux": "electron-vite build && electron-builder --linux",
-    "tailwind": "tailwindcss -i ./src/renderer/src/input.css -o ./src/renderer/src/output.css --watch"
+    "tailwind": "tailwindcss -i ./src/renderer/src/input.css -o ./src/renderer/src/output.css --watch",
+    "test": "vitest"
   },
   "build": {
     "asarUnpack": [
@@ -95,6 +96,7 @@
     "tailwindcss": "^4.1.8",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.33.0",
-    "vite": "^6.3.5"
+    "vite": "^6.3.5",
+    "vitest": "^4.1.2"
   }
 }
