@@ -10,8 +10,6 @@ import { Ctx } from '@renderer/rpgAudioEngine'
 import { SoundIcon, StopIcon } from '@renderer/assets/icons'
 import { produce } from 'immer'
 
-export type SequenceListProps = {}
-
 export function SequenceList() {
   const { append } = useFieldArray<FormInput>({
     name: 'request.sequence'

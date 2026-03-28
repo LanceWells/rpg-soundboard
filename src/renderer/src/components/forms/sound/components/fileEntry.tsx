@@ -87,7 +87,7 @@ export function FileEntry(props: FileEntryProps) {
 
   const onClickRemove = useCallback(() => {
     onClick(index)
-  }, [index, onclick])
+  }, [index, onClick])
 
   const onClickTest = useCallback(async () => {
     if (!playHandler.current) {

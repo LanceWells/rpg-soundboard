@@ -2,11 +2,7 @@ import { useAudioStore } from '@renderer/stores/audio/audioStore'
 import { GroupIcon } from '../icon/base'
 import { MoveIcon, StopIcon } from '@renderer/assets/icons'
 
-export type PlaybackProps = {}
-
-export function Playback(props: PlaybackProps) {
-  const {} = props
-
+export function Playback() {
   const soundtrack = useAudioStore((state) => state.activeSoundtrack)
   const playNextSong = useAudioStore((state) => state.playNextSong)
   const stopGroup = useAudioStore((state) => state.stopGroup)

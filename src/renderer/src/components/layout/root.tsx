@@ -1,8 +1,6 @@
 import { createRouter, RouterProvider } from '@tanstack/react-router'
 import { routeTree } from '../../routeTree.gen'
 
-type RootLayoutProps = {}
-
 const router = createRouter({
   routeTree,
   defaultPreload: 'intent',
@@ -15,9 +13,7 @@ declare module '@tanstack/react-router' {
   }
 }
 
-export function RootLayout(props: RootLayoutProps) {
-  const {} = props
-
+export function RootLayout() {
   return (
     <div
       className={`
