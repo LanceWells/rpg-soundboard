@@ -2,6 +2,9 @@ import { useAudioStore } from '@renderer/stores/audio/audioStore'
 import { GroupIcon } from '../icon/base'
 import { MoveIcon, StopIcon } from '@renderer/assets/icons'
 
+/**
+ * Renders the currently-active soundtrack controls: title, group icon, stop, skip-next, and volume slider. Returns null when no soundtrack is active.
+ */
 export function Playback() {
   const soundtrack = useAudioStore((state) => state.activeSoundtrack)
   const playNextSong = useAudioStore((state) => state.playNextSong)

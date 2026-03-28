@@ -1,5 +1,8 @@
 import { twMerge } from 'tailwind-merge'
 
+/**
+ * Icon representing a sound / speaker with volume waves.
+ */
 export function SoundIcon(props: { className?: string }) {
   const { className } = props
 

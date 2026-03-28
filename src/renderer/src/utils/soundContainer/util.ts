@@ -7,6 +7,14 @@ import { EffectID } from 'src/apis/audio/types/effects'
 import { SoundtrackSoundContainerV2 } from './variants/soundtrackV2'
 import { Ctx } from '@renderer/rpgAudioEngine'
 
+/**
+ * Factory that instantiates the correct ISoundContainer subclass for the given variant.
+ * @param variant The playback variant (Default, Looping, Rapid, Soundtrack).
+ * @param lastEffectID The previously played effect ID, used by Rapid mode to avoid repeats.
+ * @param setup Sound container configuration including effects and event handlers.
+ * @param enableLoops Whether looping should be enabled (used by Looping variant).
+ * @param ctx The audio processing context to use.
+ */
 export function NewSoundContainer(
   variant: SoundVariants,
   lastEffectID: EffectID | undefined,

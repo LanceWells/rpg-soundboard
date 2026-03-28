@@ -1,5 +1,8 @@
 import { twMerge } from 'tailwind-merge'
 
+/**
+ * Icon representing a sequence / playlist playback mode.
+ */
 export function SequenceIcon(props: { className?: string }) {
   const { className } = props
 

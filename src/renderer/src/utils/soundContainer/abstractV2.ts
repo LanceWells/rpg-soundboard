@@ -5,6 +5,9 @@ import { SoundEffectWithPlayerDetails } from 'src/apis/audio/types/groups'
 import { getRandomInt } from '../random'
 import { Ctx, RpgAudio } from '@renderer/rpgAudioEngine'
 
+/**
+ * Base class for sound containers that wraps an RpgAudio instance and exposes play/stop/volume/fade operations.
+ */
 export abstract class AbstractSoundContainerV2<
   TStopped extends string = string,
   TLoaded extends string = string,

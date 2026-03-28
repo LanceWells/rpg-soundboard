@@ -2,14 +2,23 @@ import { VariantTag } from '@renderer/components/groups/variantTag'
 import { GroupIcon } from '@renderer/components/icon/base'
 import { SoundGroupSourceEditableFields } from 'src/apis/audio/types/items'
 
+/**
+ * Placeholder spinner shown while a bulk upload button is being generated.
+ */
 export function GenButtonLoading() {
   return <div className="loading-spinner"></div>
 }
 
+/**
+ * Props for the GenButtonLoaded component.
+ */
 export type GenButtonLoadedProps = {
   button: SoundGroupSourceEditableFields
 }
 
+/**
+ * Renders a preview card for a fully loaded generated button, showing its icon, name, and effect count.
+ */
 export function GenButtonLoaded(props: GenButtonLoadedProps) {
   const { button } = props
 

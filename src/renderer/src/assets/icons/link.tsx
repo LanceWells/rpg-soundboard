@@ -1,5 +1,8 @@
 import { twMerge } from 'tailwind-merge'
 
+/**
+ * Icon representing a hyperlink / chain link.
+ */
 export function LinkIcon(props: { className?: string }) {
   const { className } = props
 

@@ -3,10 +3,16 @@ import { useRef } from 'react'
 import { GenButtonLoading, GenButtonLoaded } from './genButton'
 import { BulkButton } from './types'
 
+/**
+ * Props for the BulkButtonList component.
+ */
 export type BulkButtonListProps = {
   buttons: BulkButton[]
 }
 
+/**
+ * Virtualized list that renders a collection of bulk upload buttons.
+ */
 export function BulkButtonList(props: BulkButtonListProps) {
   const { buttons } = props
 

@@ -3,6 +3,9 @@ import { useDebounce } from 'use-debounce'
 import { useVirtualizer } from '@tanstack/react-virtual'
 import { twMerge } from 'tailwind-merge'
 
+/**
+ * Props for {@link VirtualizedSearch}. Controls the search callback, the component used to render each result row, and the row height estimator.
+ */
 export type VirtualizedSearchProps<T extends JSX.IntrinsicAttributes & { style: CSSProperties }> = {
   className?: string
   onSearch: (searchText: string) => T[]
@@ -10,6 +13,9 @@ export type VirtualizedSearchProps<T extends JSX.IntrinsicAttributes & { style: 
   estimateSize: (index: number) => number
 }
 
+/**
+ * Generic debounced search input paired with a virtualized results list.
+ */
 export default function VirtualizedSearch<
   T extends JSX.IntrinsicAttributes & { style: CSSProperties }
 >(props: VirtualizedSearchProps<T>) {

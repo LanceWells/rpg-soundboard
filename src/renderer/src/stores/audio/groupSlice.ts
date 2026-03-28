@@ -15,25 +15,43 @@ import fuse from 'fuse.js'
 import { ColorOptions } from '@renderer/components/forms/sound/types'
 import { SoundVariants } from 'src/apis/audio/types/soundVariants'
 
+/**
+ * Enumeration of the available sort field keys.
+ */
 export const SortType = {
   name: 0
 }
 
+/**
+ * The key used to sort groups (currently only supports 'name').
+ */
 export type SortType = keyof typeof SortType
 
+/**
+ * Direction of a sort operation.
+ */
 export type SortOrder = 'asc' | 'desc'
 
+/**
+ * Describes a sort operation: which field and in which direction.
+ */
 export type SortVals = {
   type: SortType
   order: SortOrder
 }
 
+/**
+ * The combined filter and sort state applied to the group list.
+ */
 export type SortFilterVal = {
   sorting?: SortVals
   soundTypes: SoundVariants[]
   search: string
 }
 
+/**
+ * Zustand slice that manages the list of sound groups, searching, filtering, sorting, and CRUD operations.
+ */
 export interface GroupSlice {
   groups: ISoundGroup[]
   /**
@@ -68,6 +86,9 @@ export interface GroupSlice {
   setSearchText: (newText: string, skipDebounce?: boolean) => void
 }
 
+/**
+ * Factory function that creates the group management slice for the Zustand store.
+ */
 export const createGroupSlice: StateCreator<GroupSlice, [], [], GroupSlice> = (set, get) => ({
   groups: window.audio.Groups.GetAll().groups,
   sorting: {
@@ -275,6 +296,9 @@ export const createGroupSlice: StateCreator<GroupSlice, [], [], GroupSlice> = (s
   }
 })
 
+/**
+ * Returns default field values for a new source-type sound group.
+ */
 export const getDefaultGroup = (): Omit<SoundGroupSource, 'id'> => ({
   type: 'source',
   effects: [],
@@ -288,6 +312,9 @@ export const getDefaultGroup = (): Omit<SoundGroupSource, 'id'> => ({
   tags: []
 })
 
+/**
+ * Returns default field values for a new sequence-type sound group.
+ */
 export const getDefaultSequence = (): SoundGroupSequenceEditableFields => ({
   icon: {
     type: 'svg',
@@ -299,6 +326,9 @@ export const getDefaultSequence = (): SoundGroupSequenceEditableFields => ({
   tags: []
 })
 
+/**
+ * Returns a predicate that filters groups to only those matching the given variant list (no filter if empty).
+ */
 function filterToVariants(variants: SoundVariants[] | undefined): (group: ISoundGroup) => boolean {
   return (group) => {
     if (variants === undefined || variants.length === 0) {
@@ -309,6 +339,9 @@ function filterToVariants(variants: SoundVariants[] | undefined): (group: ISound
   }
 }
 
+/**
+ * Returns a comparator function for sorting groups by the given field and order.
+ */
 function sortGroups(
   order: SortOrder,
   type: SortType | undefined
@@ -336,6 +369,9 @@ function sortGroups(
   }
 }
 
+/**
+ * Performs a fuzzy search over all groups by name, tags, and variant; returns all groups when the query is empty.
+ */
 function searchGroups(searchText: string) {
   const allGroups = window.audio.Groups.GetAll().groups
 
@@ -364,6 +400,9 @@ function searchGroups(searchText: string) {
   return soughtGroups
 }
 
+/**
+ * Creates a debounced wrapper around `callback` that delays invocation by `wait` milliseconds.
+ */
 function debounce<T extends (...args: any) => any>(callback: T, wait: number) {
   let timeoutId: number | undefined = undefined
   return (...args: Parameters<T>) => {
@@ -374,6 +413,9 @@ function debounce<T extends (...args: any) => any>(callback: T, wait: number) {
   }
 }
 
+/**
+ * Debounced search that triggers a group search 500 ms after the user stops typing.
+ */
 const debouncedSearch = debounce((get: () => GroupSlice, newText: string) => {
   get().searchForGroups(newText, ['source', 'sequence'])
 }, 500)

@@ -1,7 +1,13 @@
+/**
+ * Props for {@link PixelIcon}.
+ */
 export type PixelIconProps = {
   src: string
 }
 
+/**
+ * Renders a pixel-art icon image absolutely positioned within its container.
+ */
 export function PixelIcon(props: PixelIconProps) {
   const { src } = props
 

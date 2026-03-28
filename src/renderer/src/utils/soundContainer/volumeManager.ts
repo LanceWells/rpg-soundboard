@@ -1,3 +1,6 @@
+/**
+ * Calculates the actual playback volume by combining an effect's base volume, a container-level volume, and an internal modifier.
+ */
 export class VolumeManager {
   constructor(private volumeModifier: number) {}
 

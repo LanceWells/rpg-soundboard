@@ -1,5 +1,8 @@
 import { AbstractRpgAudioNode } from '.'
 
+/**
+ * An audio node that applies convolution reverb using an impulse response loaded from a file path.
+ */
 export class RpgAudioConvolverNode extends AbstractRpgAudioNode {
   private _sourceNode: ConvolverNode
 

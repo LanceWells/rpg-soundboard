@@ -2,6 +2,9 @@ import { ColorOptions, FormInput, GroupFormInput, SequenceFormInput } from '../t
 import { ISoundGroup, SoundGroupSequence, SoundGroupSource } from 'src/apis/audio/types/items'
 import { produce } from 'immer'
 
+/**
+ * Returns a blank {@link GroupFormInput} with sensible default icon and empty effects.
+ */
 export function newDefaultGroupRequest(): GroupFormInput {
   return {
     type: 'group',
@@ -20,6 +23,9 @@ export function newDefaultGroupRequest(): GroupFormInput {
   }
 }
 
+/**
+ * Returns a blank {@link SequenceFormInput} with sensible default icon and empty sequence.
+ */
 export function newDefaultSequenceRequest(): SequenceFormInput {
   return {
     type: 'sequence',
@@ -36,6 +42,9 @@ export function newDefaultSequenceRequest(): SequenceFormInput {
   }
 }
 
+/**
+ * Converts an existing {@link ISoundGroup} into a {@link FormInput} suitable for pre-populating the edit form.
+ */
 export function copyGroupForRequest(group: ISoundGroup): FormInput {
   switch (group.type) {
     case 'source': {

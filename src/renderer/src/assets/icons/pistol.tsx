@@ -1,5 +1,8 @@
 import { twMerge } from 'tailwind-merge'
 
+/**
+ * Icon representing a pistol, used as a thematic RPG icon.
+ */
 export function PistolIcon(props: { className?: string }) {
   const { className } = props
 

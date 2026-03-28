@@ -1,5 +1,8 @@
 import { twMerge } from 'tailwind-merge'
 
+/**
+ * Icon representing a hamburger / bars menu.
+ */
 export function BarsIcon(props: { className?: string }) {
   const { className } = props
 

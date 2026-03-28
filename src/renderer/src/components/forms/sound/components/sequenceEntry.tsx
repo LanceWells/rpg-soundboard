@@ -6,12 +6,27 @@ import { SoundGroupSequenceElement, SoundGroupSequenceGroup } from 'src/apis/aud
 import { useShallow } from 'zustand/shallow'
 import { FormInput } from '../types'
 
+/**
+ * Props for {@link SequenceEntry}.
+ */
 export type SequenceEntryProps = {
+  /**
+   * The sequence element data (group reference or delay) to render.
+   */
   element: SoundGroupSequenceElement
+  /**
+   * Position of this element in the sequence list.
+   */
   index: number
+  /**
+   * Whether this element is currently being previewed.
+   */
   isPlaying: boolean
 }
 
+/**
+ * Renders a single sequence element (group or delay) with remove and reorder controls.
+ */
 export function SequenceEntry(props: SequenceEntryProps) {
   const { element, index, isPlaying } = props
 

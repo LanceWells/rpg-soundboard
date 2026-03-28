@@ -7,6 +7,9 @@ import { Playback } from '../playback/playback'
 import { SearchBox } from '../search/search'
 import { SearchPins } from '../search/pins'
 
+/**
+ * Sidebar navigation panel containing the app header, hero image, route links, playback widget, pinned searches, and search box.
+ */
 export function Nav() {
   return (
     <div

@@ -3,11 +3,17 @@ import { BulkButtonList } from './buttonList'
 import { BulkButtonStates, BulkButtonLoading, BulkButtonLoaded } from './types'
 import { produce } from 'immer'
 
+/**
+ * Props for the BulkFiles component.
+ */
 export type BulkFilesProps = {
   bulkButtons: BulkButtonStates
   setBulkButtons: React.Dispatch<React.SetStateAction<BulkButtonStates>>
 }
 
+/**
+ * File drop zone that collects audio files and renders them as bulk upload buttons.
+ */
 export function BulkFiles(props: BulkFilesProps) {
   const { bulkButtons, setBulkButtons } = props
 
@@ -137,6 +143,9 @@ export function BulkFiles(props: BulkFilesProps) {
   )
 }
 
+/**
+ * Resolves a loading button into a loaded button by fetching AI-generated icon data from the API.
+ */
 async function loadButton(loadingButton: BulkButtonLoading): Promise<BulkButtonLoaded> {
   const bestIcon = await window.audio.Icons.GenGroupInput({
     filePaths: loadingButton.filePaths,

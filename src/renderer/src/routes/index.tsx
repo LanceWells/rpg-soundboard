@@ -9,10 +9,16 @@ import SortUp from '@renderer/assets/images/Layout/SortUp.png'
 import SortDown from '@renderer/assets/images/Layout/SortDown.png'
 import SortLabel from '@renderer/assets/images/Layout/SortingLabel.png'
 
+/**
+ * TanStack Router route definition for the home page (sound group grid).
+ */
 export const Route = createFileRoute('/')({
   component: RouteComponent
 })
 
+/**
+ * Root page that renders the virtualized, filtered, and sorted grid of sound groups.
+ */
 function RouteComponent() {
   const parentRef = useRef<HTMLDivElement | null>(null)
 
@@ -100,6 +106,9 @@ function RouteComponent() {
   )
 }
 
+/**
+ * Renders the row of variant filter tabs that appear above the sound group grid.
+ */
 function FilterTabs() {
   return (
     <div
@@ -119,10 +128,16 @@ function FilterTabs() {
   )
 }
 
+/**
+ * Props for the FilterTag component.
+ */
 type FilterTagProps = {
   variant: SoundVariants
 }
 
+/**
+ * A clickable tag button that toggles a variant filter on/off.
+ */
 function FilterTag(props: FilterTagProps) {
   const { variant } = props
 
@@ -157,6 +172,9 @@ function FilterTag(props: FilterTagProps) {
   )
 }
 
+/**
+ * Container for sorting controls displayed in the top-right corner of the grid.
+ */
 function Sortings() {
   return (
     <div
@@ -170,6 +188,9 @@ function Sortings() {
   )
 }
 
+/**
+ * Button that cycles through ascending, descending, and no-sort ordering by group name.
+ */
 function NameSort() {
   const sorting = useAudioStore((store) => store.sorting)
   const setSorting = useAudioStore((store) => store.setSorting)

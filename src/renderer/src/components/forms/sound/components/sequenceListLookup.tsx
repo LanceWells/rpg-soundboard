@@ -10,10 +10,19 @@ import { FormInput } from '../types'
 import { v4 } from 'uuid'
 import { AddIcon } from '@renderer/assets/icons'
 
+/**
+ * Props for {@link SequenceListLookup}.
+ */
 export type SequenceListLookupProps = {
+  /**
+   * Additional CSS classes to apply to the virtualized search container.
+   */
   className?: string
 }
 
+/**
+ * Virtualized, fuzzy-searchable list of existing groups that can be appended to the sequence.
+ */
 export function SequenceListLookup(props: SequenceListLookupProps) {
   const { className } = props
 

@@ -1,5 +1,8 @@
 import { twMerge } from 'tailwind-merge'
 
+/**
+ * Icon representing a repeat / loop playback mode.
+ */
 export function RepeatIcon(props: { className?: string }) {
   const { className } = props
 

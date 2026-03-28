@@ -4,6 +4,9 @@ import { PropsWithChildren, useMemo } from 'react'
 import { twMerge } from 'tailwind-merge'
 import { useShallow } from 'zustand/react/shallow'
 
+/**
+ * Renders the list of pinned search terms as clickable, removable tags.
+ */
 export function SearchPins() {
   const pinnedSearches = useAudioStore((store) => store.pinnedSearches)
 

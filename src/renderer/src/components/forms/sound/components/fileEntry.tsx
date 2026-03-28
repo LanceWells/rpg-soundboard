@@ -4,14 +4,35 @@ import { NewSoundContainer } from '@renderer/utils/soundContainer/util'
 import { useState, useRef, useEffect, useCallback, ChangeEventHandler } from 'react'
 import { SoundEffectEditableFields } from 'src/apis/audio/types/items'
 
+/**
+ * Props for {@link FileEntry}.
+ */
 export type FileEntryProps = {
+  /**
+   * Sound effect data for this entry.
+   */
   file: SoundEffectEditableFields
+  /**
+   * Display name of the file.
+   */
   name: string
+  /**
+   * Position of this entry in the effects list.
+   */
   index: number
+  /**
+   * Called with the entry index when the remove button is clicked.
+   */
   onClickRemove: (i: number) => void
+  /**
+   * Called with the entry index and new volume value when the volume slider changes.
+   */
   onChangeVolume: (i: number, newVolume: number) => void
 }
 
+/**
+ * Renders a single sound file entry with a volume slider and play/stop preview button.
+ */
 export function FileEntry(props: FileEntryProps) {
   const { file, index, onClickRemove: onClick, onChangeVolume: handleChangeVolume } = props
 

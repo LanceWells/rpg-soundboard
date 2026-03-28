@@ -1,5 +1,8 @@
 import { twMerge } from 'tailwind-merge'
 
+/**
+ * Icon representing a board / display screen.
+ */
 export function BoardIcon(props: { className?: string }) {
   const { className } = props
 

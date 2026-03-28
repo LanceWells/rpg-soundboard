@@ -10,6 +10,9 @@ import { Ctx } from '@renderer/rpgAudioEngine'
 import { SoundIcon, StopIcon } from '@renderer/assets/icons'
 import { produce } from 'immer'
 
+/**
+ * Renders the ordered list of sequence elements with controls to add delays and preview playback.
+ */
 export function SequenceList() {
   const { append } = useFieldArray<FormInput>({
     name: 'request.sequence'

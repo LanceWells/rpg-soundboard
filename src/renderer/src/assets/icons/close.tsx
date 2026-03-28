@@ -1,5 +1,8 @@
 import { twMerge } from 'tailwind-merge'
 
+/**
+ * Icon representing a close / dismiss action (X mark).
+ */
 export function CloseIcon(props: { className?: string }) {
   const { className } = props
 

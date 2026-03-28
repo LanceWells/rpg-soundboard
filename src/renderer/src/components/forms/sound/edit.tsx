@@ -6,10 +6,19 @@ import { GroupID } from 'src/apis/audio/types/groups'
 import { useMemo } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 
+/**
+ * Props for {@link EditSoundForm}.
+ */
 export type EditSoundFormProps = {
+  /**
+   * ID of the group/sequence to edit.
+   */
   id: GroupID
 }
 
+/**
+ * Form page for editing an existing sound button identified by `id`. Navigates home on submit.
+ */
 export function EditSoundForm(props: EditSoundFormProps) {
   const { id } = props
 

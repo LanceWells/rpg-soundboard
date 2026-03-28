@@ -2,11 +2,23 @@ import { useAudioStore } from '@renderer/stores/audio/audioStore'
 import { useRef } from 'react'
 import { CloseIcon } from '@renderer/assets/icons'
 
+/**
+ * Props for {@link TagInput}.
+ */
 export type TagInput = {
+  /**
+   * Currently applied tags.
+   */
   tags: string[]
+  /**
+   * Called with the updated tag array when tags are added.
+   */
   setTags: (newTags: string[]) => void
 }
 
+/**
+ * Text input with datalist suggestions for adding tags to a sound button.
+ */
 export function TagInput(props: TagInput) {
   const { setTags, tags } = props
 
@@ -62,11 +74,23 @@ export function TagInput(props: TagInput) {
   )
 }
 
+/**
+ * Props for {@link Tag}.
+ */
 type TagProps = {
+  /**
+   * The tag label to display.
+   */
   text: string
+  /**
+   * Called with the tag text when the badge is clicked to remove it.
+   */
   onRemove: (text: string) => void
 }
 
+/**
+ * Displays a removable tag badge.
+ */
 export function Tag(props: TagProps) {
   const { onRemove, text } = props
 

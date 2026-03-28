@@ -7,6 +7,9 @@ import { CloseIcon } from '@renderer/assets/icons'
 import { Tag, TagInput } from '../sound/components/tagInput'
 import { useNavigate } from '@tanstack/react-router'
 
+/**
+ * Form component that handles bulk upload of audio files, including file selection, preview, tagging, and submission.
+ */
 export function BulkUploadFiles() {
   const methods = useForm<FormInput>({
     defaultValues: {
@@ -186,6 +189,9 @@ export function BulkUploadFiles() {
   )
 }
 
+/**
+ * Virtualized list of buttons bound to the bulk upload form context.
+ */
 function ButtonList() {
   const { watch } = useFormContext<FormInput>()
 
@@ -240,6 +246,9 @@ function ButtonList() {
   )
 }
 
+/**
+ * Resolves a loading button into a loaded button by fetching AI-generated icon data from the API.
+ */
 async function loadButton(loadingButton: BulkButtonLoading): Promise<BulkButtonLoaded> {
   const bestIcon = await window.audio.Icons.GenGroupInput({
     filePaths: loadingButton.filePaths,

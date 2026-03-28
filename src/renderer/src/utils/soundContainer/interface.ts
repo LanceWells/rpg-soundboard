@@ -27,6 +27,9 @@ export type StopHandler = {
   handler: (groupID: string) => void
 }
 
+/**
+ * Generic event handler pairing an ID with a callback that receives the ID and an associated container.
+ */
 export type Handler<T extends string, C = ISoundContainer> = {
   id: T
   handler: (groupID: T, container: C) => void
@@ -61,12 +64,18 @@ export type SoundContainerSetup<
   playingHandler?: Handler<TPlaying>
 }
 
+/**
+ * Bundles an RpgAudio player with its display name and intended target volume.
+ */
 export type RpgAudioContainer = {
   targetVolume: number
   name: string
   audio: RpgAudio
 }
 
+/**
+ * Common interface for all sound containers, providing play/stop/volume/fade controls.
+ */
 export interface ISoundContainer {
   Variant: SoundVariants
   Volume: number
@@ -78,12 +87,21 @@ export interface ISoundContainer {
   readonly LoadedEffectID: EffectID | undefined
 }
 
+/**
+ * Enumeration of event names specific to soundtrack containers.
+ */
 export const SoundtrackEvents = {
   playNext: 'playNext'
 }
 
+/**
+ * String union of valid soundtrack event names.
+ */
 export type SoundtrackEvents = keyof typeof SoundtrackEvents
 
+/**
+ * Interface for soundtrack containers that support queued playback and song-advance events.
+ */
 export interface ISoundtrackContainer {
   playNextSong(): Promise<void>
   getActiveSong(): RpgAudioContainer | undefined

@@ -1,5 +1,8 @@
 import { twMerge } from 'tailwind-merge'
 
+/**
+ * Icon representing a group / sound group.
+ */
 export function GroupIcon(props: { className?: string }) {
   const { className } = props
 

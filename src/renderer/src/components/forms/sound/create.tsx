@@ -4,6 +4,9 @@ import { FormInput } from './types'
 import { newDefaultGroupRequest } from './util/default'
 import { useNavigate } from '@tanstack/react-router'
 
+/**
+ * Form page for creating a new sound button (group or sequence). Navigates home on submit.
+ */
 export function CreateSoundForm() {
   const addGroup = useAudioStore((store) => store.addGroup)
   const addSequence = useAudioStore((store) => store.addSequence)

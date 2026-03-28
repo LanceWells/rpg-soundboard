@@ -11,11 +11,23 @@ import { IconLookup } from '@renderer/components/icon/iconLookup'
 import { SequenceListLookup } from './components/sequenceListLookup'
 import { SequenceList } from './components/sequenceList'
 
+/**
+ * Props for {@link CreateEditSoundForm}.
+ */
 type CreateEditSoundFormProps = {
+  /**
+   * Called with validated form data when the user submits.
+   */
   onSubmit: (data: FormInput) => void
+  /**
+   * Initial values to pre-populate the form.
+   */
   defaultValues: FormInput
 }
 
+/**
+ * Shared create/edit form for sound buttons, supporting both group and sequence types.
+ */
 export function CreateEditSoundForm(props: CreateEditSoundFormProps) {
   const { onSubmit: onSubmitParent, defaultValues } = props
 

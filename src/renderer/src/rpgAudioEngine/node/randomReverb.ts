@@ -2,6 +2,9 @@ import { getRandomInt } from '@renderer/utils/random'
 import { IRpgAudioNode, RandomReverbNodeConfig, RpgAudioNodeEvent } from '../types'
 import { RpgAudioConvolverNode } from './convolver'
 
+/**
+ * An audio node that proxies connections to a pool of convolver nodes, selecting one at random for each play.
+ */
 export class RandomReverbNode implements IRpgAudioNode {
   private _loadListeners: ((e: IRpgAudioNode) => void)[] = []
   private _errrListeners: ((e: IRpgAudioNode) => void)[] = []

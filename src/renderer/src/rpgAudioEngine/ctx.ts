@@ -7,6 +7,9 @@ import patio from '../assets/impulseResponses/echothief_supercomppatio.wav'
 import batcave from '../assets/impulseResponses/echothief_batcave.wav'
 import { RandomReverbNode } from './node/randomReverb'
 
+/**
+ * Holds the shared audio processing graph nodes (convolver, compressor, random reverb) for the engine.
+ */
 class AudioProcessingNodes {
   public readonly cave: RpgAudioConvolverNode
   public readonly caveRandom: RandomReverbNode
@@ -39,6 +42,12 @@ class AudioProcessingNodes {
   }
 }
 
+/**
+ * The singleton Web Audio API context used by the entire engine.
+ */
 export const AudioCtx = new AudioContext()
 
+/**
+ * The singleton audio processing node graph (reverb, compressor) wired to the audio context.
+ */
 export const AudioProcessing = new AudioProcessingNodes(AudioCtx)

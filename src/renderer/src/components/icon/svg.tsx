@@ -4,10 +4,16 @@ import { svgToData } from '@iconify/utils'
 import { useRef, useState, useEffect } from 'react'
 import { SvgSoundIcon } from 'src/apis/audio/types/items'
 
+/**
+ * Props for {@link GroupSvgIcon}.
+ */
 export type GroupSvgIconProps = {
   icon: SvgSoundIcon
 }
 
+/**
+ * Renders an SVG icon onto a canvas with pixel-art scaling and foreground color tinting, displayed over a themed background image.
+ */
 export function GroupSvgIcon(props: GroupSvgIconProps) {
   const { icon } = props
 

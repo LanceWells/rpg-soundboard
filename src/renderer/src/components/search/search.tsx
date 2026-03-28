@@ -1,5 +1,8 @@
 import { useAudioStore } from '@renderer/stores/audio/audioStore'
 
+/**
+ * Search input widget that filters the board by text and allows pinning the current search term.
+ */
 export function SearchBox() {
   const search = useAudioStore((store) => store.searchText)
   const setSearch = useAudioStore((store) => store.setSearchText)

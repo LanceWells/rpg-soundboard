@@ -9,10 +9,16 @@ import { useNavigate } from '@tanstack/react-router'
 import { DeleteGroupConfirmationDialogId } from '@renderer/components/dialogs/deleteGroupConfirmationDialog'
 import { PencilIcon, DeleteIcon } from '@renderer/assets/icons'
 
+/**
+ * Props for {@link Group}.
+ */
 export type GroupBaseProps = {
   id: GroupID
 }
 
+/**
+ * Renders a sound group button with its icon, name, variant tag, and a context-menu dropdown for edit and delete actions.
+ */
 export function Group(props: GroupBaseProps) {
   const { id } = props
 

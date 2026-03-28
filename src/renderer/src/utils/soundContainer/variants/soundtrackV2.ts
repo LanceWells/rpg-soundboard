@@ -13,6 +13,9 @@ import { SoundEffectWithPlayerDetails } from 'src/apis/audio/types/groups'
 import { produce } from 'immer'
 import { VolumeManager } from '../volumeManager'
 
+/**
+ * Sound container for the Soundtrack variant: shuffles and continuously plays music tracks with crossfade transitions.
+ */
 export class SoundtrackSoundContainerV2 implements ISoundContainer, ISoundtrackContainer {
   public Variant: SoundVariants = 'Soundtrack'
 

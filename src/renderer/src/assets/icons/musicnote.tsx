@@ -1,5 +1,8 @@
 import { twMerge } from 'tailwind-merge'
 
+/**
+ * Icon representing a music note / audio track.
+ */
 export function MusicNoteIcon(props: { className?: string }) {
   const { className } = props
 

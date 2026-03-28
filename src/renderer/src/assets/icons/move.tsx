@@ -1,5 +1,8 @@
 import { twMerge } from 'tailwind-merge'
 
+/**
+ * Icon representing a move / skip-to-next action.
+ */
 export function MoveIcon(props: { className?: string }) {
   const { className } = props
 

@@ -1,5 +1,8 @@
 import { twMerge } from 'tailwind-merge'
 
+/**
+ * Icon representing a delete / trash action.
+ */
 export function DeleteIcon(props: { className?: string }) {
   const { className } = props
 

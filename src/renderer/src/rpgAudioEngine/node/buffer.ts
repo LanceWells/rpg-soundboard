@@ -1,5 +1,8 @@
 import { AbstractPlayableRpgAudioNode } from './abstractPlayable'
 
+/**
+ * Audio node backed by a decoded AudioBuffer; suitable for short, non-streaming audio files.
+ */
 export class RpgAudioBufferNode extends AbstractPlayableRpgAudioNode {
   private _sourceNode: AudioBufferSourceNode
   private _audioBuffer: AudioBuffer | null = null

@@ -1,6 +1,9 @@
 import { SupportedFileTypes } from 'src/apis/audio/supportedFileTypes'
 import { AbstractPlayableRpgAudioNode } from '.'
 
+/**
+ * Audio node backed by a MediaElement (HTML audio element); suitable for large/streaming audio files.
+ */
 export class RpgAudioElementNode extends AbstractPlayableRpgAudioNode {
   private _sourceNode: MediaElementAudioSourceNode
 

@@ -1,5 +1,8 @@
 import { twMerge } from 'tailwind-merge'
 
+/**
+ * Icon representing a stop / halt playback action.
+ */
 export function StopIcon(props: { className?: string }) {
   const { className } = props
 

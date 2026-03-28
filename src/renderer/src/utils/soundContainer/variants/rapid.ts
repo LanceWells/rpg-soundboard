@@ -6,6 +6,9 @@ import { EffectID } from 'src/apis/audio/types/effects'
 import { AbstractSoundContainerV2 } from '../abstractV2'
 import { Ctx } from '@renderer/rpgAudioEngine'
 
+/**
+ * Sound container for the Rapid variant: plays a randomly selected effect with randomized pan and rate, avoiding immediate repeats.
+ */
 export class RapidSoundContainer extends AbstractSoundContainerV2 {
   Variant: SoundVariants = 'Rapid'
 

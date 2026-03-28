@@ -1,5 +1,8 @@
 import { twMerge } from 'tailwind-merge'
 
+/**
+ * Icon representing a category / list view.
+ */
 export function CategoryIcon(props: { className?: string }) {
   const { className } = props
 

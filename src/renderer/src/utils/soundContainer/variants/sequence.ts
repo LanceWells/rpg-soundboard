@@ -9,12 +9,18 @@ import { NewSoundContainer } from '../util'
 import { SequenceElementID, SoundGroupSequenceElement } from 'src/apis/audio/types/items'
 import { Ctx } from '@renderer/rpgAudioEngine'
 
+/**
+ * A timed pause element within a sequence.
+ */
 export type Delay = {
   type: 'delay'
   id: SequenceElementID
   delayInMs: number
 }
 
+/**
+ * A sound group element within a sequence, carrying its resolved effects and variant.
+ */
 export type Group = {
   type: 'group'
   groupID: GroupID
@@ -23,8 +29,14 @@ export type Group = {
   variant: SoundVariants
 }
 
+/**
+ * Union of the two element types that can appear in a sequence.
+ */
 export type EffectGroup = Delay | Group
 
+/**
+ * Setup parameters specific to a SequenceSoundContainer.
+ */
 export type SequenceSpecificSetup = {
   effectGroups: EffectGroup[]
   elementPlayingHandler?: (sequence: SequenceElementID, container: ISoundContainer) => void
@@ -42,6 +54,9 @@ type ContainerWithSequenceID = {
   id: SequenceElementID
 }
 
+/**
+ * Sound container for the Sequence variant: plays a series of groups and delays in order, with optional looping.
+ */
 export class SequenceSoundContainer implements ISoundContainer {
   Variant: SoundVariants = 'Sequence'
   LoadedEffectID: `eff-${string}-${string}-${string}-${string}-${string}` | undefined = undefined

@@ -1,5 +1,8 @@
 import { twMerge } from 'tailwind-merge'
 
+/**
+ * Icon representing an add / plus action.
+ */
 export function AddIcon(props: { className?: string }) {
   const { className } = props
 

@@ -4,8 +4,14 @@ import { GroupIcon } from '../icon/base'
 import SweatDrop from '@renderer/assets/images/Buttons/SweatDrop.png'
 import { CloseIcon } from '@renderer/assets/icons'
 
+/**
+ * HTML element ID for the delete-group confirmation `<dialog>`, used to imperatively show the modal.
+ */
 export const DeleteGroupConfirmationDialogId = 'DeleteGroupConfirmationDialog'
 
+/**
+ * Modal dialog that asks the user to confirm deletion of the currently selected group.
+ */
 export function DeleteGroupConfirmationDialog() {
   const deleteGroup = useAudioStore((store) => store.deleteGroup)
   const groupBeingDeletedID = useAudioStore((store) => store.groupBeingDeletedID)

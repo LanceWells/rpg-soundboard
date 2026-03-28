@@ -3,6 +3,9 @@ import { SoundContainerSetup } from '../interface'
 import { AbstractSoundContainerV2 } from '../abstractV2'
 import { Ctx } from '@renderer/rpgAudioEngine'
 
+/**
+ * Sound container for the Looping variant: plays an effect on repeat and fades out smoothly on stop.
+ */
 export class LoopingSoundContainer extends AbstractSoundContainerV2 {
   Variant: SoundVariants = 'Looping'
 

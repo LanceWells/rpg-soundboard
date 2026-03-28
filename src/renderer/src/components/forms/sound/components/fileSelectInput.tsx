@@ -4,11 +4,23 @@ import { FormInput } from '../types'
 import { twMerge } from 'tailwind-merge'
 import { SoundEffectEditableFields } from 'src/apis/audio/types/items'
 
+/**
+ * Props for {@link FileSelectInput}.
+ */
 export type FileSelectInputProps = {
+  /**
+   * Additional CSS classes to apply to the file input.
+   */
   className?: string
+  /**
+   * Error message that, when present, applies an error style to the input.
+   */
   error?: string
 }
 
+/**
+ * File input that appends the selected audio file to the form's effects field array.
+ */
 export function FileSelectInput(props: FileSelectInputProps) {
   const { error, className } = props
 

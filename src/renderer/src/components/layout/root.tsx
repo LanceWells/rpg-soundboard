@@ -13,6 +13,9 @@ declare module '@tanstack/react-router' {
   }
 }
 
+/**
+ * Root application layout that mounts the TanStack Router and provides the two-column grid shell.
+ */
 export function RootLayout() {
   return (
     <div

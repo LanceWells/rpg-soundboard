@@ -13,6 +13,9 @@ import { isSequenceGroup, isSoundtrackContainer } from '@renderer/utils/typePred
 import { ISoundGroup, SoundGroupSequence, SoundIcon } from 'src/apis/audio/types/items'
 import { Ctx } from '@renderer/rpgAudioEngine'
 
+/**
+ * Zustand slice that manages audio playback, including playing/stopping groups and soundtrack controls.
+ */
 export interface SoundSlice {
   playGroup: (groupID: GroupID) => Promise<void>
   stopGroup: (groupID: GroupID) => void
@@ -25,10 +28,19 @@ export interface SoundSlice {
   isInCave: boolean
 }
 
+/**
+ * Maps each playing group to the set of active sound container instances it owns.
+ */
 const GroupHandles: Map<GroupID, Array<ISoundContainer>> = new Map()
 
+/**
+ * Tracks the last-played effect ID per group to avoid immediate repeats in Rapid mode.
+ */
 const RepeatSoundIDs: Map<GroupID, EffectID> = new Map()
 
+/**
+ * Information about the currently active soundtrack track.
+ */
 export type SoundTrackDetails = {
   icon: SoundIcon
   groupName: string
@@ -37,6 +49,9 @@ export type SoundTrackDetails = {
   volume: number
 }
 
+/**
+ * Factory function that creates the sound playback slice for the Zustand store.
+ */
 export const createSoundSlice: StateCreator<SoundSlice & GroupSlice, [], [], SoundSlice> = (
   set,
   get
@@ -208,12 +223,19 @@ export const createSoundSlice: StateCreator<SoundSlice & GroupSlice, [], [], Sou
   }
 })
 
+/**
+ * Returns all currently playing groups that are soundtracks.
+ */
 function getActiveSongs(get: StoreApi<SoundSlice & GroupSlice>['getState']) {
   return get()
     .playingGroups.map((g) => get().getGroup(g))
     .filter((g) => isSoundtrack(g, get))
 }
 
+/**
+ * Called when a group's sound container finishes playing; cleans up handles and fades soundtracks
+ * back up if no more effects are active.
+ */
 function handleGroupStop(
   groupID: GroupID,
   set: StoreApi<SoundSlice & GroupSlice>['setState'],
@@ -250,6 +272,9 @@ function handleGroupStop(
   })
 }
 
+/**
+ * Updates the active soundtrack metadata in the store whenever the soundtrack advances to the next song.
+ */
 function handleNextSong(
   groupID: GroupID,
   sound: ISoundtrackContainer & ISoundContainer,
@@ -270,10 +295,16 @@ function handleNextSong(
   })
 }
 
+/**
+ * Type guard that narrows an ISoundGroup to SoundGroupSequence.
+ */
 function isSequence(sound: ISoundGroup): sound is SoundGroupSequence {
   return sound.variant === 'Sequence'
 }
 
+/**
+ * Returns true if the group is a soundtrack or a sequence playlist composed entirely of soundtrack groups.
+ */
 function isSoundtrack(g: ISoundGroup | undefined, get: () => GroupSlice): boolean {
   if (g === undefined) {
     return false

@@ -2,10 +2,19 @@ import { FileEntry } from './fileEntry'
 import { useFieldArray, useFormContext } from 'react-hook-form'
 import { FormInput } from '../types'
 
+/**
+ * Props for {@link FileSelectList}.
+ */
 export type FileSelectListProps = {
+  /**
+   * Additional CSS classes to apply to the list container.
+   */
   className?: string
 }
 
+/**
+ * Scrollable list of all selected audio files, each rendered as a {@link FileEntry}.
+ */
 export function FileSelectList(props: FileSelectListProps) {
   const { className } = props
   const { update, remove } = useFieldArray<FormInput>({
