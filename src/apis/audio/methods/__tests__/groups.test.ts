@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import type { ISoundGroup, SoundGroupSequence, SoundGroupSource } from '../types/items'
-import type { AudioApiConfig } from '../interface'
+import type { ISoundGroup, SoundGroupSequence, SoundGroupSource } from '../../types/items'
+import type { AudioApiConfig } from '../../interface'
 
 // vi.hoisted ensures this object is accessible from mock factories (which are hoisted above imports)
 const mockState = vi.hoisted<{ config: AudioApiConfig }>(() => ({
@@ -37,7 +37,7 @@ vi.mock('../../../utils/paths', () => ({
   GetAppDataPath: vi.fn(() => 'C:\\TestAppData\\rpg-soundboard')
 }))
 
-import { GroupsAudioAPI } from './groups'
+import { GroupsAudioAPI } from '../groups'
 
 const baseIcon = { type: 'svg' as const, name: 'moon', foregroundColor: '#ffffff' }
 const makeSourceGroup = (
@@ -183,7 +183,7 @@ describe('GroupsAudioAPI.Create', () => {
   })
 
   it('calls the AudioConfig.Config setter with the updated config', async () => {
-    const { AudioConfig } = await import('../utils/config')
+    const { AudioConfig } = await import('../../utils/config')
     const setterSpy = vi.spyOn(AudioConfig, 'Config', 'set')
 
     GroupsAudioAPI.Create({
@@ -219,7 +219,7 @@ describe('GroupsAudioAPI.Create', () => {
   })
 
   it('calls saveSoundEffect once per effect', async () => {
-    const { saveSoundEffect } = vi.mocked(await import('./fs'))
+    const { saveSoundEffect } = vi.mocked(await import('../fs'))
     GroupsAudioAPI.Create({
       name: 'X',
       icon: baseIcon,
@@ -420,7 +420,7 @@ describe('GroupsAudioAPI.Update', () => {
   })
 
   it('calls the AudioConfig.Config setter with all updated fields', async () => {
-    const { AudioConfig } = await import('../utils/config')
+    const { AudioConfig } = await import('../../utils/config')
     const setterSpy = vi.spyOn(AudioConfig, 'Config', 'set')
     const altIcon = { type: 'svg' as const, name: 'sword', foregroundColor: '#ff0000' }
     const existingEffect = {
@@ -553,6 +553,40 @@ describe('GroupsAudioAPI.CreateSequence', () => {
       })
     ).toThrow('Unknown type')
   })
+
+  it('calls the AudioConfig.Config setter with all fields', async () => {
+    const { AudioConfig } = await import('../../utils/config')
+    const setterSpy = vi.spyOn(AudioConfig, 'Config', 'set')
+
+    GroupsAudioAPI.CreateSequence({
+      name: 'Intro',
+      icon: baseIcon,
+      tags: ['narrative'],
+      sequence: [
+        { type: 'delay', id: 'seq-0-0-0-0-0' as any, msToDelay: 2000 },
+        { type: 'group', id: 'seq-0-0-0-0-1' as any, groupID: 'grp-1-2-3-4-5' as any }
+      ]
+    })
+
+    expect(setterSpy).toHaveBeenCalledOnce()
+    expect(setterSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        Groups: expect.arrayContaining([
+          expect.objectContaining({
+            name: 'Intro',
+            icon: baseIcon,
+            variant: 'Sequence',
+            tags: ['narrative'],
+            type: 'sequence',
+            sequence: expect.arrayContaining([
+              expect.objectContaining({ type: 'delay', msToDelay: 2000 }),
+              expect.objectContaining({ type: 'group', groupID: 'grp-1-2-3-4-5' })
+            ])
+          })
+        ])
+      })
+    )
+  })
 })
 
 // ---------------------------------------------------------------------------
@@ -600,6 +634,42 @@ describe('GroupsAudioAPI.UpdateSequence', () => {
     expect(sequence.name).toBe('New Name')
     expect(sequence.tags).toEqual(['updated'])
   })
+
+  it('calls the AudioConfig.Config setter with all fields', async () => {
+    const { AudioConfig } = await import('../../utils/config')
+    const setterSpy = vi.spyOn(AudioConfig, 'Config', 'set')
+    const altIcon = { type: 'svg' as const, name: 'sword', foregroundColor: '#ff0000' }
+    mockState.config.Groups.push(makeSequenceGroup('grp-1-2-3-4-5'))
+
+    GroupsAudioAPI.UpdateSequence({
+      groupID: 'grp-1-2-3-4-5' as any,
+      name: 'Updated',
+      icon: altIcon,
+      tags: ['boss', 'combat'],
+      sequence: [
+        { type: 'delay', id: 'seq-0-0-0-0-0' as any, msToDelay: 1500 },
+        { type: 'group', id: 'seq-0-0-0-0-1' as any, groupID: 'grp-9-9-9-9-9' as any }
+      ]
+    })
+
+    expect(setterSpy).toHaveBeenCalledOnce()
+    expect(setterSpy).toHaveBeenCalledWith(
+      expect.objectContaining({
+        Groups: expect.arrayContaining([
+          expect.objectContaining({
+            name: 'Updated',
+            icon: altIcon,
+            tags: ['boss', 'combat'],
+            type: 'sequence',
+            sequence: expect.arrayContaining([
+              expect.objectContaining({ type: 'delay', msToDelay: 1500 }),
+              expect.objectContaining({ type: 'group', groupID: 'grp-9-9-9-9-9' })
+            ])
+          })
+        ])
+      })
+    )
+  })
 })
 
 // ---------------------------------------------------------------------------
@@ -624,7 +694,7 @@ describe('GroupsAudioAPI.GetSounds', () => {
   })
 
   it('returns sounds with useHtml5=false for files under 2 MB', async () => {
-    const { getFileSize } = await import('./fs')
+    const { getFileSize } = await import('../fs')
     vi.mocked(getFileSize).mockResolvedValue(1.0) // 1 MB < 2 MB threshold
 
     mockState.config.Groups.push(
@@ -648,7 +718,7 @@ describe('GroupsAudioAPI.GetSounds', () => {
   })
 
   it('returns sounds with useHtml5=true for files over 2 MB', async () => {
-    const { getFileSize } = await import('./fs')
+    const { getFileSize } = await import('../fs')
     vi.mocked(getFileSize).mockResolvedValue(3.0) // 3 MB > 2 MB threshold
 
     mockState.config.Groups.push(

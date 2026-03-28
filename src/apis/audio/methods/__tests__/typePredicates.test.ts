@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { isSourceGroup, isSequenceGroup } from './typePredicates'
-import type { SoundGroupSource, SoundGroupSequence } from '../types/items'
+import { isSourceGroup, isSequenceGroup } from '../typePredicates'
+import type { SoundGroupSource, SoundGroupSequence } from '../../types/items'
 
 const baseIcon = { type: 'svg' as const, name: 'moon', foregroundColor: '#ffffff' }
 

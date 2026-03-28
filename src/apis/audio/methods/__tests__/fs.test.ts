@@ -25,8 +25,8 @@ vi.mock('../../../utils/paths', () => ({
 }))
 
 import fs from 'node:fs'
-import { getGroupPath, saveSoundEffect, deleteFile, getFileSize } from './fs'
-import { GroupID } from '../types/groups'
+import { getGroupPath, saveSoundEffect, deleteFile, getFileSize } from '../fs'
+import { GroupID } from '../../types/groups'
 
 const mockFs = fs as unknown as {
   existsSync: ReturnType<typeof vi.fn>

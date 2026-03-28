@@ -19,11 +19,11 @@ export const IconsApi: IIcons = {
     const bestIcon = await soundboardIcons.GetBestIcon(name)
 
     function guessVariant(): SoundVariants {
-      if (filePaths.length > 2) {
-        return 'Rapid'
-      }
       if (filePaths.some((fp) => fp.match(/[\s_]loop/g))) {
         return 'Looping'
+      }
+      if (filePaths.length > 2) {
+        return 'Rapid'
       }
       return 'Default'
     }
