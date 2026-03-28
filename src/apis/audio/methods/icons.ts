@@ -1,6 +1,6 @@
 import {
-  BulkGenGroupInputsRequest,
-  BulkGenGroupInputsResponse,
+  GenGroupInputRequest,
+  GenGroupInputResponse,
   GetIconRequest,
   GetIconResponse,
   IIcons,
@@ -14,9 +14,7 @@ export const IconsApi: IIcons = {
   /**
    * @inheritdoc
    */
-  GenGroupInput: async function (
-    request: BulkGenGroupInputsRequest
-  ): Promise<BulkGenGroupInputsResponse> {
+  GenGroupInput: async function (request: GenGroupInputRequest): Promise<GenGroupInputResponse> {
     const { filePaths, name } = request
     const bestIcon = await soundboardIcons.GetBestIcon(name)
 
@@ -51,12 +49,18 @@ export const IconsApi: IIcons = {
       }
     }
   },
+  /**
+   * @inheritdoc
+   */
   Search: function (request: SearchIconsRequest): SearchIconsResponse {
     const resp = soundboardIcons.SearchIcons(request.search)
     return {
       icons: resp
     }
   },
+  /**
+   * @inheritdoc
+   */
   GetIcon: function (request: GetIconRequest): GetIconResponse {
     const resp = soundboardIcons.GetIcon(request.iconName)
     return {

@@ -26,24 +26,58 @@ export type CreateResponse = {
   group: SoundGroupSource
 }
 
+/**
+ * Request for {@link IGroups.CreateBulk}.
+ */
 export type CreateBulkRequest = {
+  /**
+   * The groups that should be created.
+   */
   groups: SoundGroupSourceEditableFields[]
+
+  /**
+   * Any tags that should be applied to each newly-created group.
+   */
   commonTags: string[]
 }
 
+/**
+ * Response for {@link IGroups.CreateBulk}.
+ */
 export type CreateBulkResponse = {}
 
+/**
+ * Request for {@link IGroups.CreateSequence}.
+ */
 export type CreateSequenceRequest = SoundGroupSequenceEditableFields
 
+/**
+ * Response for {@link IGroups.CreateSequence}.
+ */
 export type CreateSequenceResponse = {
+  /**
+   * The newly-created sequence.
+   */
   sequence: SoundGroupSequence
 }
 
+/**
+ * Request for {@link IGroups.UpdateSequence}.
+ */
 export type UpdateSequenceRequest = {
+  /**
+   * The group that should be edited.
+   */
   groupID: GroupID
 } & SoundGroupSequenceEditableFields
 
+/**
+ * Response for {@link IGroups.UpdateSequence}.
+ */
 export type UpdateSequenceResponse = {
+  /**
+   * The sequence that has been created.
+   */
   sequence: SoundGroupSequence
 }
 
@@ -87,64 +121,44 @@ export type GetResponse = {
   group: ISoundGroup | undefined
 }
 
+/**
+ * Response for {@link IGroups.GetAll}.
+ */
 export type GetAllResponse = {
+  /**
+   * All of the user's groups.
+   */
   groups: ISoundGroup[]
 }
 
 /**
- * The request object for {@link IGroups.GetSound}.
+ * The request object for {@link IGroups.GetSounds}.
  */
-export type GetSoundRequest = {
+export type GetSoundsRequest = {
   /**
    * The ID for the group to get the sound effect for.
    */
   groupID: GroupID
-
-  idsToSkip?: EffectID[]
 }
 
 /**
- * The response object for {@link IGroups.GetSound}.
+ * Response for {@link IGroups.GetSounds}.
  */
-export type GetSoundResponse = {
+export type GetSoundsResponse = {
   /**
-   * The base64 data URL for the file. This can be handed off directly to an audio player to load
-   * the sound effect.
-   */
-  src: string
-
-  /**
-   * The file format from the original file. This is necessary when sending a data URL into an audio
-   * player.
-   */
-  format: SupportedFileType
-
-  /**
-   * The volume of the effect to play. Will range from 0 to 200.
-   */
-  volume: number
-
-  /**
-   * The ID for the effect that is being played.
-   */
-  effectID: EffectID
-
-  /**
-   * The variant for the group that the sound has been fetched for. This is provided as a factor of
-   * convenience, but should be included on the originating object.
+   * The sound variant associated with the particular button (group).
    */
   variant: SoundVariants
 
   /**
-   * If true, this provided sound effect should utilize HTML5 audio. This should be "false" in
-   * general. The Web Audio API is preferable in most aspects, but at time of writing our
-   * implementation does not allow for audio streaming using the Web Audio API. As a result, any
-   * large files that should be streamed, should use html5 to ensure that they are streamed as
-   * opposed to fully downloaded.
+   * The set of sounds associated with the particular button (group).
    */
-  useHtml5: boolean
+  sounds: SoundEffectWithPlayerDetails[]
 }
 
+/**
+ * A complete representation of a sound effect usable by the FE. Includes additional player details.
+ */
 export type SoundEffectWithPlayerDetails = SoundEffect & {
   /**
    * If true, this provided sound effect should utilize HTML5 audio. This should be "false" in
@@ -154,11 +168,6 @@ export type SoundEffectWithPlayerDetails = SoundEffect & {
    * opposed to fully downloaded.
    */
   useHtml5: boolean
-}
-
-export type GetSoundsResponse = {
-  variant: SoundVariants
-  sounds: SoundEffectWithPlayerDetails[]
 }
 
 /**
@@ -176,16 +185,32 @@ export type DeleteRequest = {
  */
 export type DeleteResponse = {}
 
+/**
+ * A request for {@link IGroups.GetPinnedSearches}.
+ */
 export type GetPinnedSearchesRequest = {}
 
+/**
+ * A response for {@link IGroups.GetPinnedSearches}.
+ */
 export type GetPinnedSearchesResponse = {
   pinnedSearches: string[]
 }
 
+/**
+ * A request for {@link IGroups.UpdatePinnedSearches}.
+ */
 export type UpdatePinnedSearchesRequest = {
+  /**
+   * The new pinned searches that should be saved. This will entirely replace the existing pinned
+   * searches.
+   */
   newPinnedSearches: string[]
 }
 
+/**
+ * A response for {@link IGroups.UpdatePinnedSearches}.
+ */
 export type UpdatePinnedSearchesResponse = {}
 
 /**
@@ -207,8 +232,15 @@ export interface IGroups {
    */
   Get(request: GetRequest): GetResponse
 
+  /**
+   * Fetches all groups.
+   */
   GetAll(): GetAllResponse
 
+  /**
+   * Creates a number of groups in a single request.
+   * @param request See {@link CreateBulk}.
+   */
   CreateBulk(request: CreateBulkRequest): Promise<CreateBulkResponse>
 
   /**
@@ -229,13 +261,33 @@ export interface IGroups {
    */
   Delete(request: DeleteRequest): DeleteResponse
 
-  GetSounds(request: GetSoundRequest): Promise<GetSoundsResponse>
+  /**
+   * Gets all of the sounds (effects) associated with a particular button (group).
+   * @param request See {@link GetSoundsRequest}.
+   */
+  GetSounds(request: GetSoundsRequest): Promise<GetSoundsResponse>
 
+  /**
+   * Creates a new sequence element.
+   * @param request See {@link CreateSequenceRequest}.
+   */
   CreateSequence(request: CreateSequenceRequest): CreateSequenceResponse
 
+  /**
+   * Updates an existing sequence element.
+   * @param request See {@link UpdateSequence}.
+   */
   UpdateSequence(request: UpdateSequenceRequest): UpdateSequenceResponse
 
+  /**
+   * Gets all of the pinned searches.
+   * @param request See {@link GetPinnedSearchesRequest}.
+   */
   GetPinnedSearches(request: GetPinnedSearchesRequest): GetPinnedSearchesResponse
 
+  /**
+   * Updates the pinned searches.
+   * @param request See {@link UpdatePinnedSearchesRequest}.
+   */
   UpdatePinnedSearches(request: UpdatePinnedSearchesRequest): UpdatePinnedSearchesResponse
 }

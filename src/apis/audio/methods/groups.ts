@@ -25,7 +25,7 @@ import {
   UpdateResponse,
   DeleteRequest,
   DeleteResponse,
-  GetSoundRequest,
+  GetSoundsRequest,
   GetSoundsResponse,
   SoundEffectWithPlayerDetails,
   CreateSequenceRequest,
@@ -58,6 +58,9 @@ export const GroupsAudioAPI: IGroups = {
       groups: AudioConfig.getAllGroups()
     }
   },
+  /**
+   * @inheritdoc
+   */
   async CreateBulk(request: CreateBulkRequest): Promise<CreateBulkResponse> {
     const { commonTags, groups } = request
 
@@ -168,6 +171,9 @@ export const GroupsAudioAPI: IGroups = {
       sequence: newGroup
     }
   },
+  /**
+   * @inheritdoc
+   */
   UpdateSequence(request) {
     const matchingGroup = AudioConfig.getGroup(request.groupID)
     if (!matchingGroup) {
@@ -329,7 +335,7 @@ export const GroupsAudioAPI: IGroups = {
   /**
    * @inheritdoc
    */
-  GetSounds: async function (request: GetSoundRequest): Promise<GetSoundsResponse> {
+  GetSounds: async function (request: GetSoundsRequest): Promise<GetSoundsResponse> {
     const group = AudioConfig.getGroup(request.groupID)
 
     if (group === undefined || !isSourceGroup(group)) {
@@ -370,6 +376,9 @@ export const GroupsAudioAPI: IGroups = {
       sounds: effects
     }
   },
+  /**
+   * @inheritdoc
+   */
   UpdatePinnedSearches: function (
     request: UpdatePinnedSearchesRequest
   ): UpdatePinnedSearchesResponse {
@@ -380,6 +389,9 @@ export const GroupsAudioAPI: IGroups = {
     AudioConfig.Config = newConfig
     return {}
   },
+  /**
+   * @inheritdoc
+   */
   GetPinnedSearches: function (_request: GetPinnedSearchesRequest): GetPinnedSearchesResponse {
     return {
       pinnedSearches: (AudioConfig.Config.pinnedSearches ?? []).toSpliced(0, 0)

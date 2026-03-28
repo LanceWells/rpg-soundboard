@@ -67,18 +67,25 @@ export function BulkUploadFiles() {
         .replace(/(^[\w\s]+\s?-\s?)/g, '')
         // Replace underscores with spaces
         .replaceAll('_', ' ')
+        // Replace any prefixed, all-caps wo
+        .replaceAll('^[A-Z\s]+\s(?=[\w\s]{1,})', '')
         // Any missed whitespace on the edge
         .trim()
 
-      if (acc[nonNumberedName] === undefined) {
-        acc[nonNumberedName] = {
+      const entireWordIsCaps = nonNumberedName.toUpperCase() === nonNumberedName
+      const sanitizedName = entireWordIsCaps
+        ? nonNumberedName
+        : nonNumberedName.replace(/^[A-Z\s]+\s(?=[\w\s]{1,})/g, '')
+
+      if (acc[sanitizedName] === undefined) {
+        acc[sanitizedName] = {
           state: 'loading',
           filePaths: [],
-          name: nonNumberedName
+          name: sanitizedName
         }
       }
 
-      ;(acc[nonNumberedName] as BulkButtonLoading).filePaths.push(path)
+      ;(acc[sanitizedName] as BulkButtonLoading).filePaths.push(path)
 
       return acc
     }, {} as BulkButtonStates)

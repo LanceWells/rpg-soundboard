@@ -11,12 +11,6 @@ export const getGroupPath = (groupID: GroupID): string => {
   return grpDir
 }
 
-export const getGroupEffectsPath = (groupID: GroupID): string => {
-  const effDir = path.join(getGroupPath(groupID), 'effects')
-
-  return effDir
-}
-
 export const saveSoundEffect = (
   groupID: GroupID,
   srcFilePath: string
@@ -81,39 +75,6 @@ export const deleteFile = (pathToDelete: string) => {
   }
 
   fs.rmSync(litPath)
-}
-
-export const deleteGroupFolder = (groupID: GroupID) => {
-  const groupPath = getGroupPath(groupID)
-
-  if (!fs.existsSync(groupPath)) {
-    console.error(`Attempt to delete a folder that does not exist (${groupPath})`)
-    return
-  }
-
-  fs.rmSync(groupPath, {
-    recursive: true,
-    force: true
-  })
-}
-
-export const copyGroupFolder = (oldGroupID: GroupID, newGroupID: GroupID) => {
-  const oldGroupPath = getGroupPath(oldGroupID)
-  if (!fs.existsSync(oldGroupPath)) {
-    console.error(`Attempt to copy from a folder that does not exist (${oldGroupPath})`)
-    return
-  }
-
-  const newGroupPath = getGroupPath(newGroupID)
-  if (fs.existsSync(newGroupPath)) {
-    console.error(`Attempt to copy to a folder that already exists (${newGroupPath})`)
-    return
-  }
-
-  fs.cpSync(oldGroupPath, newGroupPath, {
-    recursive: true,
-    force: true
-  })
 }
 
 export async function getFileSize(path: string): Promise<number> {
