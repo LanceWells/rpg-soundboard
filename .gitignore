@@ -4,3 +4,4 @@ dist - Copy
 out
 .DS_Store
 *.log*
+test-data

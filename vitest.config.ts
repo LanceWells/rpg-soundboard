@@ -8,7 +8,7 @@ export default defineConfig({
           name: 'api',
           root: 'src/apis',
           environment: 'node',
-          setupFiles: []
+          setupFiles: ['./test-setup.ts']
         }
       },
       {
