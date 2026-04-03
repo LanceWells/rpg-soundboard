@@ -107,12 +107,14 @@ export function GroupSvgIcon(props: GroupSvgIconProps) {
           skeleton
           ${isLoading ? 'opacity-100' : 'opacity-0'}
       `}
-      ></div>
+      />
       <div
         className={`
           transition-opacity
           w-full
           h-full
+          absolute
+          top-0
           ${isLoading ? 'opacity-0' : 'opacity-100'}
         `}
       >

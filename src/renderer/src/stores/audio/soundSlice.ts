@@ -12,6 +12,7 @@ import { SequenceSoundContainer } from '@renderer/utils/soundContainer/variants/
 import { isSequenceGroup, isSoundtrackContainer } from '@renderer/utils/typePredicates'
 import { ISoundGroup, SoundGroupSequence, SoundIcon } from 'src/apis/audio/types/items'
 import { Ctx } from '@renderer/rpgAudioEngine'
+import { SoundVariant } from '@renderer/utils/soundVariants'
 
 /**
  * Zustand slice that manages audio playback, including playing/stopping groups and soundtrack controls.
@@ -163,8 +164,7 @@ export const createSoundSlice: StateCreator<SoundSlice & GroupSlice, [], [], Sou
     } else {
       const remainingEffectsCount = get()
         .playingGroups.map((g) => get().getGroup(g))
-        // .filter((g) => g.type === 'sequence' || ['Default', 'Rapid'].includes(g.variant))
-        .filter((g) => !isSoundtrack(g, get))
+        .filter((g) => !isSoundtrack(g, get) && g.variant !== SoundVariant.Looping)
         .flatMap((g) => g).length
 
       if (remainingEffectsCount === 0) {

@@ -1,6 +1,6 @@
 import { CloseIcon } from '@renderer/assets/icons'
 import { useAudioStore } from '@renderer/stores/audio/audioStore'
-import { PropsWithChildren, useMemo } from 'react'
+import { PropsWithChildren, useEffect, useMemo, useState } from 'react'
 import { twMerge } from 'tailwind-merge'
 import { useShallow } from 'zustand/react/shallow'
 
@@ -29,6 +29,12 @@ type PinnedSearchProps = {
   text: string
 }
 
+type RemoveOpts = 'Idle' | 'Confirming'
+type RemoveState = {
+  opt: RemoveOpts
+  timeout: number | undefined
+}
+
 function PinnedSearch(props: PinnedSearchProps) {
   const { text } = props
 
@@ -37,10 +43,38 @@ function PinnedSearch(props: PinnedSearchProps) {
   const updatePinnedSearches = useAudioStore((store) => store.updatePinnedSearches)
   const pinnedSearches = useAudioStore((store) => store.pinnedSearches)
 
-  const removePin = () => {
-    const pins = pinnedSearches.filter((p) => p !== text)
-    updatePinnedSearches([...pins])
+  const [removeState, setRemoveState] = useState<RemoveState>({
+    opt: 'Idle',
+    timeout: undefined
+  })
+
+  const onClickRemove = () => {
+    clearTimeout(removeState.timeout)
+    switch (removeState.opt) {
+      case 'Idle': {
+        setRemoveState({
+          opt: 'Confirming',
+          timeout: window.setTimeout(() => {
+            setRemoveState({ opt: 'Idle', timeout: undefined })
+          }, 2500)
+        })
+        break
+      }
+      case 'Confirming': {
+        const pins = pinnedSearches.filter((p) => p !== text)
+        updatePinnedSearches([...pins])
+        break
+      }
+    }
   }
+
+  useEffect(() => {
+    return () => {
+      clearTimeout(removeState.timeout)
+    }
+  })
+
+  const confirmingRemove = removeState.opt === 'Confirming'
 
   return (
     <Pin className={activeSearch === text ? 'bg-green-900' : 'bg-base-100'}>
@@ -53,9 +87,27 @@ function PinnedSearch(props: PinnedSearchProps) {
       >
         {text}
       </span>
-      <button onClick={removePin} className="btn btn-circle btn-xs">
-        <CloseIcon className="max-h-5 stroke-white fill-white" />
-      </button>
+      <div
+        className={`
+          ${confirmingRemove ? 'tooltip tooltip-open' : ''}
+        `}
+      >
+        {confirmingRemove && (
+          <div className="tooltip-content w-24 wrap-break-word z-50">Click again to remove</div>
+        )}
+        <button
+          onClick={onClickRemove}
+          className={`
+          btn
+          btn-circle
+          btn-xs
+          transition-colors
+          ${confirmingRemove ? 'btn-error' : ''}
+        `}
+        >
+          <CloseIcon className="max-h-5 stroke-white fill-white" />
+        </button>
+      </div>
     </Pin>
   )
 }
