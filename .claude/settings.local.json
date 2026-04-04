@@ -1,7 +1,10 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npx vitest:*)"
+      "Bash(npx vitest:*)",
+      "Bash(node -e \"try { require.resolve\\('vite-tsconfig-paths'\\); console.log\\('exists'\\) } catch\\(e\\) { console.log\\('not installed'\\) }\")",
+      "Bash(npm install:*)",
+      "Bash(npm test:*)"
     ]
   }
 }
