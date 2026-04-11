@@ -2,7 +2,6 @@ import { GetSoundsResponse, GroupID } from 'src/apis/audio/types/groups'
 import { StateCreator, StoreApi } from 'zustand'
 import { GroupSlice } from './groupSlice'
 import { SoundIcon } from 'src/apis/audio/types/items'
-import { Ctx } from '@renderer/rpgAudioEngine'
 import { SoundscapeManager } from '@renderer/rpgAudioEngine/manager/soundscapeManager'
 import { ManagerListenerType } from '@renderer/rpgAudioEngine/manager/abstractSoundManager'
 
@@ -17,9 +16,6 @@ export interface SoundSlice {
   activeSoundtrack: SoundTrackDetails | null
   playNextSong: () => void
   setMusicVolume: (newVolume: number) => void
-  toggleInCave: () => void
-  soundCtx(): Ctx
-  isInCave: boolean
   soundscape: SoundscapeManager
 }
 
@@ -65,19 +61,6 @@ export const createSoundSlice: StateCreator<SoundSlice & GroupSlice, [], [], Sou
   },
   stopGroup(groupID) {
     get().soundscape.stop(groupID)
-  },
-  toggleInCave() {
-    set(() => {
-      return {
-        isInCave: !get().isInCave
-      }
-    })
-  },
-  soundCtx() {
-    if (get().isInCave) {
-      return Ctx.Environmental
-    }
-    return Ctx.Effectless
   }
 })
 

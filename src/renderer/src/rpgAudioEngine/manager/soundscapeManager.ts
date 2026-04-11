@@ -30,6 +30,7 @@ export class SoundscapeManager implements IRpgAudioManager {
     this._soundEffects.on(ManagerListenerType.AllSoundsStopped, this.onAllEffectsDone.bind(this))
     this._soundEffects.on(ManagerListenerType.AnySoundsStopped, this.onAnyEffectsDone.bind(this))
     this._soundEffects.on(ManagerListenerType.AnySoundsStarted, this.onAnySoundsStarted.bind(this))
+
     this._soundtracks.on(ManagerListenerType.PlayNext, this.onPlayNextSong.bind(this))
     this._soundtracks.on(ManagerListenerType.AnySoundsStarted, this.onAnySoundsStarted.bind(this))
     this._soundtracks.on(ManagerListenerType.AnySoundsStopped, this.onPlayNextSong.bind(this))
