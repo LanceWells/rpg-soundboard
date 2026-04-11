@@ -57,7 +57,7 @@ export interface GroupSlice {
   /**
    * The set of IDs for groups that are actively playing a sound effect.
    */
-  playingGroups: GroupID[]
+  // playingGroups: GroupID[]
   sorting: SortFilterVal
   getGroup: (groupID: GroupID) => ISoundGroup
   getGroupSource: (groupID: GroupID) => SoundGroupSource
@@ -222,7 +222,7 @@ export const createGroupSlice: StateCreator<GroupSlice, [], [], GroupSlice> = (s
   },
   editingGroup: null,
   editingGroupID: undefined,
-  playingGroups: [],
+  // playingGroups: [],
   soughtGroups: window.audio.Groups.GetAll().groups,
   searchForGroups(searchText) {
     set({

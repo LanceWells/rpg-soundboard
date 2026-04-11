@@ -1,9 +1,5 @@
 import { SoundVariants } from 'src/apis/audio/types/soundVariants'
-import {
-  GetSoundsResponse,
-  GroupID,
-  SoundEffectWithPlayerDetails
-} from 'src/apis/audio/types/groups'
+import { GroupID, SoundEffectWithPlayerDetails } from 'src/apis/audio/types/groups'
 import { Handler, ISoundContainer } from '../interface'
 import { NewSoundContainer } from '../util'
 import { SequenceElementID, SoundGroupSequenceElement } from 'src/apis/audio/types/items'
@@ -41,7 +37,7 @@ export type SequenceSpecificSetup = {
   effectGroups: EffectGroup[]
   elementPlayingHandler?: (sequence: SequenceElementID, container: ISoundContainer) => void
   elementStoppedHandler?: (sequence: SequenceElementID, container: ISoundContainer) => void
-  stoppedHandler?: Handler<string>
+  stoppedHandler?: Handler<GroupID>
 }
 
 type EffectTiming = {
@@ -77,7 +73,7 @@ export class SequenceSoundContainer implements ISoundContainer {
     | ((sequence: SequenceElementID, container: ISoundContainer) => void)
     | undefined
 
-  private stoppedHandler: Handler<string> | undefined
+  private stoppedHandler: Handler<GroupID> | undefined
 
   durationMap: Map<string, number> = new Map()
 
@@ -252,10 +248,7 @@ export class SequenceSoundContainer implements ISoundContainer {
     )
   }
 
-  static ApiToSetupElements(
-    elements: SoundGroupSequenceElement[],
-    getSounds: (groupID: GroupID) => Promise<GetSoundsResponse>
-  ) {
+  static ApiToSetupElements(elements: SoundGroupSequenceElement[]) {
     return elements.map<Promise<EffectGroup>>(async (e) => {
       if (e.type === 'delay') {
         // I found that, coming from a form, the delay can get converted into a string instead of a
@@ -283,7 +276,9 @@ export class SequenceSoundContainer implements ISoundContainer {
         }
       }
 
-      const s = await getSounds(e.groupID)
+      const s = await window.audio.Groups.GetSounds({
+        groupID: e.groupID
+      })
 
       return {
         type: 'group',

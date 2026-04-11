@@ -1,7 +1,7 @@
 import { SoundVariants } from 'src/apis/audio/types/soundVariants'
 import { ISoundContainer, SoundContainerSetup } from './interface'
 import { EffectID } from 'src/apis/audio/types/effects'
-import { SoundEffectWithPlayerDetails } from 'src/apis/audio/types/groups'
+import { GroupID, SoundEffectWithPlayerDetails } from 'src/apis/audio/types/groups'
 import { getRandomInt } from '../random'
 import { Ctx, RpgAudio } from '@renderer/rpgAudioEngine'
 
@@ -9,9 +9,9 @@ import { Ctx, RpgAudio } from '@renderer/rpgAudioEngine'
  * Base class for sound containers that wraps an RpgAudio instance and exposes play/stop/volume/fade operations.
  */
 export abstract class AbstractSoundContainerV2<
-  TStopped extends string = string,
-  TLoaded extends string = string,
-  TPlaying extends string = string
+  TStopped extends string = GroupID,
+  TLoaded extends string = GroupID,
+  TPlaying extends string = GroupID
 > implements ISoundContainer
 {
   protected _lastEffectID: EffectID | undefined

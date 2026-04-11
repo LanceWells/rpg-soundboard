@@ -1,6 +1,6 @@
 import { RpgAudio } from '@renderer/rpgAudioEngine'
 import { EffectID } from 'src/apis/audio/types/effects'
-import { SoundEffectWithPlayerDetails } from 'src/apis/audio/types/groups'
+import { GroupID, SoundEffectWithPlayerDetails } from 'src/apis/audio/types/groups'
 import { SoundVariants } from 'src/apis/audio/types/soundVariants'
 
 /**
@@ -45,9 +45,9 @@ export type Handler<T extends string, C = ISoundContainer> = {
  * useful for situations in which this container is considered to be a disposiable one-use object.
  */
 export type SoundContainerSetup<
-  TStopped extends string = string,
-  TLoaded extends string = string,
-  TPlaying extends string = string
+  TStopped extends string = GroupID,
+  TLoaded extends string = GroupID,
+  TPlaying extends string = GroupID
 > = {
   effects: SoundEffectWithPlayerDetails[]
 
@@ -105,5 +105,5 @@ export type SoundtrackEvents = keyof typeof SoundtrackEvents
 export interface ISoundtrackContainer {
   playNextSong(): Promise<void>
   getActiveSong(): RpgAudioContainer | undefined
-  on(event: SoundtrackEvents, handler: Handler<string, ISoundContainer & ISoundtrackContainer>)
+  on(event: SoundtrackEvents, handler: Handler<GroupID, ISoundContainer & ISoundtrackContainer>)
 }

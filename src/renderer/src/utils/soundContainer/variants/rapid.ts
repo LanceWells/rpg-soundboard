@@ -1,5 +1,5 @@
 import { SoundVariants } from 'src/apis/audio/types/soundVariants'
-import { SoundEffectWithPlayerDetails } from 'src/apis/audio/types/groups'
+import { GroupID, SoundEffectWithPlayerDetails } from 'src/apis/audio/types/groups'
 import { getRandomArbitrary, getRandomInt } from '@renderer/utils/random'
 import { SoundContainerSetup } from '../interface'
 import { EffectID } from 'src/apis/audio/types/effects'
@@ -9,7 +9,11 @@ import { Ctx } from '@renderer/rpgAudioEngine'
 /**
  * Sound container for the Rapid variant: plays a randomly selected effect with randomized pan and rate, avoiding immediate repeats.
  */
-export class RapidSoundContainer extends AbstractSoundContainerV2 {
+export class RapidSoundContainer<
+  TStopped extends string = GroupID,
+  TLoaded extends string = GroupID,
+  TPlaying extends string = GroupID
+> extends AbstractSoundContainerV2<TStopped, TLoaded, TPlaying> {
   Variant: SoundVariants = 'Rapid'
 
   protected override SelectEffect(effects: SoundEffectWithPlayerDetails[]) {
@@ -24,7 +28,11 @@ export class RapidSoundContainer extends AbstractSoundContainerV2 {
     return effects[effectIndex]
   }
 
-  constructor(setup: SoundContainerSetup, lastEffectID: EffectID | undefined, ctx?: Ctx) {
+  constructor(
+    setup: SoundContainerSetup<TStopped, TLoaded, TPlaying>,
+    lastEffectID: EffectID | undefined,
+    ctx?: Ctx
+  ) {
     super(setup, false, lastEffectID, ctx)
   }
 

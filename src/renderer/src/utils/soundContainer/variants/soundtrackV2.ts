@@ -9,14 +9,20 @@ import {
 } from '../interface'
 import { Ctx, ListenerType, RpgAudio, RpgAudioState } from '@renderer/rpgAudioEngine'
 import { getRandomInt } from '@renderer/utils/random'
-import { SoundEffectWithPlayerDetails } from 'src/apis/audio/types/groups'
+import { GroupID, SoundEffectWithPlayerDetails } from 'src/apis/audio/types/groups'
 import { produce } from 'immer'
 import { VolumeManager } from '../volumeManager'
 
 /**
  * Sound container for the Soundtrack variant: shuffles and continuously plays music tracks with crossfade transitions.
  */
-export class SoundtrackSoundContainerV2 implements ISoundContainer, ISoundtrackContainer {
+export class SoundtrackSoundContainerV2<
+    TStopped extends string = GroupID,
+    TLoaded extends string = GroupID,
+    TPlaying extends string = GroupID
+  >
+  implements ISoundContainer, ISoundtrackContainer
+{
   public Variant: SoundVariants = 'Soundtrack'
 
   private readonly crossfadeTime: number = 12500
@@ -25,9 +31,9 @@ export class SoundtrackSoundContainerV2 implements ISoundContainer, ISoundtrackC
 
   private _audioQueue: RpgAudioContainer[]
   private ctx: Ctx
-  private _loadedHandler: Handler<string> | undefined
-  private _stopHandler: Handler<string> | undefined
-  private _nextHandlers: Handler<string, ISoundContainer & ISoundtrackContainer>[] = []
+  private _loadedHandler: Handler<TLoaded> | undefined
+  private _stopHandler: Handler<TStopped> | undefined
+  private _nextHandlers: Handler<GroupID, ISoundContainer & ISoundtrackContainer>[] = []
 
   private _effects: SoundEffectWithPlayerDetails[]
   private _effectsPointer: number = 0
@@ -66,7 +72,10 @@ export class SoundtrackSoundContainerV2 implements ISoundContainer, ISoundtrackC
     return this._effects[this._effectsPointer++]
   }
 
-  constructor(setup: SoundContainerSetup, _enableLoops: boolean = true) {
+  constructor(
+    setup: SoundContainerSetup<TStopped, TLoaded, TPlaying>,
+    _enableLoops: boolean = true
+  ) {
     const { effects, stopHandler, loadedHandler } = setup
 
     this._effects = effects
@@ -91,7 +100,7 @@ export class SoundtrackSoundContainerV2 implements ISoundContainer, ISoundtrackC
 
   public on(
     event: SoundtrackEvents,
-    handler: Handler<string, ISoundContainer & ISoundtrackContainer>
+    handler: Handler<GroupID, ISoundContainer & ISoundtrackContainer>
   ) {
     switch (event) {
       case 'playNext': {
