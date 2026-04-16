@@ -137,8 +137,20 @@ describe('SequenceSoundContainer', () => {
       const sc = new SequenceSoundContainer(
         {
           effectGroups: [
-            { type: 'group', id: makeSeqId(1), groupID: makeGroupId(1), effects: [makeEffect()], variant: 'Default' },
-            { type: 'group', id: makeSeqId(2), groupID: makeGroupId(2), effects: [makeEffect()], variant: 'Default' }
+            {
+              type: 'group',
+              id: makeSeqId(1),
+              groupID: makeGroupId(1),
+              effects: [makeEffect()],
+              variant: 'Default'
+            },
+            {
+              type: 'group',
+              id: makeSeqId(2),
+              groupID: makeGroupId(2),
+              effects: [makeEffect()],
+              variant: 'Default'
+            }
           ]
         },
         2
@@ -152,7 +164,13 @@ describe('SequenceSoundContainer', () => {
         {
           effectGroups: [
             { type: 'delay', id: makeSeqId(1), delayInMs: 1000 },
-            { type: 'group', id: makeSeqId(2), groupID: makeGroupId(1), effects: [makeEffect()], variant: 'Default' }
+            {
+              type: 'group',
+              id: makeSeqId(2),
+              groupID: makeGroupId(1),
+              effects: [makeEffect()],
+              variant: 'Default'
+            }
           ]
         },
         2
@@ -171,7 +189,15 @@ describe('SequenceSoundContainer', () => {
       const id1 = makeSeqId(1)
       const sc = new SequenceSoundContainer(
         {
-          effectGroups: [{ type: 'group', id: id1, groupID: makeGroupId(1), effects: [makeEffect()], variant: 'Default' }]
+          effectGroups: [
+            {
+              type: 'group',
+              id: id1,
+              groupID: makeGroupId(1),
+              effects: [makeEffect()],
+              variant: 'Default'
+            }
+          ]
         },
         2
       )
@@ -197,8 +223,20 @@ describe('SequenceSoundContainer', () => {
       const sc = new SequenceSoundContainer(
         {
           effectGroups: [
-            { type: 'group', id: makeSeqId(1), groupID: makeGroupId(1), effects: [makeEffect()], variant: 'Default' },
-            { type: 'group', id: makeSeqId(2), groupID: makeGroupId(2), effects: [makeEffect()], variant: 'Default' }
+            {
+              type: 'group',
+              id: makeSeqId(1),
+              groupID: makeGroupId(1),
+              effects: [makeEffect()],
+              variant: 'Default'
+            },
+            {
+              type: 'group',
+              id: makeSeqId(2),
+              groupID: makeGroupId(2),
+              effects: [makeEffect()],
+              variant: 'Default'
+            }
           ]
         },
         2
@@ -213,8 +251,20 @@ describe('SequenceSoundContainer', () => {
       const sc = new SequenceSoundContainer(
         {
           effectGroups: [
-            { type: 'group', id: makeSeqId(1), groupID: makeGroupId(1), effects: [makeEffect()], variant: 'Default' },
-            { type: 'group', id: makeSeqId(2), groupID: makeGroupId(2), effects: [makeEffect()], variant: 'Default' }
+            {
+              type: 'group',
+              id: makeSeqId(1),
+              groupID: makeGroupId(1),
+              effects: [makeEffect()],
+              variant: 'Default'
+            },
+            {
+              type: 'group',
+              id: makeSeqId(2),
+              groupID: makeGroupId(2),
+              effects: [makeEffect()],
+              variant: 'Default'
+            }
           ]
         },
         2
@@ -231,7 +281,7 @@ describe('SequenceSoundContainer', () => {
       const sc = new SequenceSoundContainer(
         {
           effectGroups: [],
-          stoppedHandler: { id: 'grp-test-1', handler: stoppedHandler }
+          stoppedHandler: { id: 'grp-test-1' as GroupID, handler: stoppedHandler }
         },
         2
       )
@@ -246,7 +296,13 @@ describe('SequenceSoundContainer', () => {
       const sc = new SequenceSoundContainer(
         {
           effectGroups: [
-            { type: 'group', id: makeSeqId(1), groupID: makeGroupId(1), effects: [makeEffect()], variant: 'Default' }
+            {
+              type: 'group',
+              id: makeSeqId(1),
+              groupID: makeGroupId(1),
+              effects: [makeEffect()],
+              variant: 'Default'
+            }
           ]
         },
         2
@@ -262,7 +318,13 @@ describe('SequenceSoundContainer', () => {
       const sc = new SequenceSoundContainer(
         {
           effectGroups: [
-            { type: 'group', id: makeSeqId(1), groupID: makeGroupId(1), effects: [makeEffect()], variant: 'Default' }
+            {
+              type: 'group',
+              id: makeSeqId(1),
+              groupID: makeGroupId(1),
+              effects: [makeEffect()],
+              variant: 'Default'
+            }
           ]
         },
         2
@@ -279,7 +341,7 @@ describe('SequenceSoundContainer', () => {
         { type: 'delay', id: makeSeqId(1), msToDelay: 2000 }
       ]
       const getSounds = vi.fn()
-      const results = await Promise.all(SequenceSoundContainer.ApiToSetupElements(elements, getSounds))
+      const results = await Promise.all(SequenceSoundContainer.ApiToSetupElements(elements))
       expect(results[0]).toEqual({ type: 'delay', id: makeSeqId(1), delayInMs: 2000 })
       expect(getSounds).not.toHaveBeenCalled()
     })
@@ -288,8 +350,7 @@ describe('SequenceSoundContainer', () => {
       const elements: SoundGroupSequenceElement[] = [
         { type: 'delay', id: makeSeqId(1), msToDelay: '1500' as unknown as number }
       ]
-      const getSounds = vi.fn()
-      const results = await Promise.all(SequenceSoundContainer.ApiToSetupElements(elements, getSounds))
+      const results = await Promise.all(SequenceSoundContainer.ApiToSetupElements(elements))
       expect((results[0] as any).delayInMs).toBe(1500)
     })
 
@@ -297,17 +358,18 @@ describe('SequenceSoundContainer', () => {
       const elements: SoundGroupSequenceElement[] = [
         { type: 'delay', id: makeSeqId(1), msToDelay: 'bad' as unknown as number }
       ]
-      const getSounds = vi.fn()
-      const results = await Promise.all(SequenceSoundContainer.ApiToSetupElements(elements, getSounds))
+      const results = await Promise.all(SequenceSoundContainer.ApiToSetupElements(elements))
       expect((results[0] as any).delayInMs).toBe(0)
     })
 
     it('calls getSounds and converts a group element', async () => {
       const gid = makeGroupId(1)
-      const elements: SoundGroupSequenceElement[] = [{ type: 'group', id: makeSeqId(1), groupID: gid }]
+      const elements: SoundGroupSequenceElement[] = [
+        { type: 'group', id: makeSeqId(1), groupID: gid }
+      ]
       const getSounds = vi.fn().mockResolvedValue({ variant: 'Default', sounds: [makeEffect()] })
 
-      const results = await Promise.all(SequenceSoundContainer.ApiToSetupElements(elements, getSounds))
+      const results = await Promise.all(SequenceSoundContainer.ApiToSetupElements(elements))
       expect(getSounds).toHaveBeenCalledWith(gid)
       expect(results[0]).toMatchObject({ type: 'group', groupID: gid, variant: 'Default' })
     })
@@ -329,8 +391,20 @@ describe('SequenceSoundContainer', () => {
       const sc = new SequenceSoundContainer(
         {
           effectGroups: [
-            { type: 'group', id: id1, groupID: makeGroupId(1), effects: [makeEffect()], variant: 'Default' },
-            { type: 'group', id: id2, groupID: makeGroupId(2), effects: [makeEffect()], variant: 'Default' }
+            {
+              type: 'group',
+              id: id1,
+              groupID: makeGroupId(1),
+              effects: [makeEffect()],
+              variant: 'Default'
+            },
+            {
+              type: 'group',
+              id: id2,
+              groupID: makeGroupId(2),
+              effects: [makeEffect()],
+              variant: 'Default'
+            }
           ]
         },
         2

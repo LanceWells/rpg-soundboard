@@ -4,11 +4,11 @@ import { SequenceEntry } from './sequenceEntry'
 import { SequenceElementID } from 'src/apis/audio/types/items'
 import { v4 } from 'uuid'
 import { SequenceSoundContainer } from '@renderer/utils/soundContainer/variants/sequence'
-import { useAudioStore } from '@renderer/stores/audio/audioStore'
 import { useRef, useState } from 'react'
 import { Ctx } from '@renderer/rpgAudioEngine'
 import { SoundIcon, StopIcon } from '@renderer/assets/icons'
 import { produce } from 'immer'
+import { GroupID } from 'src/apis/audio/types/groups'
 
 /**
  * Renders the ordered list of sequence elements with controls to add delays and preview playback.
@@ -82,14 +82,12 @@ function PreviewButton(props: PreviewButtonProps) {
   const { watch } = useFormContext<FormInput>()
   const sequenceElements = watch('request.sequence')
 
-  const getSounds = useAudioStore((store) => store.getSounds)
-
   const [isGroupPlaying, setIsGroupPlaying] = useState(false)
 
   const previewContainerRef = useRef<SequenceSoundContainer | null>(null)
 
   const previewSound = async () => {
-    const effectPromises = SequenceSoundContainer.ApiToSetupElements(sequenceElements, getSounds)
+    const effectPromises = SequenceSoundContainer.ApiToSetupElements(sequenceElements)
 
     const effects = await Promise.all(effectPromises)
 
@@ -103,7 +101,7 @@ function PreviewButton(props: PreviewButtonProps) {
           setIsElementPlaying(sequenceElementID, false)
         },
         stoppedHandler: {
-          id: '',
+          id: '' as GroupID,
           handler: () => setIsGroupPlaying(false)
         }
       },

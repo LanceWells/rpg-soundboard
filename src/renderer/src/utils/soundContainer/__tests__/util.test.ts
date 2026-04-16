@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import type { SoundEffectWithPlayerDetails } from 'src/apis/audio/types/groups'
 import type { EffectID } from 'src/apis/audio/types/effects'
 

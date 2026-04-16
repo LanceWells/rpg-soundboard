@@ -83,12 +83,23 @@ function makeGroupId(n: number): GroupID {
 
 const baseIcon = { type: 'svg' as const, name: 'moon', foregroundColor: '#ffffff' }
 
-function makeSourceGroup(id: GroupID, variant: ISoundGroup['variant'] = 'Default'): SoundGroupSource {
+function makeSourceGroup(
+  id: GroupID,
+  variant: ISoundGroup['variant'] = 'Default'
+): SoundGroupSource {
   return { type: 'source', id, name: 'Test', icon: baseIcon, variant, tags: [], effects: [] }
 }
 
 function makeSequenceGroup(id: GroupID): SoundGroupSequence {
-  return { type: 'sequence', id, name: 'Seq', icon: baseIcon, variant: 'Sequence', tags: [], sequence: [] }
+  return {
+    type: 'sequence',
+    id,
+    name: 'Seq',
+    icon: baseIcon,
+    variant: 'Sequence',
+    tags: [],
+    sequence: []
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -144,42 +155,9 @@ function createStore(groups: ISoundGroup[] = []) {
 // ---------------------------------------------------------------------------
 describe('SoundSlice', () => {
   describe('initial state', () => {
-    it('isInCave starts as false', () => {
-      const store = createStore()
-      expect(store.getState().isInCave).toBe(false)
-    })
-
     it('activeSoundtrack starts as null', () => {
       const store = createStore()
       expect(store.getState().activeSoundtrack).toBeNull()
-    })
-  })
-
-  describe('toggleInCave()', () => {
-    it('toggles isInCave from false to true', () => {
-      const store = createStore()
-      store.getState().toggleInCave()
-      expect(store.getState().isInCave).toBe(true)
-    })
-
-    it('toggles isInCave back to false on second call', () => {
-      const store = createStore()
-      store.getState().toggleInCave()
-      store.getState().toggleInCave()
-      expect(store.getState().isInCave).toBe(false)
-    })
-  })
-
-  describe('soundCtx()', () => {
-    it('returns Effectless (2) when isInCave is false', () => {
-      const store = createStore()
-      expect(store.getState().soundCtx()).toBe(2)
-    })
-
-    it('returns Environmental (0) when isInCave is true', () => {
-      const store = createStore()
-      store.getState().toggleInCave()
-      expect(store.getState().soundCtx()).toBe(0)
     })
   })
 
@@ -299,7 +277,13 @@ describe('SoundSlice', () => {
     it('updates activeSoundtrack.volume when active', async () => {
       const store = createStore()
       store.setState({
-        activeSoundtrack: { groupID: makeGroupId(1), icon: baseIcon, groupName: 'Test', effectName: 'Song', volume: 100 }
+        activeSoundtrack: {
+          groupID: makeGroupId(1),
+          icon: baseIcon,
+          groupName: 'Test',
+          effectName: 'Song',
+          volume: 100
+        }
       })
 
       store.getState().setMusicVolume(80)

@@ -98,11 +98,6 @@ describe('GroupSlice', () => {
       expect(store.getState().pinnedSearches).toEqual(['combat', 'tavern'])
     })
 
-    it('initializes playingGroups as empty', () => {
-      const store = createStore()
-      expect(store.getState().playingGroups).toEqual([])
-    })
-
     it('initializes searchText as empty string', () => {
       const store = createStore()
       expect(store.getState().searchText).toBe('')
