@@ -52,9 +52,6 @@ export abstract class AbstractSoundManager<TContainer extends ISoundContainer>
     sound.forEach((s) => {
       s.Stop()
     })
-
-    this._activeSounds.delete(groupID)
-    // this._anySoundsDoneListeners.forEach((l) => l(this))
   }
 
   on(listenOn: ManagerListenerType, callback: (e: IRpgAudioManager) => void) {
