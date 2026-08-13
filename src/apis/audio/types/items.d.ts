@@ -1,8 +1,6 @@
 import type { SupportedFileTypes } from '../supportedFileTypes'
 import type { SoundVariants } from './soundVariants'
 import type { EffectID } from './effects'
-import type { BoardID } from './boards'
-import type { CategoryID } from './categories'
 import { GroupID } from './groups'
 
 /**

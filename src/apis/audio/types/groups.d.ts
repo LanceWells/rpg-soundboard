@@ -2,7 +2,6 @@ import type {
   SoundGroupSourceEditableFields,
   SoundGroupSource,
   SoundEffect,
-  SoundGroupReferenceEditableFields,
   SoundGroupSequenceEditableFields,
   SoundGroupSequence,
   ISoundGroup

@@ -6,6 +6,5 @@ import { vi } from 'vitest'
 const TEST_APP_DATA = path.resolve(__dirname, '../../test-data')
 
 vi.mock('../utils/paths', () => ({
-  GetAppDataPath: () => TEST_APP_DATA,
-  GetCwd: () => ''
+  GetAppDataPath: () => TEST_APP_DATA
 }))

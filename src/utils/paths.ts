@@ -9,7 +9,3 @@ export function GetAppDataPath(): string {
 
   return path.join(appDataPath, 'rpg-soundboard')
 }
-
-export function GetCwd(): string {
-  return process.env.PWD ?? ''
-}

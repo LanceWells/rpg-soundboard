@@ -2,76 +2,67 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { create } from 'zustand'
 import type { ISoundGroup, SoundGroupSource, SoundGroupSequence } from 'src/apis/audio/types/items'
 import type { GroupID } from 'src/apis/audio/types/groups'
-import type { EffectID } from 'src/apis/audio/types/effects'
 
 // ---------------------------------------------------------------------------
-// Mock @renderer/rpgAudioEngine so Ctx enum loads without the real audio chain
+// Mock @renderer/rpgAudioEngine — prevents real AudioContext instantiation
 // ---------------------------------------------------------------------------
 vi.mock('@renderer/rpgAudioEngine', () => ({
-  RpgAudio: vi.fn().mockImplementation(function (this: any) {
-    this.State = 0
-    this.play = vi.fn().mockResolvedValue(undefined)
-    this.stop = vi.fn()
-    this.fade = vi.fn()
-    this.on = vi.fn()
-    this.getDuration = vi.fn().mockResolvedValue(5)
-    this.setVolume = vi.fn()
-  }),
+  RpgAudio: vi.fn(),
   Ctx: { Environmental: 0, Soundtrack: 1, Effectless: 2 },
   ListenerType: { Load: 0, Stop: 1, Play: 2 },
   RpgAudioState: { Loading: 0, Ready: 1, Playing: 2, Stopped: 3, Error: 4 }
 }))
 
 // ---------------------------------------------------------------------------
-// Mock sound container utilities — use function(this) so new works
+// Mock SoundscapeManager — soundSlice delegates all playback to it
 // ---------------------------------------------------------------------------
-const mockContainers = vi.hoisted(() => {
-  const created: any[] = []
+const mockSoundscapeState = vi.hoisted(() => {
+  let inst: any = null
 
-  function createContainerProps(variant = 'Default') {
-    return {
-      Variant: variant,
-      Volume: 100,
-      LoadedEffectID: 'eff-aaa-bbb-ccc-ddd-eee' as EffectID,
-      Play: vi.fn(),
-      Stop: vi.fn(),
-      ChangeVolume: vi.fn(),
-      Fade: vi.fn(),
-      GetDuration: vi.fn().mockResolvedValue(5),
-      on: vi.fn(),
-      playNextSong: vi.fn().mockResolvedValue(undefined),
-      getActiveSong: vi.fn().mockReturnValue({ name: 'Test Song', targetVolume: 100, audio: {} })
+  const MockSoundscapeManager = vi.fn().mockImplementation(function (this: any) {
+    const listeners: Record<number, ((e: any) => void)[]> = {}
+    this.play = vi.fn().mockResolvedValue(undefined)
+    this.stop = vi.fn()
+    this.playingGroups = vi.fn().mockReturnValue([])
+    this.playNextSong = vi.fn()
+    this.setMusicVolume = vi.fn()
+    this.fade = vi.fn()
+    this.on = vi.fn().mockImplementation((type: number, cb: (e: any) => void) => {
+      listeners[type] = listeners[type] ?? []
+      listeners[type].push(cb)
+      return this // on() returns this for chaining
+    })
+    this._fire = (type: number) => {
+      listeners[type]?.forEach((cb) => cb(this))
     }
-  }
-
-  // NewSoundContainer is a factory (no `new`), so arrow function is correct
-  const MockNewSoundContainer = vi.fn().mockImplementation(() => {
-    const c = createContainerProps()
-    created.push(c)
-    return c
+    this._activeSoundtrack = null
+    Object.defineProperty(this, 'ActiveSoundtrack', {
+      get() {
+        return this._activeSoundtrack
+      },
+      configurable: true
+    })
+    Object.defineProperty(this, 'ActiveSoundtrackID', {
+      get() {
+        return this._activeSoundtrack?.id ?? null
+      },
+      configurable: true
+    })
+    inst = this
   })
-
-  const MockSequenceSoundContainerFn = vi.fn().mockImplementation(function (this: any) {
-    Object.assign(this, createContainerProps('Sequence'))
-    this.Init = vi.fn().mockResolvedValue(this)
-    created.push(this)
-  })
-  ;(MockSequenceSoundContainerFn as any).ApiToSetupElements = vi.fn().mockReturnValue([])
 
   return {
-    created,
-    createContainerProps,
-    MockNewSoundContainer,
-    MockSequenceSoundContainer: MockSequenceSoundContainerFn
+    MockSoundscapeManager,
+    getInstance: () => inst,
+    reset() {
+      inst = null
+      MockSoundscapeManager.mockClear()
+    }
   }
 })
 
-vi.mock('@renderer/utils/soundContainer/util', () => ({
-  NewSoundContainer: mockContainers.MockNewSoundContainer
-}))
-
-vi.mock('@renderer/utils/soundContainer/variants/sequence', () => ({
-  SequenceSoundContainer: mockContainers.MockSequenceSoundContainer
+vi.mock('@renderer/rpgAudioEngine/manager/soundscapeManager', () => ({
+  SoundscapeManager: mockSoundscapeState.MockSoundscapeManager
 }))
 
 // ---------------------------------------------------------------------------
@@ -109,6 +100,8 @@ type AudioMock = { Groups: Record<string, ReturnType<typeof vi.fn>> }
 let mockAudio: AudioMock
 
 beforeEach(() => {
+  mockSoundscapeState.reset()
+
   mockAudio = {
     Groups: {
       GetAll: vi.fn().mockReturnValue({ groups: [] }),
@@ -124,10 +117,6 @@ beforeEach(() => {
     }
   }
   vi.stubGlobal('audio', mockAudio)
-  mockContainers.created.length = 0
-  mockContainers.MockNewSoundContainer.mockClear()
-  mockContainers.MockSequenceSoundContainer.mockClear()
-  ;(mockContainers.MockSequenceSoundContainer as any).ApiToSetupElements.mockClear()
 })
 
 afterEach(() => {
@@ -162,131 +151,88 @@ describe('SoundSlice', () => {
   })
 
   describe('playGroup()', () => {
-    it('adds groupID to playingGroups after playing a source group', async () => {
+    it('delegates to soundscape.play() with the groupID', async () => {
       const gid = makeGroupId(1)
-      const group = makeSourceGroup(gid)
-      const store = createStore([group])
-
-      mockAudio.Groups.Get.mockReturnValue({ group })
-      mockAudio.Groups.GetSounds.mockResolvedValue({ variant: 'Default', sounds: [] })
-
+      const store = createStore()
       await store.getState().playGroup(gid)
-
-      expect(store.getState().playingGroups).toContain(gid)
+      expect(mockSoundscapeState.getInstance().play).toHaveBeenCalledWith(gid)
     })
 
-    it('calls Play() on the created sound container', async () => {
+    it('updates playingGroups when the soundscape fires AnySoundsStarted', () => {
       const gid = makeGroupId(1)
-      const group = makeSourceGroup(gid)
-      const store = createStore([group])
-
-      mockAudio.Groups.Get.mockReturnValue({ group })
-      mockAudio.Groups.GetSounds.mockResolvedValue({ variant: 'Default', sounds: [] })
-
-      await store.getState().playGroup(gid)
-
-      expect(mockContainers.created[0].Play).toHaveBeenCalledTimes(1)
+      const store = createStore()
+      const soundscape = mockSoundscapeState.getInstance()
+      soundscape.playingGroups.mockReturnValue([gid])
+      soundscape._fire(ManagerListenerType.AnySoundsStarted)
+      expect(store.getState().playingGroups).toContain(gid)
     })
 
     it('does nothing when group is not found', async () => {
       const store = createStore()
       mockAudio.Groups.Get.mockReturnValue({ group: undefined })
-
       await store.getState().playGroup(makeGroupId(99))
-
+      // soundscape.play() is still called — routing/guard is inside SoundscapeManager
       expect(store.getState().playingGroups).toHaveLength(0)
     })
 
-    it('handles a sequence group by using SequenceSoundContainer', async () => {
+    it('delegates play to soundscape for sequence groups', async () => {
       const gid = makeGroupId(1)
       const group = makeSequenceGroup(gid)
       const store = createStore([group])
-
-      mockAudio.Groups.Get.mockReturnValue({ group })
-      ;(mockContainers.MockSequenceSoundContainer as any).ApiToSetupElements.mockReturnValue([])
-
       await store.getState().playGroup(gid)
-
-      expect(mockContainers.MockSequenceSoundContainer).toHaveBeenCalledTimes(1)
-      expect(store.getState().playingGroups).toContain(gid)
+      expect(mockSoundscapeState.getInstance().play).toHaveBeenCalledWith(gid)
     })
 
-    it('stops existing soundtracks when playing a new soundtrack', async () => {
-      const gid1 = makeGroupId(1)
-      const gid2 = makeGroupId(2)
-      const soundtrack1 = makeSourceGroup(gid1, 'Soundtrack')
-      const soundtrack2 = makeSourceGroup(gid2, 'Soundtrack')
-      const store = createStore([soundtrack1, soundtrack2])
-
-      // Use per-ID routing so getGroup(gid1) still returns soundtrack1 after gid2 is played
-      mockAudio.Groups.Get.mockImplementation(({ groupID }: { groupID: GroupID }) => {
-        if (groupID === gid1) return { group: soundtrack1 }
-        if (groupID === gid2) return { group: soundtrack2 }
-        return { group: undefined }
-      })
-      mockAudio.Groups.GetSounds.mockResolvedValue({ variant: 'Soundtrack', sounds: [] })
-
-      await store.getState().playGroup(gid1)
-      const container1 = mockContainers.created[0]
-
-      await store.getState().playGroup(gid2)
-
-      // First container should have been stopped when the second soundtrack started
-      expect(container1.Stop).toHaveBeenCalled()
+    it('delegates play to soundscape for soundtrack groups', async () => {
+      const gid = makeGroupId(1)
+      const group = makeSourceGroup(gid, 'Soundtrack')
+      const store = createStore([group])
+      await store.getState().playGroup(gid)
+      expect(mockSoundscapeState.getInstance().play).toHaveBeenCalledWith(gid)
     })
   })
 
   describe('stopGroup()', () => {
-    it('calls Stop() on all handles for the group', async () => {
+    it('delegates to soundscape.stop() with the groupID', () => {
       const gid = makeGroupId(1)
-      const group = makeSourceGroup(gid)
-      const store = createStore([group])
-
-      mockAudio.Groups.Get.mockReturnValue({ group })
-      mockAudio.Groups.GetSounds.mockResolvedValue({ variant: 'Default', sounds: [] })
-
-      await store.getState().playGroup(gid)
-      const container = mockContainers.created[0]
-
+      const store = createStore()
       store.getState().stopGroup(gid)
-
-      expect(container.Stop).toHaveBeenCalled()
+      expect(mockSoundscapeState.getInstance().stop).toHaveBeenCalledWith(gid)
     })
 
-    it('does nothing if the group has no active handles', () => {
+    it('updates playingGroups when the soundscape fires AnySoundsStopped', () => {
+      const gid = makeGroupId(1)
       const store = createStore()
-      expect(() => store.getState().stopGroup(makeGroupId(99))).not.toThrow()
+      const soundscape = mockSoundscapeState.getInstance()
+      soundscape.playingGroups.mockReturnValue([gid])
+      soundscape._fire(ManagerListenerType.AnySoundsStarted)
+      soundscape.playingGroups.mockReturnValue([])
+      soundscape._fire(ManagerListenerType.AnySoundsStopped)
+      expect(store.getState().playingGroups).toHaveLength(0)
     })
   })
 
   describe('setMusicVolume()', () => {
-    it('calls ChangeVolume on all active soundtrack containers', async () => {
+    it('delegates to soundscape.setMusicVolume()', () => {
+      const store = createStore()
+      store.getState().setMusicVolume(75)
+      expect(mockSoundscapeState.getInstance().setMusicVolume).toHaveBeenCalledWith(75)
+    })
+
+    it('updates activeSoundtrack when EffectUpdated fires with an active soundtrack', () => {
       const gid = makeGroupId(1)
       const group = makeSourceGroup(gid, 'Soundtrack')
       const store = createStore([group])
+      const soundscape = mockSoundscapeState.getInstance()
 
       mockAudio.Groups.Get.mockReturnValue({ group })
-      mockAudio.Groups.GetSounds.mockResolvedValue({ variant: 'Soundtrack', sounds: [] })
-      await store.getState().playGroup(gid)
+      soundscape._activeSoundtrack = {
+        id: gid,
+        getActiveSong: vi.fn().mockReturnValue({ name: 'Test Song', targetVolume: 80, audio: {} }),
+        Volume: 80
+      }
 
-      store.getState().setMusicVolume(150)
-
-      expect(mockContainers.created[0].ChangeVolume).toHaveBeenCalledWith(150)
-    })
-
-    it('updates activeSoundtrack.volume when active', async () => {
-      const store = createStore()
-      store.setState({
-        activeSoundtrack: {
-          groupID: makeGroupId(1),
-          icon: baseIcon,
-          groupName: 'Test',
-          effectName: 'Song',
-          volume: 100
-        }
-      })
-
-      store.getState().setMusicVolume(80)
+      soundscape._fire(ManagerListenerType.EffectUpdated)
 
       expect(store.getState().activeSoundtrack?.volume).toBe(80)
     })
@@ -305,3 +251,8 @@ describe('SoundSlice', () => {
     })
   })
 })
+
+// ---------------------------------------------------------------------------
+// Import ManagerListenerType after mocks so the enum is available in tests
+// ---------------------------------------------------------------------------
+import { ManagerListenerType } from '@renderer/rpgAudioEngine/manager/abstractSoundManager'

@@ -90,6 +90,7 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.useRealTimers()
+  vi.unstubAllGlobals()
 })
 
 // ---------------------------------------------------------------------------
@@ -368,9 +369,10 @@ describe('SequenceSoundContainer', () => {
         { type: 'group', id: makeSeqId(1), groupID: gid }
       ]
       const getSounds = vi.fn().mockResolvedValue({ variant: 'Default', sounds: [makeEffect()] })
+      vi.stubGlobal('audio', { Groups: { GetSounds: getSounds } })
 
       const results = await Promise.all(SequenceSoundContainer.ApiToSetupElements(elements))
-      expect(getSounds).toHaveBeenCalledWith(gid)
+      expect(getSounds).toHaveBeenCalledWith({ groupID: gid })
       expect(results[0]).toMatchObject({ type: 'group', groupID: gid, variant: 'Default' })
     })
   })
