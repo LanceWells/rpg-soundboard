@@ -41,7 +41,10 @@ function createWindow(): void {
 }
 
 protocol.registerSchemesAsPrivileged([
-  { scheme: 'aud', privileges: { stream: true, supportFetchAPI: true, bypassCSP: true } }
+  {
+    scheme: 'aud',
+    privileges: { stream: true, supportFetchAPI: true, bypassCSP: true, corsEnabled: true }
+  }
 ])
 
 // This method will be called when Electron has finished
