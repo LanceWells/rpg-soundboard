@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, ipcMain, protocol, net } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, protocol, net, session } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
@@ -69,6 +69,22 @@ app.whenReady().then(async () => {
     optimizer.watchWindowShortcuts(window)
   })
 
+  // Set a Content-Security-Policy on every response. This is done here (rather than
+  // via a <meta> tag in index.html) because dev needs to allow the Vite dev server's
+  // HMR websocket/eval, while the packaged build should be locked down to 'self'.
+  session.defaultSession.webRequest.onHeadersReceived((details, callback) => {
+    const csp = is.dev
+      ? "default-src 'self' http://localhost:* ws://localhost:*; script-src 'self' 'unsafe-eval' http://localhost:*; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' http://localhost:* ws://localhost:*"
+      : "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'"
+
+    callback({
+      responseHeaders: {
+        ...details.responseHeaders,
+        'Content-Security-Policy': [csp]
+      }
+    })
+  })
+
   // Add a protocol to access local files on the host machine.
   protocol.handle('aud', (request) => {
     const filePath = request.url.slice(`${AudProtocolPrefix}://`.length)
@@ -76,7 +92,7 @@ app.whenReady().then(async () => {
     const pathWithDir = join(configFilePath, filePath)
     const pathToFileUrl = url.pathToFileURL(pathWithDir)
 
-    return net.fetch(pathToFileUrl.toString())
+    return net.fetch(pathToFileUrl.toString(), { headers: request.headers })
   })
 
   // IPC test

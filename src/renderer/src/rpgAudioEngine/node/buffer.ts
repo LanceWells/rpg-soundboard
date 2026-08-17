@@ -60,8 +60,10 @@ export class RpgAudioBufferNode extends AbstractPlayableRpgAudioNode {
   }
 
   async stop(): Promise<void> {
+    // Don't call handleStop() here directly - calling AudioBufferSourceNode.stop() always
+    // triggers the 'ended' listener registered in the constructor, which already invokes
+    // handleStop(). Calling it again here would fire Stop listeners twice per stop.
     this._sourceNode.stop()
-    this.handleStop()
   }
 
   async rate(rate: number): Promise<void> {

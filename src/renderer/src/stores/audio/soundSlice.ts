@@ -2,7 +2,7 @@ import { GetSoundsResponse, GroupID } from 'src/apis/audio/types/groups'
 import { StateCreator, StoreApi } from 'zustand'
 import { GroupSlice } from './groupSlice'
 import { SoundIcon } from 'src/apis/audio/types/items'
-import { SoundscapeManager } from '@renderer/rpgAudioEngine/manager/soundscapeManager'
+import { Conductor } from '@renderer/rpgAudioEngine/manager/soundscapeManager'
 import { ManagerListenerType } from '@renderer/rpgAudioEngine/manager/abstractSoundManager'
 
 /**
@@ -16,7 +16,7 @@ export interface SoundSlice {
   activeSoundtrack: SoundTrackDetails | null
   playNextSong: () => void
   setMusicVolume: (newVolume: number) => void
-  soundscape: SoundscapeManager
+  soundscape: Conductor
 }
 
 /**
@@ -37,7 +37,7 @@ export const createSoundSlice: StateCreator<SoundSlice & GroupSlice, [], [], Sou
   set,
   get
 ) => ({
-  soundscape: new SoundscapeManager()
+  soundscape: new Conductor()
     .on(ManagerListenerType.PlayNext, (mgr) => handleAlbumUpdate(mgr, set))
     .on(ManagerListenerType.AnySoundsStopped, (mgr) => updatePlayingGroups(mgr, set))
     .on(ManagerListenerType.AnySoundsStarted, (mgr) => updatePlayingGroups(mgr, set))
@@ -64,10 +64,7 @@ export const createSoundSlice: StateCreator<SoundSlice & GroupSlice, [], [], Sou
   }
 })
 
-function handleAlbumUpdate(
-  mgr: SoundscapeManager,
-  set: StoreApi<SoundSlice & GroupSlice>['setState']
-) {
+function handleAlbumUpdate(mgr: Conductor, set: StoreApi<SoundSlice & GroupSlice>['setState']) {
   const id = mgr.ActiveSoundtrackID
   if (id === null) {
     set({
@@ -103,10 +100,7 @@ function handleAlbumUpdate(
   })
 }
 
-function updatePlayingGroups(
-  mgr: SoundscapeManager,
-  set: StoreApi<SoundSlice & GroupSlice>['setState']
-) {
+function updatePlayingGroups(mgr: Conductor, set: StoreApi<SoundSlice & GroupSlice>['setState']) {
   set({
     playingGroups: mgr.playingGroups()
   })

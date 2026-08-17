@@ -89,7 +89,7 @@ vi.mock('../soundEffectManager', () => ({
 // Import under test (after mocks)
 // ---------------------------------------------------------------------------
 
-import { SoundscapeManager } from '../soundscapeManager'
+import { Conductor } from '../soundscapeManager'
 import { ManagerListenerType } from '../abstractSoundManager'
 
 // ---------------------------------------------------------------------------
@@ -104,7 +104,7 @@ const GRP_EFFECT = 'grp-eff-0000-0000-0000-0000' as GroupID
 // ---------------------------------------------------------------------------
 
 describe('SoundscapeManager', () => {
-  let mgr: SoundscapeManager
+  let mgr: Conductor
   let mockAudio: any
   let soundtrack: any
   let effects: any
@@ -120,7 +120,7 @@ describe('SoundscapeManager', () => {
     vi.stubGlobal('audio', mockAudio)
 
     // SoundscapeManager constructor creates the sub-managers; capture them after.
-    mgr = new SoundscapeManager()
+    mgr = new Conductor()
     soundtrack = mockManagerState.getSoundtrack()
     effects = mockManagerState.getEffects()
   })

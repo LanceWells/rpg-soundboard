@@ -5,15 +5,15 @@ import { SoundEffectManager } from './soundEffectManager'
 import { ISoundContainer, ISoundtrackContainer } from '@renderer/utils/soundContainer/interface'
 import { ManagerListenerType } from './abstractSoundManager'
 
-export class SoundscapeManager implements IRpgAudioManager {
+export class Conductor implements IRpgAudioManager {
   private _soundtracks: SoundtrackManager
   private _soundEffects: SoundEffectManager
 
-  private _allSoundsDoneListeners: ((e: SoundscapeManager) => void)[] = []
-  private _anySoundsDoneListeners: ((e: SoundscapeManager) => void)[] = []
-  private _playNextListeners: ((e: SoundscapeManager) => void)[] = []
-  private _anySoundsStartedListeners: ((e: SoundscapeManager) => void)[] = []
-  protected _anySoundsUpdatedListeners: ((e: SoundscapeManager) => void)[] = []
+  private _allSoundsDoneListeners: ((e: Conductor) => void)[] = []
+  private _anySoundsDoneListeners: ((e: Conductor) => void)[] = []
+  private _playNextListeners: ((e: Conductor) => void)[] = []
+  private _anySoundsStartedListeners: ((e: Conductor) => void)[] = []
+  protected _anySoundsUpdatedListeners: ((e: Conductor) => void)[] = []
 
   public get ActiveSoundtrack(): (ISoundContainer & ISoundtrackContainer) | null {
     return this._soundtracks.ActiveSoundtrack
@@ -80,7 +80,7 @@ export class SoundscapeManager implements IRpgAudioManager {
     this._anySoundsStartedListeners.forEach((l) => l(this))
   }
 
-  on(listenOn: ManagerListenerType, callback: (e: SoundscapeManager) => void): SoundscapeManager {
+  on(listenOn: ManagerListenerType, callback: (e: Conductor) => void): Conductor {
     switch (listenOn) {
       case ManagerListenerType.AllSoundsStopped:
         this._allSoundsDoneListeners.push(callback)

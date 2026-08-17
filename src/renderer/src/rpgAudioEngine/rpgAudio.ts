@@ -1,5 +1,5 @@
 import { AudioCtx, AudioProcessing } from './ctx'
-import { RpgAudioBufferNode } from './node'
+import { RpgAudioBufferNode, RpgAudioElementNode } from './node'
 import { RpgAudioConfig, ListenerType, Ctx, IRpgAudioPlayableNode, RpgAudioState } from './types'
 
 /**
@@ -37,16 +37,16 @@ export class RpgAudio {
       this.on(ListenerType.Stop, onStop)
     }
 
-    // if (config.isLargeFile) {
-    //   this._sourceNode = new RpgAudioElementNode(
-    //     this.getCtx(),
-    //     config.path,
-    //     config.loop,
-    //     config.format
-    //   )
-    // } else {
-    this._sourceNode = new RpgAudioBufferNode(this.getCtx(), config.path, config.loop)
-    // }
+    if (config.isLargeFile) {
+      this._sourceNode = new RpgAudioElementNode(
+        this.getCtx(),
+        config.path,
+        config.loop,
+        config.format
+      )
+    } else {
+      this._sourceNode = new RpgAudioBufferNode(this.getCtx(), config.path, config.loop)
+    }
 
     this._sourceNode.on('load', this.handleLoad.bind(this))
     this._sourceNode.on('play', this.handlePlay.bind(this))

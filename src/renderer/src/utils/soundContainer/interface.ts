@@ -105,5 +105,8 @@ export type SoundtrackEvents = keyof typeof SoundtrackEvents
 export interface ISoundtrackContainer {
   playNextSong(): Promise<void>
   getActiveSong(): RpgAudioContainer | undefined
-  on(event: SoundtrackEvents, handler: Handler<GroupID, ISoundContainer & ISoundtrackContainer>)
+  on(
+    event: SoundtrackEvents,
+    handler: Handler<GroupID, ISoundContainer & ISoundtrackContainer>
+  ): void
 }
