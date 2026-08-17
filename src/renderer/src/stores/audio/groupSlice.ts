@@ -5,12 +5,10 @@ import {
   SoundGroupSequence,
   SoundGroupSequenceEditableFields,
   SoundGroupSource,
-  SoundGroupSourceEditableFields,
   SoundGroupTypes
 } from 'src/apis/audio/types/items'
 import { StateCreator } from 'zustand'
 import { produce } from 'immer'
-import { isSequenceGroup, isSourceGroup } from '@renderer/utils/typePredicates'
 import fuse from 'fuse.js'
 import { ColorOptions } from '@renderer/components/forms/sound/types'
 
@@ -21,15 +19,9 @@ export interface GroupSlice {
    */
   playingGroups: GroupID[]
   getGroup: (groupID: GroupID) => ISoundGroup
-  getGroupSource: (groupID: GroupID) => SoundGroupSource
-  getGroupSequence: (groupID: GroupID) => SoundGroupSequence
   addGroup: IAudioApi['Groups']['Create']
   addSequence: IAudioApi['Groups']['CreateSequence']
   updateGroup: IAudioApi['Groups']['Update']
-  updateGroupPartial: (
-    groupID: GroupID,
-    updatedFields: Partial<SoundGroupSourceEditableFields>
-  ) => void
   updateSequencePartial: (
     groupID: GroupID,
     updatedFields: Partial<SoundGroupSequenceEditableFields>
@@ -87,30 +79,6 @@ export const createGroupSlice: StateCreator<GroupSlice, [], [], GroupSlice> = (s
 
     return group
   },
-  getGroupSequence(request) {
-    const group = window.audio.Groups.Get({ groupID: request }).group
-    if (!group) {
-      throw new Error(`Could not find a group with id ${request}`)
-    }
-
-    if (!isSequenceGroup(group)) {
-      throw new Error(`Found a group with id ${request}, but it isn't a sequence type`)
-    }
-
-    return group
-  },
-  getGroupSource(request) {
-    const group = window.audio.Groups.Get({ groupID: request }).group
-    if (!group) {
-      throw new Error(`Could not find a group with id ${request}`)
-    }
-
-    if (!isSourceGroup(group)) {
-      throw new Error(`Found a group with id ${request}, but it isn't a sequence type`)
-    }
-
-    return group
-  },
   updateGroup(req) {
     const updatedGroup = window.audio.Groups.Update(req)
 
@@ -121,29 +89,6 @@ export const createGroupSlice: StateCreator<GroupSlice, [], [], GroupSlice> = (s
     })
 
     return updatedGroup
-  },
-  updateGroupPartial(groupID, updatedFields) {
-    const currentGroup = window.audio.Groups.Get({
-      groupID
-    }).group
-
-    if (!currentGroup) {
-      return
-    }
-
-    const newGroup = produce(currentGroup, (draft) => {
-      Object.assign(draft, updatedFields)
-    }) as SoundGroupSource
-
-    window.audio.Groups.Update({
-      groupID,
-      ...newGroup
-    })
-    get().searchForGroups('', ['sequence', 'source'])
-
-    set({
-      groups: window.audio.Groups.GetAll().groups
-    })
   },
   updateSequencePartial(groupID, updatedFields) {
     const currentGroup = window.audio.Groups.Get({
